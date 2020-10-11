@@ -10,16 +10,26 @@
     int coluna=1;
     int flag=0;
     int flagError=0;
+    int erroC = 0, erroL =0;
 %}
-%X COMMENT COMMENT2
+%X COMMENT
 ponto           [,.]
 numero         [0-9]+
 signal         [+-]
 exp [eE]
-plica   "'"
+nExp    {exp}{signal}?{numero}
+SPACE           ([ ]|"\t")
+ENTER   \\n 
+ASPAS           \\\"
+PLICA           \\\'
+SEQUENCIA       \\[0-7]{1,3}
+TAB             \\t
+CHRLIT     \'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB})\'
+REALLIT (({numero}".")|({numero}"."{numero})|{numero}"."{numero}{nExp}|{numero}"."{nExp}|"."{numero}{nExp}|{numero}{nExp}|"."{numero})
+ENDOFFILE <<EOF>>
+RESERVED            "auto"|"break"|"const"|"continue"|"asm"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"register"|"long"|"signed"|"unsigned"|"sizeof"|"static"|"struct"|"switch"|"case"|"default"|"typedef"|"union"|"volatile"|"break"|"restrict"|"inline"|"["|"]"|"++"|"--"|("__"[a-zA-Z0-9]+)|("_"[A-Z][a-zA-Z0-9]*)
 ID                  [a-zA-Z_][a-zA-Z0-9_]*
 INTLIT              [0-9]+
-CHARLIT             {plica}[a-zA-z]|"\n"|"\t"|"\\"|"\’"|"\"|"\"{plica}
 LPAR                "("
 LT                  "<"
 MINUS               "-"
@@ -32,6 +42,7 @@ RBRACE              "}"
 RPAR                ")"
 SEMI                ";"
 ELSE                "else"
+IF  "if"
 CHAR                "char"
 WHILE      "while"
 INT         "int"
@@ -52,56 +63,57 @@ GE  ">="
 GT  ">"
 LBRACE  "{"
 LE  "<="
-RESERVED            "auto"|"break"|"const"|"continue"|"asm"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"register"|"long"|"signed"|"unsigned"|"sizeof"|"static"|"struct"|"switch"|"case"|"default"|"typedef"|"union"|"volatile"|"break"|"restrict"|"inline"|"["|"]"|"++"|"--"|("__"[a-zA-Z0-9]+)|("_"[A-Z][a-zA-Z0-9]*)
 %%
-\/\*              { BEGIN COMMENT;}
-\/\/              { BEGIN COMMENT2;}
-<COMMENT>.        {;}
-<COMMENT>\n       {;}
-<COMMENT>\*\/     { BEGIN 0;}
-<COMMENT2>.        {;}
-<COMMENT2>\n       {BEGIN 0;}
-{signal}?{numero}{ponto}{numero} {printf("REALLIT\n");}
-{signal}?{numero}{exp}{signal}?{numero} {printf("REALLIT\n");}
-{signal}?{numero}{ponto}{numero}{exp}{signal}{numero} {printf("REALLIT\n");}
-{CHAR}  {if(flag)printf("CHAR\n");}
-{ELSE} {if(flag)printf("ELSE\n");}
-{WHILE} {if(flag)printf("WHILE\n");}
-{INT}   {if(flag)printf("INT\n");}
-{SHORT} {if(flag)printf("SHORT\n");}
-{DOUBLE} {if(flag)printf("DOUBLE\n");}
-{RETURN}   {if(flag)printf("RETURN\n");}
-{VOID} {if(flag)printf("VOID\n");}
-{BAND} {if(flag)printf("BITWISEAND\n");}
-{BOR} {if(flag)printf("BITWISEOR\n");}
-{BXOR} {if(flag)printf("BITWISEXOR\n");}
-{AND}    {if(flag)printf("AND\n");}
-{ASSIGN} {if(flag)printf("ASSIGN\n");}
-{MUL}   {if(flag)printf("MUL\n");}
-{COMMA} {if(flag)printf("COMMA\n");}
-{DIV} {if(flag)printf("DIV\n");}
-{EQ}   {if(flag)printf("EQ\n");}
-{GE}    {if(flag)printf("GE\n");}
-{GT} {if(flag)printf("GT\n");}
-{LBRACE} {if(flag)printf("LBRACE\n");}
-{LE} {if(flag)printf("LE\n");}
-{INTLIT}  {if(flag)printf("INTLIT(%s)\n",yytext);}  
-{ID}    {if(flag)printf("ID(%s)\n",yytext);}
-{CHARLIT}    {if(flag)printf("CHARLIT(%s)\n",yytext);}
-{LPAR}  {if(flag)printf("LPAR\n");}
-{LT}                 {if(flag)printf("LT\n");}
-{MINUS}             {if(flag)printf("MINUS\n");}
-{MOD}                {if(flag)printf("MOD\n");}
-{NE}                  {if(flag)printf("NE\n");}
-{NOT}                 {if(flag)printf("NOT\n");}
-{OR}                  {if(flag)printf("OR\n");}
-{PLUS}               {if(flag)printf("PLUS\n");}
-{RBRACE}             {if(flag)printf("RBRACE\n");}
-{RPAR}                {if(flag)printf("RPAR\n");}
-{SEMI}  {if(flag)printf("SEMI\n");}
-.	;
-\n	;
-%%
+\/\*              {BEGIN COMMENT;erroC=coluna;erroL=linha;coluna+=yyleng;}
+\/\/.*            {coluna+=yyleng;}         
+<COMMENT>.        {coluna+=yyleng;}
+<COMMENT>\n       {linha++;coluna=1;}
+<COMMENT>\*\/     {BEGIN 0;coluna+=yyleng;}
+<COMMENT><<EOF>>   {printf("Line %d, col %d: unterminated comment\n",erroL,erroC); BEGIN 0;}
+{REALLIT}   {printf("REALLIT(%s)\n",yytext);coluna+=yyleng;}
+{CHAR}  {if(flag)printf("CHAR\n");coluna+=yyleng;}
+{ELSE} {if(flag)printf("ELSE\n");coluna+=yyleng;}
+{IF} {if(flag)printf("IF\n");coluna+=yyleng;}
+{WHILE} {if(flag)printf("WHILE\n");coluna+=yyleng;}
+{INT}   {if(flag)printf("INT\n");coluna+=yyleng;}
+{DOUBLE}   {if(flag)printf("DOUBLE\n");coluna+=yyleng;}
+{SHORT} {if(flag)printf("SHORT\n");coluna+=yyleng;}
+{RETURN}   {if(flag)printf("RETURN\n");coluna+=yyleng;}
+{VOID} {if(flag)printf("VOID\n");coluna+=yyleng;}
+{BAND} {if(flag)printf("BITWISEAND\n");coluna+=yyleng;}
+{BOR} {if(flag)printf("BITWISEOR\n");coluna+=yyleng;}
+{BXOR} {if(flag)printf("BITWISEXOR\n");coluna+=yyleng;}
+{AND}    {if(flag)printf("AND\n");coluna+=yyleng;}
+{ASSIGN} {if(flag)printf("ASSIGN\n");coluna+=yyleng;}
+{MUL}   {if(flag)printf("MUL\n");coluna+=yyleng;}
+{COMMA} {if(flag)printf("COMMA\n");coluna+=yyleng;}
+{DIV} {if(flag)printf("DIV\n");coluna+=yyleng;}
+{EQ}   {if(flag)printf("EQ\n");coluna+=yyleng;}
+{GE}    {if(flag)printf("GE\n");coluna+=yyleng;}
+{GT} {if(flag)printf("GT\n");coluna+=yyleng;}
+{LBRACE} {if(flag)printf("LBRACE\n");coluna+=yyleng;}
+{LE} {if(flag)printf("LE\n");coluna+=yyleng;}
+{INTLIT}  {if(flag)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;} 
+{CHRLIT}    {if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
+{RESERVED}  {if(flag)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;}
+{ID}    {if(flag)printf("ID(%s)\n",yytext);coluna+=yyleng;}
+{LPAR}  {if(flag)printf("LPAR\n");coluna+=yyleng;}
+{LT}                 {if(flag)printf("LT\n");coluna+=yyleng;}
+{MINUS}             {if(flag)printf("MINUS\n");coluna+=yyleng;}
+{MOD}                {if(flag)printf("MOD\n");coluna+=yyleng;}
+{NE}                  {if(flag)printf("NE\n");coluna+=yyleng;}
+{NOT}                 {if(flag)printf("NOT\n");coluna+=yyleng;}
+{OR}                  {if(flag)printf("OR\n");coluna+=yyleng;}
+{PLUS}               {if(flag)printf("PLUS\n");coluna+=yyleng;}
+{RBRACE}             {if(flag)printf("RBRACE\n");coluna+=yyleng;}
+{RPAR}                {if(flag)printf("RPAR\n");coluna+=yyleng;}
+{SEMI}  {if(flag)printf("SEMI\n");coluna+=yyleng;}
+{SPACE} {coluna+=yyleng;}
+\'([^\n\'\\]|\\.)*\'  {printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
+\'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB})   {printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;}
+.   {printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
+\n|"\r\n"|"\r"    {linha++;coluna=1;}
+%%                  
 int main(int argc, char **argv)
 {
     if(argc>1){
