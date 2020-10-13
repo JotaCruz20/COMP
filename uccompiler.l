@@ -13,10 +13,10 @@
     int erroC = 0, erroL =0;
 %}
 %X COMMENT
-numero         [0-9]+
-signal         [+-]
+INTLIT         [0-9]+
+signal        [+-]
 exp [eE]
-nExp    {exp}{signal}?{numero}
+nExp    {exp}{signal}?{INTLIT}
 SPACE           ([ ]|"\t")
 ENTER   \\n 
 ASPAS           \\\"
@@ -25,11 +25,10 @@ PLICA           \\\'
 SEQUENCIA       \\[0-7]{1,3}
 TAB             \\t
 CHRLIT     ([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA})
-REALLIT     (({numero}".")|({numero}"."{numero})|{numero}"."{numero}{nExp}|{numero}"."{nExp}|"."{numero}{nExp}|{numero}{nExp}|"."{numero})
+REALLIT        (({INTLIT}".")|({INTLIT}"."{INTLIT})|{INTLIT}"."{INTLIT}{nExp}|{INTLIT}"."{nExp}|"."{INTLIT}{nExp}|{INTLIT}{nExp}|"."{INTLIT})
 ENDOFFILE   <<EOF>>
 RESERVED        "auto"|"break"|"const"|"continue"|"asm"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"register"|"long"|"signed"|"unsigned"|"sizeof"|"static"|"struct"|"switch"|"case"|"default"|"typedef"|"union"|"volatile"|"break"|"_Bool"|"_Imaginary"|"restrict"|"inline"|"_Complex"|"["|"]"|"++"|"--"
 ID                  [a-zA-Z_][a-zA-Z0-9_]*
-INTLIT              [0-9]+
 LPAR                "("
 LT                  "<"
 MINUS               "-"
@@ -70,7 +69,6 @@ LE  "<="
 <COMMENT>\n       {linha++;coluna=1;}
 <COMMENT>\*\/     {BEGIN 0;coluna+=yyleng;}
 <COMMENT><<EOF>>   {if(flagError)printf("Line %d, col %d: unterminated comment\n",erroL,erroC); BEGIN 0;}
-{REALLIT}   {printf("REALLIT(%s)\n",yytext);coluna+=yyleng;}
 {CHAR}  {if(flag)printf("CHAR\n");coluna+=yyleng;}
 {ELSE} {if(flag)printf("ELSE\n");coluna+=yyleng;}
 {IF} {if(flag)printf("IF\n");coluna+=yyleng;}
@@ -93,10 +91,6 @@ LE  "<="
 {GT} {if(flag)printf("GT\n");coluna+=yyleng;}
 {LBRACE} {if(flag)printf("LBRACE\n");coluna+=yyleng;}
 {LE} {if(flag)printf("LE\n");coluna+=yyleng;}
-{INTLIT}  {if(flag)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;} 
-\'{CHRLIT}\'    {if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
-{RESERVED}  {if(flag)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;}
-{ID}    {if(flag)printf("ID(%s)\n",yytext);coluna+=yyleng;}
 {LPAR}  {if(flag)printf("LPAR\n");coluna+=yyleng;}
 {LT}    {if(flag)printf("LT\n");coluna+=yyleng;}
 {MINUS} {if(flag)printf("MINUS\n");coluna+=yyleng;}
@@ -108,11 +102,16 @@ LE  "<="
 {RBRACE}             {if(flag)printf("RBRACE\n");coluna+=yyleng;}
 {RPAR}                {if(flag)printf("RPAR\n");coluna+=yyleng;}
 {SEMI}  {if(flag)printf("SEMI\n");coluna+=yyleng;}
-{SPACE} {coluna+=yyleng;/*flagError=1;if(printM)flag=1;*/}
-\'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA}|\\.)*\'  {if(flagError)printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;/*flagError=0;flag=0;*/}
-\'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA})*   {if(flagError)printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;/*flagError=0;flag=0;*/}
-.   {if(flagError)printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;/*flagError=0;flag=0;*/}
-\n|"\r\n"|"\r"    {linha++;coluna=1;/*flagError=1;if(printM)flag=1;*/}
+{SPACE} {coluna+=yyleng;}
+{RESERVED}  {if(flag)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;}
+{ID}    {if(flag)printf("ID(%s)\n",yytext);coluna+=yyleng;}
+{INTLIT}  {if(flag)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;}
+{REALLIT}   {printf("REALLIT(%s)\n",yytext);coluna+=yyleng;} 
+\'{CHRLIT}\'    {if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
+\'([^\n\'\\]|\\.)*\'  {printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
+\'([^\n\'\\]|\\.)*(\\)?    {printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;}
+\n|"\r\n"|"\r"    {linha++;coluna=1;}
+.   {if(flagError)printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
 %%                  
 int main(int argc, char **argv)
 {
@@ -123,14 +122,7 @@ int main(int argc, char **argv)
             flagError=1;
         }
     }
-    else if(argc>2){
-         if (argv[1][0]=='-' && argv[1][1]=='e' && argv[1][1]=='1'){
-            flagError=1;
-        }
-    }
-    else if(argc==1){
-        flagError=1;
-    }
+    flagError=1;
 yylex();
 return 0;
 }

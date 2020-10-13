@@ -10,4 +10,3 @@ long int multiplyNumbers(int n) {
     else
         return 1;
 }
-
