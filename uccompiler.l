@@ -8,12 +8,11 @@
     #include <stdlib.h>
     int linha=1;
     int coluna=1;
-    int flag=0;
+    int flag=0,printM=0;
     int flagError=0;
     int erroC = 0, erroL =0;
 %}
 %X COMMENT
-ponto           [,.]
 numero         [0-9]+
 signal         [+-]
 exp [eE]
@@ -21,13 +20,14 @@ nExp    {exp}{signal}?{numero}
 SPACE           ([ ]|"\t")
 ENTER   \\n 
 ASPAS           \\\"
+BARRA       \\\\
 PLICA           \\\'
 SEQUENCIA       \\[0-7]{1,3}
 TAB             \\t
-CHRLIT     \'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB})\'
-REALLIT (({numero}".")|({numero}"."{numero})|{numero}"."{numero}{nExp}|{numero}"."{nExp}|"."{numero}{nExp}|{numero}{nExp}|"."{numero})
-ENDOFFILE <<EOF>>
-RESERVED            "auto"|"break"|"const"|"continue"|"asm"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"register"|"long"|"signed"|"unsigned"|"sizeof"|"static"|"struct"|"switch"|"case"|"default"|"typedef"|"union"|"volatile"|"break"|"restrict"|"inline"|"["|"]"|"++"|"--"|("__"[a-zA-Z0-9]+)|("_"[A-Z][a-zA-Z0-9]*)
+CHRLIT     ([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA})
+REALLIT     (({numero}".")|({numero}"."{numero})|{numero}"."{numero}{nExp}|{numero}"."{nExp}|"."{numero}{nExp}|{numero}{nExp}|"."{numero})
+ENDOFFILE   <<EOF>>
+RESERVED        "auto"|"break"|"const"|"continue"|"asm"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"register"|"long"|"signed"|"unsigned"|"sizeof"|"static"|"struct"|"switch"|"case"|"default"|"typedef"|"union"|"volatile"|"break"|"_Bool"|"_Imaginary"|"restrict"|"inline"|"_Complex"|"["|"]"|"++"|"--"
 ID                  [a-zA-Z_][a-zA-Z0-9_]*
 INTLIT              [0-9]+
 LPAR                "("
@@ -42,7 +42,7 @@ RBRACE              "}"
 RPAR                ")"
 SEMI                ";"
 ELSE                "else"
-IF  "if"
+IF      "if"
 CHAR                "char"
 WHILE      "while"
 INT         "int"
@@ -69,7 +69,7 @@ LE  "<="
 <COMMENT>.        {coluna+=yyleng;}
 <COMMENT>\n       {linha++;coluna=1;}
 <COMMENT>\*\/     {BEGIN 0;coluna+=yyleng;}
-<COMMENT><<EOF>>   {printf("Line %d, col %d: unterminated comment\n",erroL,erroC); BEGIN 0;}
+<COMMENT><<EOF>>   {if(flagError)printf("Line %d, col %d: unterminated comment\n",erroL,erroC); BEGIN 0;}
 {REALLIT}   {printf("REALLIT(%s)\n",yytext);coluna+=yyleng;}
 {CHAR}  {if(flag)printf("CHAR\n");coluna+=yyleng;}
 {ELSE} {if(flag)printf("ELSE\n");coluna+=yyleng;}
@@ -94,13 +94,13 @@ LE  "<="
 {LBRACE} {if(flag)printf("LBRACE\n");coluna+=yyleng;}
 {LE} {if(flag)printf("LE\n");coluna+=yyleng;}
 {INTLIT}  {if(flag)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;} 
-{CHRLIT}    {if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
+\'{CHRLIT}\'    {if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
 {RESERVED}  {if(flag)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;}
 {ID}    {if(flag)printf("ID(%s)\n",yytext);coluna+=yyleng;}
 {LPAR}  {if(flag)printf("LPAR\n");coluna+=yyleng;}
-{LT}                 {if(flag)printf("LT\n");coluna+=yyleng;}
-{MINUS}             {if(flag)printf("MINUS\n");coluna+=yyleng;}
-{MOD}                {if(flag)printf("MOD\n");coluna+=yyleng;}
+{LT}    {if(flag)printf("LT\n");coluna+=yyleng;}
+{MINUS} {if(flag)printf("MINUS\n");coluna+=yyleng;}
+{MOD}               {if(flag)printf("MOD\n");coluna+=yyleng;}
 {NE}                  {if(flag)printf("NE\n");coluna+=yyleng;}
 {NOT}                 {if(flag)printf("NOT\n");coluna+=yyleng;}
 {OR}                  {if(flag)printf("OR\n");coluna+=yyleng;}
@@ -108,23 +108,28 @@ LE  "<="
 {RBRACE}             {if(flag)printf("RBRACE\n");coluna+=yyleng;}
 {RPAR}                {if(flag)printf("RPAR\n");coluna+=yyleng;}
 {SEMI}  {if(flag)printf("SEMI\n");coluna+=yyleng;}
-{SPACE} {coluna+=yyleng;}
-\'([^\n\'\\]|\\.)*\'  {printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
-\'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB})   {printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;}
-.   {printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
-\n|"\r\n"|"\r"    {linha++;coluna=1;}
+{SPACE} {coluna+=yyleng;/*flagError=1;if(printM)flag=1;*/}
+\'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA}|\\.)*\'  {if(flagError)printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;/*flagError=0;flag=0;*/}
+\'([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA})*   {if(flagError)printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;/*flagError=0;flag=0;*/}
+.   {if(flagError)printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;/*flagError=0;flag=0;*/}
+\n|"\r\n"|"\r"    {linha++;coluna=1;/*flagError=1;if(printM)flag=1;*/}
 %%                  
 int main(int argc, char **argv)
 {
     if(argc>1){
         if (argv[1][0]=='-' && argv[1][1]=='l'){
             flag=1;
+            printM=1;
+            flagError=1;
         }
     }
     else if(argc>2){
          if (argv[1][0]=='-' && argv[1][1]=='e' && argv[1][1]=='1'){
             flagError=1;
         }
+    }
+    else if(argc==1){
+        flagError=1;
     }
 yylex();
 return 0;
