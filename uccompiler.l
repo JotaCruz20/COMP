@@ -24,8 +24,8 @@ BARRA       \\\\
 PLICA           \\\'
 SEQUENCIA       \\[0-7]{1,3}
 TAB             \\t
-CHRLIT     ([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA})
 REALLIT        (({INTLIT}".")|({INTLIT}"."{INTLIT})|{INTLIT}"."{INTLIT}{nExp}|{INTLIT}"."{nExp}|"."{INTLIT}{nExp}|{INTLIT}{nExp}|"."{INTLIT})
+CHRLIT     ([^\n\'\\]|{ENTER}|{ASPAS}|{PLICA}|{SEQUENCIA}|{TAB}|{BARRA})
 ENDOFFILE   <<EOF>>
 RESERVED        "auto"|"break"|"const"|"continue"|"asm"|"do"|"enum"|"extern"|"float"|"for"|"goto"|"register"|"long"|"signed"|"unsigned"|"sizeof"|"static"|"struct"|"switch"|"case"|"default"|"typedef"|"union"|"volatile"|"break"|"_Bool"|"_Imaginary"|"restrict"|"inline"|"_Complex"|"["|"]"|"++"|"--"
 ID                  [a-zA-Z_][a-zA-Z0-9_]*
@@ -102,15 +102,15 @@ LE  "<="
 {RBRACE}             {if(flag)printf("RBRACE\n");coluna+=yyleng;}
 {RPAR}                {if(flag)printf("RPAR\n");coluna+=yyleng;}
 {SEMI}  {if(flag)printf("SEMI\n");coluna+=yyleng;}
-{SPACE} {coluna+=yyleng;}
 {RESERVED}  {if(flag)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;}
 {ID}    {if(flag)printf("ID(%s)\n",yytext);coluna+=yyleng;}
 {INTLIT}  {if(flag)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;}
-{REALLIT}   {printf("REALLIT(%s)\n",yytext);coluna+=yyleng;} 
+{REALLIT}   {if(flag)printf("REALLIT(%s)\n",yytext);coluna+=yyleng;} 
 \'{CHRLIT}\'    {if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
 \'([^\n\'\\]|\\.)*\'  {printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
 \'([^\n\'\\]|\\.)*(\\)?    {printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;}
 \n|"\r\n"|"\r"    {linha++;coluna=1;}
+{SPACE} {coluna+=yyleng;}
 .   {if(flagError)printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
 %%                  
 int main(int argc, char **argv)

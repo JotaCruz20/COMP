@@ -362,31 +362,31 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[223] =
     {   0,
-        0,    0,    0,    0,   50,   48,   39,   47,   47,   33,
-       31,   15,   46,   28,   37,   20,   35,   21,   30,   48,
-       22,   42,   38,   29,   19,   25,   41,   40,   17,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   41,   26,   16,   36,    3,    4,
-        3,   47,   32,   18,   46,   45,   46,   40,   43,    1,
-        2,   43,   42,    0,   27,   23,   24,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   40,   41,
-       41,   41,   41,   41,   41,    8,   41,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   34,    5,   46,
+        0,    0,    0,    0,   50,   48,   47,   46,   46,   33,
+       31,   15,   45,   28,   37,   20,   35,   21,   30,   48,
+       22,   41,   38,   29,   19,   25,   40,   39,   17,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   40,   40,
+       40,   40,   40,   40,   40,   26,   16,   36,    3,    4,
+        3,   46,   32,   18,   45,   44,   45,   39,   42,    1,
+        2,   42,   41,    0,   27,   23,   24,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   39,   40,
+       40,   40,   40,   40,   40,    8,   40,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,   40,   34,    5,   45,
 
-       44,   46,   46,    0,    2,   43,    0,    0,   43,   41,
-       41,   41,   40,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   10,   41,   41,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   46,    0,   43,    0,    0,   43,   41,
-       41,   41,   41,    6,   41,   41,   41,   41,    7,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,   41,   41,   41,   14,   41,   41,   46,    0,   43,
-       41,   41,   40,   41,   41,   41,   41,   41,   41,   41,
-       41,   12,   41,   41,   41,   41,   41,   41,   41,   41,
+       43,   45,   45,    0,    2,   42,    0,    0,   42,   40,
+       40,   40,   39,   40,   40,   40,   40,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,   10,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   40,   40,
+       40,   40,   40,   45,    0,   42,    0,    0,   42,   40,
+       40,   40,   40,    6,   40,   40,   40,   40,    7,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   40,   40,
+       40,   40,   40,   40,   14,   40,   40,   45,    0,   42,
+       40,   40,   39,   40,   40,   40,   40,   40,   40,   40,
+       40,   12,   40,   40,   40,   40,   40,   40,   40,   40,
 
-        9,   41,   41,   41,   41,   11,   41,   41,   13,   41,
-       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
-       41,    0
+        9,   40,   40,   40,   40,   11,   40,   40,   13,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   40,   40,
+       40,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -1087,48 +1087,48 @@ YY_RULE_SETUP
 case 39:
 YY_RULE_SETUP
 #line 105 "uccompiler.l"
-{coluna+=yyleng;}
+{if(flag)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 106 "uccompiler.l"
-{if(flag)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;}
+{if(flag)printf("ID(%s)\n",yytext);coluna+=yyleng;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 107 "uccompiler.l"
-{if(flag)printf("ID(%s)\n",yytext);coluna+=yyleng;}
+{if(flag)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 108 "uccompiler.l"
-{if(flag)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;}
+{printf("REALLIT(%s)\n",yytext);coluna+=yyleng;} 
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 109 "uccompiler.l"
-{printf("REALLIT(%s)\n",yytext);coluna+=yyleng;} 
+{if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 110 "uccompiler.l"
-{if(flag)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;} 
+{printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 111 "uccompiler.l"
-{printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
-	YY_BREAK
-case 46:
-YY_RULE_SETUP
-#line 112 "uccompiler.l"
 {printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;}
 	YY_BREAK
+case 46:
+/* rule 46 can match eol */
+YY_RULE_SETUP
+#line 112 "uccompiler.l"
+{linha++;coluna=1;}
+	YY_BREAK
 case 47:
-/* rule 47 can match eol */
 YY_RULE_SETUP
 #line 113 "uccompiler.l"
-{linha++;coluna=1;}
+{coluna+=yyleng;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
