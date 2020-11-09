@@ -89,14 +89,14 @@ Grammar
    61     | MINUS Expr
    62     | NOT Expr
    63     | ID LPAR RPAR
-   64     | ID LPAR ExprCE RPAR
+   64     | ID LPAR Expr ExprCE RPAR
    65     | ID
    66     | INTLIT
    67     | CHRLIT
    68     | REALLIT
    69     | LPAR Expr RPAR
 
-   70 ExprCE: Expr
+   70 ExprCE: %empty
    71       | ExprCE COMMA Expr
 
 
@@ -183,7 +183,7 @@ StatementReturn (57)
 Expr (58)
     on left: 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
     60 61 62 63 64 65 66 67 68 69, on right: 30 31 34 35 36 41 42 43
-    44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 69 70
+    44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 64 69
     71
 ExprCE (59)
     on left: 70 71, on right: 64 71
@@ -474,7 +474,7 @@ State 27
 State 28
 
    63 Expr: ID . LPAR RPAR
-   64     | ID . LPAR ExprCE RPAR
+   64     | ID . LPAR Expr ExprCE RPAR
    65     | ID .
 
     LPAR  shift, and go to state 52
@@ -819,7 +819,7 @@ State 51
 State 52
 
    63 Expr: ID LPAR . RPAR
-   64     | ID LPAR . ExprCE RPAR
+   64     | ID LPAR . Expr ExprCE RPAR
 
     CHRLIT   shift, and go to state 27
     ID       shift, and go to state 28
@@ -831,8 +831,7 @@ State 52
     PLUS     shift, and go to state 34
     RPAR     shift, and go to state 90
 
-    Expr    go to state 91
-    ExprCE  go to state 92
+    Expr  go to state 91
 
 
 State 53
@@ -875,7 +874,7 @@ State 53
     NE      shift, and go to state 72
     OR      shift, and go to state 73
     PLUS    shift, and go to state 74
-    RPAR    shift, and go to state 93
+    RPAR    shift, and go to state 92
 
 
 State 54
@@ -974,7 +973,7 @@ State 57
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 94
+    Expr  go to state 93
 
 
 State 58
@@ -990,7 +989,7 @@ State 58
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 95
+    Expr  go to state 94
 
 
 State 59
@@ -1006,7 +1005,7 @@ State 59
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 96
+    Expr  go to state 95
 
 
 State 60
@@ -1022,7 +1021,7 @@ State 60
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 97
+    Expr  go to state 96
 
 
 State 61
@@ -1038,7 +1037,7 @@ State 61
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 98
+    Expr  go to state 97
 
 
 State 62
@@ -1054,7 +1053,7 @@ State 62
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 99
+    Expr  go to state 98
 
 
 State 63
@@ -1070,7 +1069,7 @@ State 63
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 100
+    Expr  go to state 99
 
 
 State 64
@@ -1086,7 +1085,7 @@ State 64
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 101
+    Expr  go to state 100
 
 
 State 65
@@ -1102,7 +1101,7 @@ State 65
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 102
+    Expr  go to state 101
 
 
 State 66
@@ -1118,7 +1117,7 @@ State 66
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 103
+    Expr  go to state 102
 
 
 State 67
@@ -1134,7 +1133,7 @@ State 67
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 104
+    Expr  go to state 103
 
 
 State 68
@@ -1150,7 +1149,7 @@ State 68
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 105
+    Expr  go to state 104
 
 
 State 69
@@ -1166,7 +1165,7 @@ State 69
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 106
+    Expr  go to state 105
 
 
 State 70
@@ -1182,7 +1181,7 @@ State 70
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 107
+    Expr  go to state 106
 
 
 State 71
@@ -1198,7 +1197,7 @@ State 71
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 108
+    Expr  go to state 107
 
 
 State 72
@@ -1214,7 +1213,7 @@ State 72
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 109
+    Expr  go to state 108
 
 
 State 73
@@ -1230,7 +1229,7 @@ State 73
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 110
+    Expr  go to state 109
 
 
 State 74
@@ -1246,7 +1245,7 @@ State 74
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 111
+    Expr  go to state 110
 
 
 State 75
@@ -1259,7 +1258,7 @@ State 75
     DOUBLE  shift, and go to state 4
     VOID    shift, and go to state 5
 
-    ParameterDeclaration  go to state 112
+    ParameterDeclaration  go to state 111
     TypeSpec              go to state 38
 
 
@@ -1290,7 +1289,7 @@ State 78
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 113
+    Expr  go to state 112
 
 
 State 79
@@ -1307,7 +1306,7 @@ State 79
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
 
-    Expr  go to state 114
+    Expr  go to state 113
 
 
 State 80
@@ -1364,7 +1363,7 @@ State 82
     NE      shift, and go to state 72
     OR      shift, and go to state 73
     PLUS    shift, and go to state 74
-    SEMI    shift, and go to state 115
+    SEMI    shift, and go to state 114
 
 
 State 83
@@ -1378,7 +1377,7 @@ State 84
 
    38 Statementlbrace: Statement . RBRACE
 
-    RBRACE  shift, and go to state 116
+    RBRACE  shift, and go to state 115
 
 
 State 85
@@ -1443,7 +1442,7 @@ State 91
    57     | Expr . GE Expr
    58     | Expr . LT Expr
    59     | Expr . GT Expr
-   70 ExprCE: Expr .
+   64     | ID LPAR Expr . ExprCE RPAR
 
     BAND    shift, and go to state 57
     BOR     shift, and go to state 58
@@ -1467,24 +1466,17 @@ State 91
     COMMA     [reduce using rule 70 (ExprCE)]
     $default  reduce using rule 70 (ExprCE)
 
+    ExprCE  go to state 116
+
 
 State 92
-
-   64 Expr: ID LPAR ExprCE . RPAR
-   71 ExprCE: ExprCE . COMMA Expr
-
-    COMMA  shift, and go to state 117
-    RPAR   shift, and go to state 118
-
-
-State 93
 
    69 Expr: LPAR Expr RPAR .
 
     $default  reduce using rule 69 (Expr)
 
 
-State 94
+State 93
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1521,7 +1513,7 @@ State 94
     $default  reduce using rule 51 (Expr)
 
 
-State 95
+State 94
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1560,7 +1552,7 @@ State 95
     $default  reduce using rule 52 (Expr)
 
 
-State 96
+State 95
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1598,7 +1590,7 @@ State 96
     $default  reduce using rule 53 (Expr)
 
 
-State 97
+State 96
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1638,7 +1630,7 @@ State 97
     $default  reduce using rule 50 (Expr)
 
 
-State 98
+State 97
 
    42 Expr: Expr . ASSIGN Expr
    42     | Expr ASSIGN Expr .
@@ -1681,7 +1673,7 @@ State 98
     $default  reduce using rule 42 (Expr)
 
 
-State 99
+State 98
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1706,7 +1698,7 @@ State 99
     $default  reduce using rule 46 (Expr)
 
 
-State 100
+State 99
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1749,7 +1741,7 @@ State 100
     $default  reduce using rule 43 (Expr)
 
 
-State 101
+State 100
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1774,7 +1766,7 @@ State 101
     $default  reduce using rule 47 (Expr)
 
 
-State 102
+State 101
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1809,7 +1801,7 @@ State 102
     $default  reduce using rule 54 (Expr)
 
 
-State 103
+State 102
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1840,7 +1832,7 @@ State 103
     $default  reduce using rule 57 (Expr)
 
 
-State 104
+State 103
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1871,7 +1863,7 @@ State 104
     $default  reduce using rule 59 (Expr)
 
 
-State 105
+State 104
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1902,7 +1894,7 @@ State 105
     $default  reduce using rule 56 (Expr)
 
 
-State 106
+State 105
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1933,7 +1925,7 @@ State 106
     $default  reduce using rule 58 (Expr)
 
 
-State 107
+State 106
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1962,7 +1954,7 @@ State 107
     $default  reduce using rule 45 (Expr)
 
 
-State 108
+State 107
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -1987,7 +1979,7 @@ State 108
     $default  reduce using rule 48 (Expr)
 
 
-State 109
+State 108
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -2022,7 +2014,7 @@ State 109
     $default  reduce using rule 55 (Expr)
 
 
-State 110
+State 109
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -2063,7 +2055,7 @@ State 110
     $default  reduce using rule 49 (Expr)
 
 
-State 111
+State 110
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -2092,14 +2084,14 @@ State 111
     $default  reduce using rule 44 (Expr)
 
 
-State 112
+State 111
 
    18 ParameterList: ParameterList COMMA ParameterDeclaration .
 
     $default  reduce using rule 18 (ParameterList)
 
 
-State 113
+State 112
 
    36 Statement: WHILE LPAR Expr . RPAR Statement
    42 Expr: Expr . ASSIGN Expr
@@ -2139,10 +2131,10 @@ State 113
     NE      shift, and go to state 72
     OR      shift, and go to state 73
     PLUS    shift, and go to state 74
-    RPAR    shift, and go to state 119
+    RPAR    shift, and go to state 117
 
 
-State 114
+State 113
 
    34 Statement: IF LPAR Expr . RPAR Statement
    35          | IF LPAR Expr . RPAR Statement ELSE Statement
@@ -2183,49 +2175,58 @@ State 114
     NE      shift, and go to state 72
     OR      shift, and go to state 73
     PLUS    shift, and go to state 74
-    RPAR    shift, and go to state 120
+    RPAR    shift, and go to state 118
 
 
-State 115
+State 114
 
    41 StatementReturn: Expr SEMI .
 
     $default  reduce using rule 41 (StatementReturn)
 
 
-State 116
+State 115
 
    38 Statementlbrace: Statement RBRACE .
 
     $default  reduce using rule 38 (Statementlbrace)
 
 
+State 116
+
+   64 Expr: ID LPAR Expr ExprCE . RPAR
+   71 ExprCE: ExprCE . COMMA Expr
+
+    COMMA  shift, and go to state 119
+    RPAR   shift, and go to state 120
+
+
 State 117
 
-   71 ExprCE: ExprCE COMMA . Expr
+   36 Statement: WHILE LPAR Expr RPAR . Statement
 
     CHRLIT   shift, and go to state 27
     ID       shift, and go to state 28
     REALLIT  shift, and go to state 29
     INTLIT   shift, and go to state 30
+    WHILE    shift, and go to state 39
+    IF       shift, and go to state 40
+    RETURN   shift, and go to state 41
+    LBRACE   shift, and go to state 42
     LPAR     shift, and go to state 31
     MINUS    shift, and go to state 32
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
+    SEMI     shift, and go to state 44
 
-    Expr  go to state 121
+    Statement  go to state 121
+    Expr       go to state 49
 
 
 State 118
 
-   64 Expr: ID LPAR ExprCE RPAR .
-
-    $default  reduce using rule 64 (Expr)
-
-
-State 119
-
-   36 Statement: WHILE LPAR Expr RPAR . Statement
+   34 Statement: IF LPAR Expr RPAR . Statement
+   35          | IF LPAR Expr RPAR . Statement ELSE Statement
 
     CHRLIT   shift, and go to state 27
     ID       shift, and go to state 28
@@ -2245,30 +2246,47 @@ State 119
     Expr       go to state 49
 
 
-State 120
+State 119
 
-   34 Statement: IF LPAR Expr RPAR . Statement
-   35          | IF LPAR Expr RPAR . Statement ELSE Statement
+   71 ExprCE: ExprCE COMMA . Expr
 
     CHRLIT   shift, and go to state 27
     ID       shift, and go to state 28
     REALLIT  shift, and go to state 29
     INTLIT   shift, and go to state 30
-    WHILE    shift, and go to state 39
-    IF       shift, and go to state 40
-    RETURN   shift, and go to state 41
-    LBRACE   shift, and go to state 42
     LPAR     shift, and go to state 31
     MINUS    shift, and go to state 32
     NOT      shift, and go to state 33
     PLUS     shift, and go to state 34
-    SEMI     shift, and go to state 44
 
-    Statement  go to state 123
-    Expr       go to state 49
+    Expr  go to state 123
+
+
+State 120
+
+   64 Expr: ID LPAR Expr ExprCE RPAR .
+
+    $default  reduce using rule 64 (Expr)
 
 
 State 121
+
+   36 Statement: WHILE LPAR Expr RPAR Statement .
+
+    $default  reduce using rule 36 (Statement)
+
+
+State 122
+
+   34 Statement: IF LPAR Expr RPAR Statement .
+   35          | IF LPAR Expr RPAR Statement . ELSE Statement
+
+    ELSE  shift, and go to state 124
+
+    $default  reduce using rule 34 (Statement)
+
+
+State 123
 
    42 Expr: Expr . ASSIGN Expr
    43     | Expr . COMMA Expr
@@ -2309,23 +2327,6 @@ State 121
     PLUS    shift, and go to state 74
 
     $default  reduce using rule 71 (ExprCE)
-
-
-State 122
-
-   36 Statement: WHILE LPAR Expr RPAR Statement .
-
-    $default  reduce using rule 36 (Statement)
-
-
-State 123
-
-   34 Statement: IF LPAR Expr RPAR Statement .
-   35          | IF LPAR Expr RPAR Statement . ELSE Statement
-
-    ELSE  shift, and go to state 124
-
-    $default  reduce using rule 34 (Statement)
 
 
 State 124

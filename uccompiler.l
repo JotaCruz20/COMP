@@ -133,8 +133,18 @@ int main(int argc, char **argv)
             printM=1;
             flagError=1;
         }
+        else if(argv[1][0]=='-' && argv[1][1]=='e' && argv[1][2]=='1'){
+            flagError=1;
+        }
+        else if(argv[1][0]=='-' && argv[1][1]=='e' && argv[1][2]=='2'){
+            flagError=1;
+            yyparse();
+        }
+        else if(argv[1][0]=='-' && argv[1][1]=='t'){
+            flag=2;
+        }
     }
-    flagError=1;
+    
 yylex();
 return 0;
 }
