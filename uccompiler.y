@@ -7,9 +7,10 @@
     #include <stdio.h>
     #include <stdlib.h>  
     #include <string.h>  
-
     int yylex(void);
     void yyerror (char * s);
+
+
 
     typedef struct no{
         char * id;
@@ -18,17 +19,29 @@
         struct no * noIrmao; // facilita, pois so temos de ter 1 pointer para o filho
     } no;                    // e o filho terá pointer para os irmaos (nao e necessario array de ponteiros)
 
-    int commaFlag = 0;
     int errorFlag = 0;
+    int counter = 0;
     extern int flag;
 
     char * auxType;
-    no * noAtual;
+    no * noAuxiliar;
 
     no * inserirNo(char * id, char * type, no * noFilho){
-        node * noAtual = (node *)malloc(sizeof(no));
-        noAtual->type = type;
-        noAtual->id = id;
+        no * noAtual = (no *)malloc(sizeof(no));
+        if(type!=NULL){
+                noAtual->type =(char *)malloc(sizeof(char)*strlen(type));
+                strcpy(noAtual->type,type);
+        }
+        else{
+               noAtual->type=NULL; 
+        }
+        if(id!=NULL){
+                noAtual->id =(char *)malloc(sizeof(char)*strlen(id));
+                strcpy(noAtual->id,id);
+        }
+        else{
+                noAtual->id = NULL;
+        }
         noAtual->noFilho = noFilho;
         noAtual->noIrmao = NULL;
     return noAtual;
@@ -37,6 +50,30 @@
     void addIrmao(no * no1, no * no2)
     {
         no1->noIrmao = no2;
+    }
+
+    void printTree(no * auxNode, int pontos) /* mudar isto */
+    {
+        int i=0;
+        if(auxNode!=NULL){
+                for(i=0;i<pontos*2;i++){
+                        printf(".");
+                }
+                if(auxNode->id!=NULL){
+                        printf("%s(%s)\n", auxNode->type,auxNode->id);
+                }
+                else{
+                         printf("%s\n", auxNode->type);
+                }
+                if(auxNode->noFilho!=NULL){
+                        printTree(auxNode->noFilho,pontos+1);
+                }
+                if(auxNode->noIrmao!=NULL){
+                        printTree(auxNode->noIrmao,pontos);
+                }
+
+        }
+        free(auxNode);
     }
 
 %}
@@ -63,7 +100,9 @@
 %type <no> Statementlbrace
 %type <no> StatementError
 %type <no> StatementReturn
+%type <no> StatementIrmao
 %type <no> Expr
+%type <no> ExprFunctions
 
 %token <id> CHRLIT 
 %token <id> ID
@@ -122,20 +161,23 @@
 
 %%
 
-Programa: FunctionsAndDeclarations {$$=inserirNo(NULL,"Program",$1);}
+Programa: FunctionsAndDeclarations {$$=inserirNo(NULL,"Program",$1);if (flag==2 && errorFlag==0)printTree($$,0);}
 	    ;
 
 FunctionsAndDeclarations: FunctionDefinition  {$$ = $1;}
         | FunctionDeclaration  {$$ = $1;}
         | Declaration  {$$ = $1;}
-        | FunctionsAndDeclarations FunctionDefinition {addIrmao($1,$2);$$ = $1;}
-        | FunctionsAndDeclarations FunctionDeclaration  {addIrmao($1,$2);$$ = $1;}
-        | FunctionsAndDeclarations Declaration {addIrmao($1,$2);$$ = $1;}
+        | FunctionsAndDeclarations FunctionDefinition {addIrmao($2,$1);$$ = $2;}
+        | FunctionsAndDeclarations FunctionDeclaration  {addIrmao($2,$1);$$ = $2;}
+        | FunctionsAndDeclarations Declaration {addIrmao($2,$1);$$ = $2;}
         ;
 	
 FunctionDefinition: TypeSpec FunctionDeclarator FunctionBody  { $$ = inserirNo(NULL,"FuncDefinition",$1);
                                                                 addIrmao($1,$2);
-                                                                addIrmao($2,$3);
+                                                                noAuxiliar = $2;
+                                                                while (noAuxiliar->noIrmao!=NULL)
+                                                                        noAuxiliar = noAuxiliar->noIrmao;
+                                                                noAuxiliar->noIrmao = $3;
                                                                 }
 		     ;
 
@@ -143,14 +185,29 @@ FunctionBody:   LBRACE RBRACE {$$ = inserirNo(NULL,"FuncBody",NULL);}
         | LBRACE DeclarationsAndStatements RBRACE {$$ = inserirNo(NULL,"FuncBody",$2);} 
         ;
 
-DeclarationsAndStatements: DeclarationsAndStatements  Statement {if($2!=NULL){
-                                                                        $$=$2;
-                                                                        addIrmao($2,$1);
-                                                                }else{
+DeclarationsAndStatements: DeclarationsAndStatements  Statement {if($1!=NULL){
                                                                         $$=$1;
+                                                                        if ($2!=NULL){
+                                                                                noAuxiliar = $$;
+                                                                                while (noAuxiliar->noIrmao!=NULL)
+                                                                                        noAuxiliar = noAuxiliar->noIrmao;
+                                                                                noAuxiliar->noIrmao = $2;
+                                                                        }
+                                                                        }else{
+                                                                                $$=$2;
+                                                                        }
                                                                 }
-                                                                addIrmao($1,$2);}
-        | DeclarationsAndStatements  Declaration  {$$=$2; addIrmao($1,$2);}
+                | DeclarationsAndStatements  Declaration        {if($1!=NULL){
+                                                                        $$=$1;
+                                                                        if ($2!=NULL){
+                                                                                noAuxiliar = $$;
+                                                                                while (noAuxiliar->noIrmao!=NULL)
+                                                                                        noAuxiliar = noAuxiliar->noIrmao;
+                                                                                noAuxiliar->noIrmao = $2;
+                                                                        }
+                                                                }else{
+                                                                        $$=$2;
+                                                                }}
         | Statement {$$=$1;}
         | Declaration {$$=$1;}
         ;
@@ -158,9 +215,9 @@ DeclarationsAndStatements: DeclarationsAndStatements  Statement {if($2!=NULL){
 FunctionDeclaration: TypeSpec FunctionDeclarator SEMI { addIrmao($1,$2); $$ = inserirNo(NULL,"FuncDeclaration",$1);}
 		;
 
-FunctionDeclarator:ID LPAR ParameterList RPAR  {$$= inserirNo($1,"Id",NULL);
-                                                addIrmao($$,inserirNo(NULL,"ParamList",$3))
-                                                /* pode causar erro aqui*/;} 
+FunctionDeclarator:ID LPAR ParameterList RPAR  {$$=inserirNo($1,"Id",NULL);
+                                                addIrmao($$,inserirNo(NULL,"ParamList",$3));
+                                                } 
         ;
 
 ParameterList: ParameterDeclaration {$$ = $1;}
@@ -168,22 +225,22 @@ ParameterList: ParameterDeclaration {$$ = $1;}
         ;
 
 
-ParameterDeclaration: TypeSpec  {$$ = insertNode(NULL,"ParamDeclaration",$1);}
+ParameterDeclaration: TypeSpec  {$$ = inserirNo(NULL,"ParamDeclaration",$1);}
 		| TypeSpec ID   {addIrmao($1,inserirNo($2,"Id",NULL));
                                 $$ = inserirNo(NULL,"ParamDeclaration",$1);}
                 ;
                            
 Declaration:TypeSpec DeclarationCD SEMI  {addIrmao($1,$2);$$ = inserirNo(NULL,"Declaration",$1);}
-            | error SEMI                 {$$ = insertNode(NULL,NULL,NULL);}
+            | error SEMI                 {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
             ;
 
 DeclarationCD: Declarator       {$$=$1;}
-        | DeclarationCD COMMA Declarator { /* pode causar erro */
-                                           $$= inserirNo("type","Declaration",$2);
-                                           $$->nodeBrother = $1;
-                                        }
-        ;
-                                     
+             | DeclarationCD COMMA Declarator { $$ = inserirNo("type","Declaration",$3);
+                                                noAuxiliar = $3;
+                                                while (noAuxiliar->noIrmao!=NULL)
+                                                        noAuxiliar = noAuxiliar->noIrmao;
+                                                noAuxiliar->noIrmao = $1;  }
+                          
 
 TypeSpec: CHAR  {$$ = inserirNo(NULL,"Char",NULL);}
         | INT   {$$ = inserirNo(NULL,"Int",NULL);}
@@ -193,38 +250,67 @@ TypeSpec: CHAR  {$$ = inserirNo(NULL,"Char",NULL);}
         ;
 
 Declarator: ID {$$ = inserirNo($1,"Id",NULL);}
-       | ID ASSIGN Expr { $$ = insertNode($1,"Id",NULL); $$->nodeBrother = $3;}
+       | ID ASSIGN Expr { $$ = inserirNo($1,"Id",NULL); addIrmao($$,$3);}
        ;
 
 Statement: Expr SEMI {$$ = $1;}
         | SEMI       {$$ = NULL;} 
-        | LBRACE Statementlbrace  {$$ = $2;}
-        | IF LPAR Expr RPAR StatementError { if($5==NULL) $5=insertNode(NULL,"Null",NULL);
+        | LBRACE Statementlbrace  {$$ = $2;
+                                   if ($2!=NULL && $2->noIrmao!=NULL){ $$ = inserirNo(NULL,"StatList",$2); }
+                                }
+        | IF LPAR Expr RPAR StatementError { if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
                                              addIrmao($3,$5);
-                                             addIrmao($5,insertNode(NULL,"Null",NULL));
-                                             $$ = insertNode(NULL,"If",$3);  }
-        | IF LPAR Expr RPAR StatementError ELSE StatementError
-        | WHILE LPAR Expr RPAR StatementError
+                                             addIrmao($5,inserirNo(NULL,"Null",NULL));
+                                             $$ = inserirNo(NULL,"If",$3);  }
+        | IF LPAR Expr RPAR StatementError ELSE StatementError {if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
+                                                                if($7==NULL) $7=inserirNo(NULL,"Null",NULL);
+                                                                addIrmao($3,$5);
+                                                                addIrmao($5,$7);
+                                                                $$ = inserirNo(NULL,"If",$3);
+                                                                ;}
+        | WHILE LPAR Expr RPAR StatementError { if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
+                                                addIrmao($3,$5);                                                
+                                                $$ = inserirNo(NULL,"While",$3);
+                                                }
         | RETURN StatementReturn {$$=$2;}
         ;
 
-Statementlbrace: StatementError RBRACE  {$$=$1;}
-        | error RBRACE  {$$ = inserirNo(NULL,NULL,NULL);}
+Statementlbrace: StatementIrmao RBRACE  {$$=$1;}
+        | error RBRACE  {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         |  RBRACE  {$$ = NULL;}
         ;
 
 StatementError: Statement {$$=$1;}
-        | error SEMI {$$ = inserirNo(NULL,NULL,NULL);}
+        | error SEMI {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         ;
+
+StatementIrmao : StatementIrmao StatementError {
+                                                if($1!=NULL){
+                                                        $$ = $1;
+                                                        if ($2!=NULL){
+                                                                noAuxiliar = $1;
+                                                                while (noAuxiliar->noIrmao!=NULL)
+                                                                        noAuxiliar = noAuxiliar->noIrmao;
+                                                                noAuxiliar->noIrmao = $2;
+                                                        }
+                                                    }else
+                                                        $$ = $2;
+                                                    }    
+                | StatementError {$$=$1;}
 
 StatementReturn: SEMI  {$$ = inserirNo(NULL,"Return",inserirNo(NULL,"Null",NULL));}
         |  Expr SEMI {$$ = inserirNo(NULL,"Return",$1);}
         ;
 
 Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);}
-        | Expr COMMA Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Comma",$1);}
-        | Expr PLUS Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Plus",$1);}
-        | Expr MINUS Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Minus",$1);}
+        | Expr COMMA Expr {     noAuxiliar=$1;
+                                while(noAuxiliar->noIrmao!=NULL){
+                                        noAuxiliar=noAuxiliar->noIrmao;
+                                }
+                                noAuxiliar->noIrmao = $3;
+                                }
+        | Expr PLUS Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Add",$1);}
+        | Expr MINUS Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Sub",$1);}
         | Expr MUL Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Mul",$1);}
         | Expr DIV Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Div",$1);}
         | Expr MOD Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Mod",$1);}
@@ -239,16 +325,19 @@ Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);}
         | Expr GE Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Ge",$1);}
         | Expr LT Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Lt",$1);}
         | Expr GT Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Gt",$1);}
-        | PLUS Expr     {$$ = inserirNo(NULL,"Plus",$2)}
+        | PLUS Expr     {$$ = inserirNo(NULL,"Plus",$2);}
         | MINUS Expr    {$$ = inserirNo(NULL,"Minus",$2);}
         | NOT Expr      {$$ = inserirNo(NULL,"Not",$2);}
-        | ID LPAR RPAR  {$$ = inserirNo($1,"Id",NULL);}
-        | ID LPAR Expr RPAR    {%falta isto}                 {%isto poderá estar mal!%}  
-        | ID LPAR error RPAR   {%falta isto}
+        | ExprFunctions {$$ = inserirNo(NULL,"Call",$1);}
+        | ID LPAR error RPAR   {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         | ID {$$=inserirNo($1,"Id",NULL);}
         | INTLIT {$$=inserirNo($1,"IntLit",NULL);}
         | CHRLIT  {$$=inserirNo($1,"ChrLit",NULL);}
         | REALLIT    {$$=inserirNo($1,"RealLit",NULL);}
-        | LPAR Expr RPAR  {%falta isto}    
-        | LPAR error RPAR {$$ = inserirNo(NULL,NULL,NULL);}
+        | LPAR Expr RPAR      {$$ = inserirNo(NULL,"Comma",$2);} 
+        | LPAR error RPAR {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         ;
+
+ExprFunctions:    ID LPAR RPAR  {$$ = inserirNo($1,"Id",NULL);}  
+                | ID LPAR Expr RPAR    {$$ = inserirNo($1,"Id",NULL);
+                                        addIrmao($$,$3);} 

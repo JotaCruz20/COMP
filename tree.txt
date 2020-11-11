@@ -1,0 +1,27 @@
+                                Programa
+                                    |
+                            FunctionsAndDeclarations
+                                    |
+                                FuncDefiniton
+                                   |
+                                FunctionDefinition
+                                /       |
+                        typeSpec FunctionDeclarator FunctionBody
+                            |    /    |    \        
+                          int    ID LPAR ParameterList RPAR
+                                /    |       |             | 
+                                int   main   (           )
+
+
+
+                                FunctionBody
+                                /     |    \
+                            LBRACE  DAndS  RBRACE
+                                      / \
+                                  DAndS  Statement
+                                  / \            \
+                             DAndS  Statement     Return
+                               |           \
+                            Declaration    While
+                               |
+                            Char ...

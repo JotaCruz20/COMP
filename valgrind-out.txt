@@ -1,0 +1,375 @@
+==24337== Memcheck, a memory error detector
+==24337== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==24337== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==24337== Command: ./uccompiler -t
+==24337== Parent PID: 15029
+==24337== 
+--24337-- 
+--24337-- Valgrind options:
+--24337--    --leak-check=full
+--24337--    --show-leak-kinds=all
+--24337--    --track-origins=yes
+--24337--    --verbose
+--24337--    --log-file=valgrind-out.txt
+--24337-- Contents of /proc/version:
+--24337--   Linux version 4.15.0-20-generic (buildd@lgw01-amd64-039) (gcc version 7.3.0 (Ubuntu 7.3.0-16ubuntu3)) #21-Ubuntu SMP Tue Apr 24 06:16:15 UTC 2018
+--24337-- 
+--24337-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--24337-- Page sizes: currently 4096, max supported 4096
+--24337-- Valgrind library directory: /usr/lib/valgrind
+--24337-- Reading syms from /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler
+--24337-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
+--24337--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
+--24337--   .. CRC mismatch (computed 6c71a321 wanted b59d24a6)
+--24337--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
+--24337--   .. CRC is valid
+--24337-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--24337--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--24337--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
+--24337--    object doesn't have a symbol table
+--24337--    object doesn't have a dynamic symbol table
+--24337-- Scheduler: using generic scheduler lock implementation.
+--24337-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==24337== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-24337-by-joao-on-???
+==24337== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-24337-by-joao-on-???
+==24337== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-24337-by-joao-on-???
+==24337== 
+==24337== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==24337== don't want to do, unless you know exactly what you're doing,
+==24337== or are doing some strange experiment):
+==24337==   /usr/lib/valgrind/../../bin/vgdb --pid=24337 ...command...
+==24337== 
+==24337== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==24337==   /path/to/gdb ./uccompiler
+==24337== and then give GDB the following command
+==24337==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=24337
+==24337== --pid is optional if only one valgrind process is running
+==24337== 
+--24337-- REDIR: 0x4020d40 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
+--24337-- REDIR: 0x4020b20 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
+--24337-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--24337--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--24337--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
+--24337--    object doesn't have a symbol table
+--24337-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--24337--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--24337--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
+--24337--    object doesn't have a symbol table
+==24337== WARNING: new redirection conflicts with existing -- ignoring it
+--24337--     old: 0x04020d40 (strlen              ) R-> (0000.0) 0x580608c1 ???
+--24337--     new: 0x04020d40 (strlen              ) R-> (2007.0) 0x04c34db0 strlen
+--24337-- REDIR: 0x401d560 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c35ee0 (strcmp)
+--24337-- REDIR: 0x4021280 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c394f0 (mempcpy)
+--24337-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
+--24337--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
+--24337--   .. CRC mismatch (computed eabd4889 wanted a033e032)
+--24337--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
+--24337--   .. CRC is valid
+--24337-- REDIR: 0x4edcb70 (libc.so.6:memmove) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edbe80 (libc.so.6:strncpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edce50 (libc.so.6:strcasecmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edb8d0 (libc.so.6:strcat) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edbeb0 (libc.so.6:rindex) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4ede5a0 (libc.so.6:rawmemchr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcce0 (libc.so.6:mempcpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcb10 (libc.so.6:bcmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edbe40 (libc.so.6:strncmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edb940 (libc.so.6:strcmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcc40 (libc.so.6:memset) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4ef9ed0 (libc.so.6:wcschr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edbde0 (libc.so.6:strnlen) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edb9b0 (libc.so.6:strcspn) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcea0 (libc.so.6:strncasecmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edb980 (libc.so.6:strcpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcfe0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edbee0 (libc.so.6:strpbrk) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edb900 (libc.so.6:index) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edbdb0 (libc.so.6:strlen) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4ee64a0 (libc.so.6:memrchr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcef0 (libc.so.6:strcasecmp_l) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcae0 (libc.so.6:memchr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4efac90 (libc.so.6:wcslen) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edc190 (libc.so.6:strspn) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edce20 (libc.so.6:stpncpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcdf0 (libc.so.6:stpcpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4ede5d0 (libc.so.6:strchrnul) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4edcf40 (libc.so.6:strncasecmp_l) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--24337-- REDIR: 0x4fcc300 (libc.so.6:__strrchr_avx2) redirected to 0x4c34730 (rindex)
+--24337-- REDIR: 0x4ed5140 (libc.so.6:malloc) redirected to 0x4c31aa0 (malloc)
+--24337-- REDIR: 0x4fcce90 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4c385d0 (memset)
+--24337-- REDIR: 0x4fcc4d0 (libc.so.6:__strlen_avx2) redirected to 0x4c34cf0 (strlen)
+--24337-- REDIR: 0x4fcc110 (libc.so.6:__strchrnul_avx2) redirected to 0x4c39020 (strchrnul)
+--24337-- REDIR: 0x4fcc9f0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c39130 (mempcpy)
+--24337-- REDIR: 0x4fcca10 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c386e0 (memmove)
+--24337-- REDIR: 0x4ed5a30 (libc.so.6:free) redirected to 0x4c32cd0 (free)
+==24337== Invalid read of size 8
+==24337==    at 0x10B618: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10BB96: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==  Address 0x5234c58 is 0 bytes after a block of size 8 alloc'd
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4EDBAF9: strdup (strdup.c:42)
+==24337==    by 0x1097A9: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== Invalid read of size 1
+==24337==    at 0x4C34CF2: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4E9B5D2: vfprintf (vfprintf.c:1643)
+==24337==    by 0x4EA3015: printf (printf.c:33)
+==24337==    by 0x10B62F: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==  Address 0x72616863747570 is not stack'd, malloc'd or (recently) free'd
+==24337== 
+==24337== 
+==24337== Process terminating with default action of signal 11 (SIGSEGV)
+==24337==  General Protection Fault
+==24337==    at 0x4C34CF2: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4E9B5D2: vfprintf (vfprintf.c:1643)
+==24337==    by 0x4EA3015: printf (printf.c:33)
+==24337==    by 0x10B62F: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== HEAP SUMMARY:
+==24337==     in use at exit: 21,133 bytes in 32 blocks
+==24337==   total heap usage: 44 allocs, 12 frees, 22,509 bytes allocated
+==24337== 
+==24337== Searching for pointers to 32 not-freed blocks
+==24337== Checked 71,296 bytes
+==24337== 
+==24337== 4 bytes in 2 blocks are still reachable in loss record 1 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4EDBAF9: strdup (strdup.c:42)
+==24337==    by 0x109802: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 8 bytes in 1 blocks are still reachable in loss record 2 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B3B1: yyalloc (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10AEBE: yyensure_buffer_stack (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x108D40: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 8 bytes in 2 blocks are still reachable in loss record 3 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4EDBAF9: strdup (strdup.c:42)
+==24337==    by 0x1098B4: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 9 bytes in 3 blocks are definitely lost in loss record 4 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4EDBAF9: strdup (strdup.c:42)
+==24337==    by 0x1097A9: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 14 bytes in 4 blocks are still reachable in loss record 5 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4EDBAF9: strdup (strdup.c:42)
+==24337==    by 0x1097A9: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 6 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C123: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 7 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10BEF9: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 8 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C101: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 9 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10CDAA: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 10 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C1E1: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 11 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C02F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 12 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10CD56: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 13 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10CAE9: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 14 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10CCCA: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 15 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C67B: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 16 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C28C: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 17 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C4A1: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 18 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10C62A: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 19 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10BD44: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 20 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10BCAA: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are still reachable in loss record 21 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10BB7B: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 32 bytes in 1 blocks are definitely lost in loss record 22 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B5A2: inserirNo (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10CD0C: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 64 bytes in 1 blocks are still reachable in loss record 23 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B3B1: yyalloc (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10AA45: yy_create_buffer (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x108D6A: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 4,096 bytes in 1 blocks are still reachable in loss record 24 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4EBC26B: _IO_file_doallocate (filedoalloc.c:101)
+==24337==    by 0x4ECC448: _IO_doallocbuf (genops.c:365)
+==24337==    by 0x4EC9893: _IO_file_xsgetn (fileops.c:1310)
+==24337==    by 0x4EBD4A0: fread (iofread.c:38)
+==24337==    by 0x10A09E: yy_get_next_buffer (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x109B40: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== 16,386 bytes in 1 blocks are still reachable in loss record 25 of 25
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x10B3B1: yyalloc (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10AA7A: yy_create_buffer (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x108D6A: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== LEAK SUMMARY:
+==24337==    definitely lost: 41 bytes in 4 blocks
+==24337==    indirectly lost: 0 bytes in 0 blocks
+==24337==      possibly lost: 0 bytes in 0 blocks
+==24337==    still reachable: 21,092 bytes in 28 blocks
+==24337==         suppressed: 0 bytes in 0 blocks
+==24337== 
+==24337== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)
+==24337== 
+==24337== 1 errors in context 1 of 4:
+==24337== Invalid read of size 1
+==24337==    at 0x4C34CF2: strlen (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4E9B5D2: vfprintf (vfprintf.c:1643)
+==24337==    by 0x4EA3015: printf (printf.c:33)
+==24337==    by 0x10B62F: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==  Address 0x72616863747570 is not stack'd, malloc'd or (recently) free'd
+==24337== 
+==24337== 
+==24337== 1 errors in context 2 of 4:
+==24337== Invalid read of size 8
+==24337==    at 0x10B618: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B673: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B651: printTree (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10BB96: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==  Address 0x5234c58 is 0 bytes after a block of size 8 alloc'd
+==24337==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==24337==    by 0x4EDBAF9: strdup (strdup.c:42)
+==24337==    by 0x1097A9: yylex (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B99F: yyparse (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337==    by 0x10B57D: main (in /home/joao/Desktop/COMP PLS/ProjetoGit/COMP/uccompiler)
+==24337== 
+==24337== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)
