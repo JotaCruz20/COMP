@@ -300,17 +300,17 @@ Statement: CommaExpr SEMI {$$ = $1;}
         | LBRACE Statementlbrace  {$$ = $2;
                                    if ($2!=NULL && $2->noIrmao!=NULL){ $$ = inserirNo(NULL,"StatList",$2); }
                                 }
-        | IF LPAR Expr RPAR StatementError { if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
+        | IF LPAR CommaExpr RPAR StatementError { if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
                                              addIrmao($3,$5);
                                              addIrmao($5,inserirNo(NULL,"Null",NULL));
                                              $$ = inserirNo(NULL,"If",$3);  }
-        | IF LPAR Expr RPAR StatementError ELSE StatementError {if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
+        | IF LPAR CommaExpr RPAR StatementError ELSE StatementError {if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
                                                                 if($7==NULL) $7=inserirNo(NULL,"Null",NULL);
                                                                 addIrmao($3,$5);
                                                                 addIrmao($5,$7);
                                                                 $$ = inserirNo(NULL,"If",$3);
                                                                 ;}
-        | WHILE LPAR Expr RPAR StatementError { if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
+        | WHILE LPAR CommaExpr RPAR StatementError { if($5==NULL) $5=inserirNo(NULL,"Null",NULL);
                                                 addIrmao($3,$5);                                                
                                                 $$ = inserirNo(NULL,"While",$3);
                                                 }
