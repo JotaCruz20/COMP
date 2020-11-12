@@ -49,7 +49,11 @@
 
     void addIrmao(no * no1, no * no2)
     {
-        no1->noIrmao = no2;
+        no * noAuxiliar  = no1;
+        while(noAuxiliar->noIrmao!=NULL){
+                noAuxiliar=noAuxiliar->noIrmao;
+        }
+        noAuxiliar->noIrmao = no2;
     }
 
     void printTree(no * auxNode, int pontos) /* mudar isto */
@@ -102,6 +106,7 @@
 %type <no> StatementReturn
 %type <no> StatementIrmao
 %type <no> Expr
+%type <no> CommaExpr
 %type <no> ExprFunctions
 %type <no> ExprMath
 
@@ -287,10 +292,10 @@ TypeSpec: CHAR  {$$ = inserirNo(NULL,"Char",NULL);}
         ;
 
 Declarator: ID {$$ = inserirNo($1,"Id",NULL);}
-       | ID ASSIGN Expr { $$ = inserirNo($1,"Id",NULL); addIrmao($$,$3);}
+       | ID ASSIGN CommaExpr { $$ = inserirNo($1,"Id",NULL); addIrmao($$,$3);}
        ;
 
-Statement: Expr SEMI {$$ = $1;}
+Statement: CommaExpr SEMI {$$ = $1;}
         | SEMI       {$$ = NULL;} 
         | LBRACE Statementlbrace  {$$ = $2;
                                    if ($2!=NULL && $2->noIrmao!=NULL){ $$ = inserirNo(NULL,"StatList",$2); }
@@ -339,9 +344,8 @@ StatementReturn: SEMI  {$$ = inserirNo(NULL,"Return",inserirNo(NULL,"Null",NULL)
         |  Expr SEMI {$$ = inserirNo(NULL,"Return",$1);}
         ;
 
-Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);
-                        }
-        | Expr COMMA Expr {addIrmao($1,$3) ;$$ = inserirNo(NULL,"Comma",$1);}
+Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);}
+        | Expr COMMA Expr {addIrmao($1,$3);$$=$1;}
         | Expr PLUS Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Add",$1);}
         | Expr MINUS Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Sub",$1);}
         | Expr MUL Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Mul",$1);}
@@ -365,15 +369,48 @@ Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);
         | INTLIT {$$=inserirNo($1,"IntLit",NULL);}
         | CHRLIT  {$$=inserirNo($1,"ChrLit",NULL);}
         | REALLIT    {$$=inserirNo($1,"RealLit",NULL);}
-        | LPAR Expr RPAR      {$$ = $2;} 
+        | LPAR CommaExpr RPAR      {$$ = $2;} 
         | LPAR error RPAR {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         ;
 
+CommaExpr :CommaExpr ASSIGN CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);}
+        | CommaExpr COMMA CommaExpr     {noAuxiliar=$1;
+                                        while(noAuxiliar->noIrmao!=NULL){
+                                             noAuxiliar=noAuxiliar->noIrmao;
+                                        } 
+                                        noAuxiliar->noIrmao=$3;
+                                        $$ = inserirNo(NULL,"Comma",$1);}
+        | CommaExpr PLUS CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Add",$1);}
+        | CommaExpr MINUS CommaExpr {addIrmao($1,$3);$$ = inserirNo(NULL,"Sub",$1);}
+        | CommaExpr MUL CommaExpr {addIrmao($1,$3);$$ = inserirNo(NULL,"Mul",$1);}
+        | CommaExpr DIV CommaExpr {addIrmao($1,$3);$$ = inserirNo(NULL,"Div",$1);}
+        | CommaExpr MOD CommaExpr {addIrmao($1,$3);$$ = inserirNo(NULL,"Mod",$1);}
+        | CommaExpr OR CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Or",$1);}
+        | CommaExpr AND CommaExpr {addIrmao($1,$3);$$ = inserirNo(NULL,"And",$1);}
+        | CommaExpr BAND CommaExpr {addIrmao($1,$3);$$ = inserirNo(NULL,"BitWiseAnd",$1);}
+        | CommaExpr BOR CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"BitWiseOr",$1);}
+        | CommaExpr BXOR CommaExpr {addIrmao($1,$3);$$ = inserirNo(NULL,"BitWiseXor",$1);}
+        | CommaExpr EQ CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Eq",$1);}
+        | CommaExpr NE CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Ne",$1);}
+        | CommaExpr LE CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Le",$1);}
+        | CommaExpr GE CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Ge",$1);}
+        | CommaExpr LT CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Lt",$1);}
+        | CommaExpr GT CommaExpr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Gt",$1);}
+        | ExprMath          
+        | ExprFunctions {$$ = inserirNo(NULL,"Call",$1);}
+        | ID LPAR error RPAR   {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
+        | ID {$$=inserirNo($1,"Id",NULL);}
+        | INTLIT {$$=inserirNo($1,"IntLit",NULL);}
+        | CHRLIT  {$$=inserirNo($1,"ChrLit",NULL);}
+        | REALLIT    {$$=inserirNo($1,"RealLit",NULL);}
+        | LPAR CommaExpr RPAR      {$$ = $2;} 
+        | LPAR error RPAR {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
+        ;
 
 ExprFunctions:    ID LPAR RPAR  {$$ = inserirNo($1,"Id",NULL);}  
                 | ID LPAR Expr RPAR    {$$ = inserirNo($1,"Id",NULL);
                                         addIrmao($$,$3);} 
 
-ExprMath:  PLUS Expr  %prec NOT   {$$ = inserirNo(NULL,"Plus",$2);}
-        | MINUS Expr  %prec NOT  {$$ = inserirNo(NULL,"Minus",$2);}
-        | NOT Expr      {$$ = inserirNo(NULL,"Not",$2);}
+ExprMath:  PLUS CommaExpr  %prec NOT   {$$ = inserirNo(NULL,"Plus",$2);}
+        | MINUS CommaExpr  %prec NOT  {$$ = inserirNo(NULL,"Minus",$2);}
+        | NOT CommaExpr      {$$ = inserirNo(NULL,"Not",$2);}
