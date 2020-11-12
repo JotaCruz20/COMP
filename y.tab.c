@@ -585,14 +585,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   164,   164,   167,   168,   169,   170,   171,   172,   175,
-     184,   185,   188,   200,   211,   212,   215,   218,   223,   224,
-     228,   229,   233,   234,   237,   238,   245,   246,   247,   248,
-     249,   252,   253,   256,   257,   258,   261,   265,   271,   275,
-     278,   279,   280,   283,   284,   287,   299,   301,   302,   305,
-     306,   312,   313,   314,   315,   316,   317,   318,   319,   320,
-     321,   322,   323,   324,   325,   326,   327,   328,   329,   330,
-     331,   332,   333,   334,   335,   336,   337,   338,   341,   342
+       0,   164,   164,   167,   168,   169,   170,   177,   184,   193,
+     202,   203,   206,   218,   229,   230,   233,   237,   242,   243,
+     253,   254,   258,   268,   271,   272,   281,   282,   283,   284,
+     285,   288,   289,   292,   293,   294,   297,   301,   307,   311,
+     314,   315,   316,   319,   320,   323,   335,   337,   338,   341,
+     342,   348,   349,   350,   351,   352,   353,   354,   355,   356,
+     357,   358,   359,   360,   361,   362,   363,   364,   365,   366,
+     367,   368,   369,   370,   371,   372,   373,   374,   377,   378
 };
 #endif
 
@@ -1561,24 +1561,42 @@ yyreduce:
 
   case 6:
 #line 170 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[0].no),(yyvsp[-1].no));(yyval.no) = (yyvsp[0].no);}
-#line 1566 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 171 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[0].no),(yyvsp[-1].no));(yyval.no) = (yyvsp[0].no);}
+    {(yyval.no) = (yyvsp[-1].no);
+                                                        noAuxiliar = (yyvsp[-1].no);
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,(yyvsp[0].no));
+                                                        }
 #line 1572 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 7:
+#line 177 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = (yyvsp[-1].no);
+                                                        noAuxiliar = (yyvsp[-1].no);
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,(yyvsp[0].no));
+                                                        }
+#line 1584 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 8:
-#line 172 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[0].no),(yyvsp[-1].no));(yyval.no) = (yyvsp[0].no);}
-#line 1578 "y.tab.c" /* yacc.c:1646  */
+#line 184 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = (yyvsp[-1].no);
+                                                        noAuxiliar = (yyvsp[-1].no);
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,(yyvsp[0].no));
+                                                        }
+#line 1596 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 175 "uccompiler.y" /* yacc.c:1646  */
+#line 193 "uccompiler.y" /* yacc.c:1646  */
     { (yyval.no) = inserirNo(NULL,"FuncDefinition",(yyvsp[-2].no));
                                                                 addIrmao((yyvsp[-2].no),(yyvsp[-1].no));
                                                                 noAuxiliar = (yyvsp[-1].no);
@@ -1586,23 +1604,23 @@ yyreduce:
                                                                         noAuxiliar = noAuxiliar->noIrmao;
                                                                 noAuxiliar->noIrmao = (yyvsp[0].no);
                                                                 }
-#line 1590 "y.tab.c" /* yacc.c:1646  */
+#line 1608 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 184 "uccompiler.y" /* yacc.c:1646  */
+#line 202 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = inserirNo(NULL,"FuncBody",NULL);}
-#line 1596 "y.tab.c" /* yacc.c:1646  */
+#line 1614 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 185 "uccompiler.y" /* yacc.c:1646  */
+#line 203 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = inserirNo(NULL,"FuncBody",(yyvsp[-1].no));}
-#line 1602 "y.tab.c" /* yacc.c:1646  */
+#line 1620 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 188 "uccompiler.y" /* yacc.c:1646  */
+#line 206 "uccompiler.y" /* yacc.c:1646  */
     {if((yyvsp[-1].no)!=NULL){
                                                                         (yyval.no)=(yyvsp[-1].no);
                                                                         if ((yyvsp[0].no)!=NULL){
@@ -1615,11 +1633,11 @@ yyreduce:
                                                                                 (yyval.no)=(yyvsp[0].no);
                                                                         }
                                                                 }
-#line 1619 "y.tab.c" /* yacc.c:1646  */
+#line 1637 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 200 "uccompiler.y" /* yacc.c:1646  */
+#line 218 "uccompiler.y" /* yacc.c:1646  */
     {if((yyvsp[-1].no)!=NULL){
                                                                         (yyval.no)=(yyvsp[-1].no);
                                                                         if ((yyvsp[0].no)!=NULL){
@@ -1631,217 +1649,235 @@ yyreduce:
                                                                 }else{
                                                                         (yyval.no)=(yyvsp[0].no);
                                                                 }}
-#line 1635 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 14:
-#line 211 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=(yyvsp[0].no);}
-#line 1641 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 15:
-#line 212 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=(yyvsp[0].no);}
-#line 1647 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 16:
-#line 215 "uccompiler.y" /* yacc.c:1646  */
-    { addIrmao((yyvsp[-2].no),(yyvsp[-1].no)); (yyval.no) = inserirNo(NULL,"FuncDeclaration",(yyvsp[-2].no));}
 #line 1653 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 14:
+#line 229 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=(yyvsp[0].no);}
+#line 1659 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 230 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=(yyvsp[0].no);}
+#line 1665 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 16:
+#line 233 "uccompiler.y" /* yacc.c:1646  */
+    { addIrmao((yyvsp[-2].no),(yyvsp[-1].no)); 
+                                                        (yyval.no) = inserirNo(NULL,"FuncDeclaration",(yyvsp[-2].no));}
+#line 1672 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 17:
-#line 218 "uccompiler.y" /* yacc.c:1646  */
+#line 237 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no)=inserirNo((yyvsp[-3].id),"Id",NULL);
                                                 addIrmao((yyval.no),inserirNo(NULL,"ParamList",(yyvsp[-1].no)));
                                                 }
-#line 1661 "y.tab.c" /* yacc.c:1646  */
+#line 1680 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 223 "uccompiler.y" /* yacc.c:1646  */
+#line 242 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = (yyvsp[0].no);}
-#line 1667 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 19:
-#line 224 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[0].no),(yyvsp[-2].no));(yyval.no) = (yyvsp[0].no);}
-#line 1673 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 20:
-#line 228 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"ParamDeclaration",(yyvsp[0].no));}
-#line 1679 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 21:
-#line 229 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-1].no),inserirNo((yyvsp[0].id),"Id",NULL));
-                                (yyval.no) = inserirNo(NULL,"ParamDeclaration",(yyvsp[-1].no));}
 #line 1686 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 233 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[-1].no));(yyval.no) = inserirNo(NULL,"Declaration",(yyvsp[-2].no));}
-#line 1692 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 23:
-#line 234 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
+  case 19:
+#line 243 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = (yyvsp[-2].no);
+                                                        noAuxiliar = (yyvsp[-2].no);
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,(yyvsp[0].no));
+                                                                }
 #line 1698 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 237 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=(yyvsp[0].no);}
+  case 20:
+#line 253 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"ParamDeclaration",(yyvsp[0].no));}
 #line 1704 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 238 "uccompiler.y" /* yacc.c:1646  */
-    { (yyval.no) = inserirNo("type","Declaration",(yyvsp[0].no));
-                                                noAuxiliar = (yyvsp[0].no);
-                                                while (noAuxiliar->noIrmao!=NULL)
-                                                        noAuxiliar = noAuxiliar->noIrmao;
-                                                noAuxiliar->noIrmao = (yyvsp[-2].no);  }
-#line 1714 "y.tab.c" /* yacc.c:1646  */
+  case 21:
+#line 254 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-1].no),inserirNo((yyvsp[0].id),"Id",NULL));
+                                (yyval.no) = inserirNo(NULL,"ParamDeclaration",(yyvsp[-1].no));}
+#line 1711 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 245 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Char",NULL);}
-#line 1720 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 27:
-#line 246 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Int",NULL);}
+  case 22:
+#line 258 "uccompiler.y" /* yacc.c:1646  */
+    {      no * noDeclarate;
+                                                /*addIrmao($1,$2);*/
+                                                noAuxiliar=(yyvsp[-1].no);
+                                                while(noAuxiliar!=NULL){
+                                                        noDeclarate=noAuxiliar->noFilho;
+                                                        noAuxiliar->noFilho=inserirNo((yyvsp[-2].no)->id,(yyvsp[-2].no)->type,(yyvsp[-2].no)->noFilho);
+                                                        addIrmao(noAuxiliar->noFilho,noDeclarate);
+                                                        noAuxiliar=noAuxiliar->noIrmao;
+                                                }
+                                                (yyval.no) = (yyvsp[-1].no);}
 #line 1726 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 247 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Void",NULL);}
+  case 23:
+#line 268 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
 #line 1732 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 29:
-#line 248 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Short",NULL);}
+  case 24:
+#line 271 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=inserirNo(NULL,"Declaration",(yyvsp[0].no));}
 #line 1738 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 249 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Double",NULL);}
-#line 1744 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 31:
-#line 252 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo((yyvsp[0].id),"Id",NULL);}
+  case 25:
+#line 272 "uccompiler.y" /* yacc.c:1646  */
+    { (yyval.no) = (yyvsp[-2].no);
+                                                noAuxiliar = (yyval.no);
+                                                while(noAuxiliar->noIrmao!=NULL){
+                                                        noAuxiliar=noAuxiliar->noIrmao;
+                                                }
+                                                addIrmao(noAuxiliar,inserirNo(NULL,"Declaration",(yyvsp[0].no)));
+                                                }
 #line 1750 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 32:
-#line 253 "uccompiler.y" /* yacc.c:1646  */
-    { (yyval.no) = inserirNo((yyvsp[-2].id),"Id",NULL); addIrmao((yyval.no),(yyvsp[0].no));}
+  case 26:
+#line 281 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Char",NULL);}
 #line 1756 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 256 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = (yyvsp[-1].no);}
+  case 27:
+#line 282 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Int",NULL);}
 #line 1762 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 257 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = NULL;}
+  case 28:
+#line 283 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Void",NULL);}
 #line 1768 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 29:
+#line 284 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Short",NULL);}
+#line 1774 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 285 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Double",NULL);}
+#line 1780 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 288 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo((yyvsp[0].id),"Id",NULL);}
+#line 1786 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 289 "uccompiler.y" /* yacc.c:1646  */
+    { (yyval.no) = inserirNo((yyvsp[-2].id),"Id",NULL); addIrmao((yyval.no),(yyvsp[0].no));}
+#line 1792 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 292 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = (yyvsp[-1].no);}
+#line 1798 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 34:
+#line 293 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = NULL;}
+#line 1804 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 35:
-#line 258 "uccompiler.y" /* yacc.c:1646  */
+#line 294 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = (yyvsp[0].no);
                                    if ((yyvsp[0].no)!=NULL && (yyvsp[0].no)->noIrmao!=NULL){ (yyval.no) = inserirNo(NULL,"StatList",(yyvsp[0].no)); }
                                 }
-#line 1776 "y.tab.c" /* yacc.c:1646  */
+#line 1812 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 261 "uccompiler.y" /* yacc.c:1646  */
+#line 297 "uccompiler.y" /* yacc.c:1646  */
     { if((yyvsp[0].no)==NULL) (yyvsp[0].no)=inserirNo(NULL,"Null",NULL);
                                              addIrmao((yyvsp[-2].no),(yyvsp[0].no));
                                              addIrmao((yyvsp[0].no),inserirNo(NULL,"Null",NULL));
                                              (yyval.no) = inserirNo(NULL,"If",(yyvsp[-2].no));  }
-#line 1785 "y.tab.c" /* yacc.c:1646  */
+#line 1821 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 265 "uccompiler.y" /* yacc.c:1646  */
+#line 301 "uccompiler.y" /* yacc.c:1646  */
     {if((yyvsp[-2].no)==NULL) (yyvsp[-2].no)=inserirNo(NULL,"Null",NULL);
                                                                 if((yyvsp[0].no)==NULL) (yyvsp[0].no)=inserirNo(NULL,"Null",NULL);
                                                                 addIrmao((yyvsp[-4].no),(yyvsp[-2].no));
                                                                 addIrmao((yyvsp[-2].no),(yyvsp[0].no));
                                                                 (yyval.no) = inserirNo(NULL,"If",(yyvsp[-4].no));
                                                                 ;}
-#line 1796 "y.tab.c" /* yacc.c:1646  */
+#line 1832 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 271 "uccompiler.y" /* yacc.c:1646  */
+#line 307 "uccompiler.y" /* yacc.c:1646  */
     { if((yyvsp[0].no)==NULL) (yyvsp[0].no)=inserirNo(NULL,"Null",NULL);
                                                 addIrmao((yyvsp[-2].no),(yyvsp[0].no));                                                
                                                 (yyval.no) = inserirNo(NULL,"While",(yyvsp[-2].no));
                                                 }
-#line 1805 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 39:
-#line 275 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=(yyvsp[0].no);}
-#line 1811 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 40:
-#line 278 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=(yyvsp[-1].no);}
-#line 1817 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 41:
-#line 279 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
-#line 1823 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 42:
-#line 280 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = NULL;}
-#line 1829 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 43:
-#line 283 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=(yyvsp[0].no);}
-#line 1835 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 44:
-#line 284 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
 #line 1841 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 39:
+#line 311 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=(yyvsp[0].no);}
+#line 1847 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 40:
+#line 314 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=(yyvsp[-1].no);}
+#line 1853 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 41:
+#line 315 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
+#line 1859 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 42:
+#line 316 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = NULL;}
+#line 1865 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 43:
+#line 319 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=(yyvsp[0].no);}
+#line 1871 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 44:
+#line 320 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
+#line 1877 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 45:
-#line 287 "uccompiler.y" /* yacc.c:1646  */
+#line 323 "uccompiler.y" /* yacc.c:1646  */
     {
                                                 if((yyvsp[-1].no)!=NULL){
                                                         (yyval.no) = (yyvsp[-1].no);
@@ -1854,221 +1890,221 @@ yyreduce:
                                                     }else
                                                         (yyval.no) = (yyvsp[0].no);
                                                     }
-#line 1858 "y.tab.c" /* yacc.c:1646  */
+#line 1894 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 299 "uccompiler.y" /* yacc.c:1646  */
+#line 335 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no)=(yyvsp[0].no);}
-#line 1864 "y.tab.c" /* yacc.c:1646  */
+#line 1900 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 301 "uccompiler.y" /* yacc.c:1646  */
+#line 337 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = inserirNo(NULL,"Return",inserirNo(NULL,"Null",NULL));}
-#line 1870 "y.tab.c" /* yacc.c:1646  */
+#line 1906 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 302 "uccompiler.y" /* yacc.c:1646  */
+#line 338 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = inserirNo(NULL,"Return",(yyvsp[-1].no));}
-#line 1876 "y.tab.c" /* yacc.c:1646  */
+#line 1912 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 305 "uccompiler.y" /* yacc.c:1646  */
+#line 341 "uccompiler.y" /* yacc.c:1646  */
     {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Store",(yyvsp[-2].no));}
-#line 1882 "y.tab.c" /* yacc.c:1646  */
+#line 1918 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 306 "uccompiler.y" /* yacc.c:1646  */
+#line 342 "uccompiler.y" /* yacc.c:1646  */
     {     noAuxiliar=(yyvsp[-2].no);
                                 while(noAuxiliar->noIrmao!=NULL){
                                         noAuxiliar=noAuxiliar->noIrmao;
                                 }
                                 noAuxiliar->noIrmao = (yyvsp[0].no);
                                 }
-#line 1893 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 51:
-#line 312 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Add",(yyvsp[-2].no));}
-#line 1899 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 52:
-#line 313 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Sub",(yyvsp[-2].no));}
-#line 1905 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 53:
-#line 314 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Mul",(yyvsp[-2].no));}
-#line 1911 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 54:
-#line 315 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Div",(yyvsp[-2].no));}
-#line 1917 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 55:
-#line 316 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Mod",(yyvsp[-2].no));}
-#line 1923 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 56:
-#line 317 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Or",(yyvsp[-2].no));}
 #line 1929 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 57:
-#line 318 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"And",(yyvsp[-2].no));}
+  case 51:
+#line 348 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Add",(yyvsp[-2].no));}
 #line 1935 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 58:
-#line 319 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"BitWiseAnd",(yyvsp[-2].no));}
+  case 52:
+#line 349 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Sub",(yyvsp[-2].no));}
 #line 1941 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 59:
-#line 320 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"BitWiseOr",(yyvsp[-2].no));}
+  case 53:
+#line 350 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Mul",(yyvsp[-2].no));}
 #line 1947 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 60:
-#line 321 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"BitWiseXor",(yyvsp[-2].no));}
+  case 54:
+#line 351 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Div",(yyvsp[-2].no));}
 #line 1953 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 61:
-#line 322 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Eq",(yyvsp[-2].no));}
+  case 55:
+#line 352 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Mod",(yyvsp[-2].no));}
 #line 1959 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 62:
-#line 323 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Ne",(yyvsp[-2].no));}
+  case 56:
+#line 353 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Or",(yyvsp[-2].no));}
 #line 1965 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 63:
-#line 324 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Le",(yyvsp[-2].no));}
+  case 57:
+#line 354 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"And",(yyvsp[-2].no));}
 #line 1971 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 64:
-#line 325 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Ge",(yyvsp[-2].no));}
+  case 58:
+#line 355 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"BitWiseAnd",(yyvsp[-2].no));}
 #line 1977 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 65:
-#line 326 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Lt",(yyvsp[-2].no));}
+  case 59:
+#line 356 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"BitWiseOr",(yyvsp[-2].no));}
 #line 1983 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 66:
-#line 327 "uccompiler.y" /* yacc.c:1646  */
-    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Gt",(yyvsp[-2].no));}
+  case 60:
+#line 357 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"BitWiseXor",(yyvsp[-2].no));}
 #line 1989 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 67:
-#line 328 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Plus",(yyvsp[0].no));}
+  case 61:
+#line 358 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Eq",(yyvsp[-2].no));}
 #line 1995 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 68:
-#line 329 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Minus",(yyvsp[0].no));}
+  case 62:
+#line 359 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Ne",(yyvsp[-2].no));}
 #line 2001 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 69:
-#line 330 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Not",(yyvsp[0].no));}
+  case 63:
+#line 360 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Le",(yyvsp[-2].no));}
 #line 2007 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 70:
-#line 331 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Call",(yyvsp[0].no));}
+  case 64:
+#line 361 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Ge",(yyvsp[-2].no));}
 #line 2013 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 71:
-#line 332 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
+  case 65:
+#line 362 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Lt",(yyvsp[-2].no));}
 #line 2019 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 72:
-#line 333 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=inserirNo((yyvsp[0].id),"Id",NULL);}
+  case 66:
+#line 363 "uccompiler.y" /* yacc.c:1646  */
+    {addIrmao((yyvsp[-2].no),(yyvsp[0].no));(yyval.no) = inserirNo(NULL,"Gt",(yyvsp[-2].no));}
 #line 2025 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 73:
-#line 334 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=inserirNo((yyvsp[0].id),"IntLit",NULL);}
+  case 67:
+#line 364 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Plus",(yyvsp[0].no));}
 #line 2031 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 74:
-#line 335 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=inserirNo((yyvsp[0].id),"ChrLit",NULL);}
+  case 68:
+#line 365 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Minus",(yyvsp[0].no));}
 #line 2037 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 75:
-#line 336 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no)=inserirNo((yyvsp[0].id),"RealLit",NULL);}
+  case 69:
+#line 366 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Not",(yyvsp[0].no));}
 #line 2043 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 76:
-#line 337 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Comma",(yyvsp[-1].no));}
+  case 70:
+#line 367 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,"Call",(yyvsp[0].no));}
 #line 2049 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 77:
-#line 338 "uccompiler.y" /* yacc.c:1646  */
+  case 71:
+#line 368 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
 #line 2055 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 78:
-#line 341 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo((yyvsp[-2].id),"Id",NULL);}
+  case 72:
+#line 369 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=inserirNo((yyvsp[0].id),"Id",NULL);}
 #line 2061 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 73:
+#line 370 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=inserirNo((yyvsp[0].id),"IntLit",NULL);}
+#line 2067 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 74:
+#line 371 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=inserirNo((yyvsp[0].id),"ChrLit",NULL);}
+#line 2073 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 75:
+#line 372 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no)=inserirNo((yyvsp[0].id),"RealLit",NULL);}
+#line 2079 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 76:
+#line 373 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = (yyvsp[-1].no);}
+#line 2085 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 77:
+#line 374 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo(NULL,NULL,NULL);errorFlag=1;}
+#line 2091 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 78:
+#line 377 "uccompiler.y" /* yacc.c:1646  */
+    {(yyval.no) = inserirNo((yyvsp[-2].id),"Id",NULL);}
+#line 2097 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 79:
-#line 342 "uccompiler.y" /* yacc.c:1646  */
+#line 378 "uccompiler.y" /* yacc.c:1646  */
     {(yyval.no) = inserirNo((yyvsp[-3].id),"Id",NULL);
                                         addIrmao((yyval.no),(yyvsp[-1].no));}
-#line 2068 "y.tab.c" /* yacc.c:1646  */
+#line 2104 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2072 "y.tab.c" /* yacc.c:1646  */
+#line 2108 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

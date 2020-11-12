@@ -167,9 +167,27 @@ Programa: FunctionsAndDeclarations {$$=inserirNo(NULL,"Program",$1);if (flag==2 
 FunctionsAndDeclarations: FunctionDefinition  {$$ = $1;}
         | FunctionDeclaration  {$$ = $1;}
         | Declaration  {$$ = $1;}
-        | FunctionsAndDeclarations FunctionDefinition {addIrmao($2,$1);$$ = $2;}
-        | FunctionsAndDeclarations FunctionDeclaration  {addIrmao($2,$1);$$ = $2;}
-        | FunctionsAndDeclarations Declaration {addIrmao($2,$1);$$ = $2;}
+        | FunctionsAndDeclarations FunctionDefinition   {$$ = $1;
+                                                        noAuxiliar = $1;
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,$2);
+                                                        }
+        | FunctionsAndDeclarations FunctionDeclaration  {$$ = $1;
+                                                        noAuxiliar = $1;
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,$2);
+                                                        }
+        | FunctionsAndDeclarations Declaration          {$$ = $1;
+                                                        noAuxiliar = $1;
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,$2);
+                                                        }
         ;
 	
 FunctionDefinition: TypeSpec FunctionDeclarator FunctionBody  { $$ = inserirNo(NULL,"FuncDefinition",$1);
@@ -212,7 +230,8 @@ DeclarationsAndStatements: DeclarationsAndStatements  Statement {if($1!=NULL){
         | Declaration {$$=$1;}
         ;
 
-FunctionDeclaration: TypeSpec FunctionDeclarator SEMI { addIrmao($1,$2); $$ = inserirNo(NULL,"FuncDeclaration",$1);}
+FunctionDeclaration: TypeSpec FunctionDeclarator SEMI { addIrmao($1,$2); 
+                                                        $$ = inserirNo(NULL,"FuncDeclaration",$1);}
 		;
 
 FunctionDeclarator:ID LPAR ParameterList RPAR  {$$=inserirNo($1,"Id",NULL);
@@ -221,7 +240,13 @@ FunctionDeclarator:ID LPAR ParameterList RPAR  {$$=inserirNo($1,"Id",NULL);
         ;
 
 ParameterList: ParameterDeclaration {$$ = $1;}
-        | ParameterList COMMA ParameterDeclaration  {addIrmao($3,$1);$$ = $3;}
+        | ParameterList COMMA ParameterDeclaration      {$$ = $1;
+                                                        noAuxiliar = $1;
+                                                        while(noAuxiliar->noIrmao!=NULL){
+                                                                noAuxiliar=noAuxiliar->noIrmao;
+                                                        }
+                                                        addIrmao(noAuxiliar,$3);
+                                                                }
         ;
 
 
@@ -230,16 +255,27 @@ ParameterDeclaration: TypeSpec  {$$ = inserirNo(NULL,"ParamDeclaration",$1);}
                                 $$ = inserirNo(NULL,"ParamDeclaration",$1);}
                 ;
                            
-Declaration:TypeSpec DeclarationCD SEMI  {addIrmao($1,$2);$$ = inserirNo(NULL,"Declaration",$1);}
+Declaration:TypeSpec DeclarationCD SEMI  {      no * noDeclarate;
+                                                /*addIrmao($1,$2);*/
+                                                noAuxiliar=$2;
+                                                while(noAuxiliar!=NULL){
+                                                        noDeclarate=noAuxiliar->noFilho;
+                                                        noAuxiliar->noFilho=inserirNo($1->id,$1->type,$1->noFilho);
+                                                        addIrmao(noAuxiliar->noFilho,noDeclarate);
+                                                        noAuxiliar=noAuxiliar->noIrmao;
+                                                }
+                                                $$ = $2;}
             | error SEMI                 {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
             ;
 
-DeclarationCD: Declarator       {$$=$1;}
-             | DeclarationCD COMMA Declarator { $$ = inserirNo("type","Declaration",$3);
-                                                noAuxiliar = $3;
-                                                while (noAuxiliar->noIrmao!=NULL)
-                                                        noAuxiliar = noAuxiliar->noIrmao;
-                                                noAuxiliar->noIrmao = $1;  }
+DeclarationCD: Declarator       {$$=inserirNo(NULL,"Declaration",$1);}
+             | DeclarationCD COMMA Declarator { $$ = $1;
+                                                noAuxiliar = $$;
+                                                while(noAuxiliar->noIrmao!=NULL){
+                                                        noAuxiliar=noAuxiliar->noIrmao;
+                                                }
+                                                addIrmao(noAuxiliar,inserirNo(NULL,"Declaration",$3));
+                                                }
                           
 
 TypeSpec: CHAR  {$$ = inserirNo(NULL,"Char",NULL);}
@@ -302,7 +338,13 @@ StatementReturn: SEMI  {$$ = inserirNo(NULL,"Return",inserirNo(NULL,"Null",NULL)
         |  Expr SEMI {$$ = inserirNo(NULL,"Return",$1);}
         ;
 
-Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);}
+Expr:   Expr ASSIGN Expr  { noAuxiliar=$1;
+                                while(noAuxiliar->noIrmao!=NULL){
+                                        noAuxiliar=noAuxiliar->noIrmao;
+                                }
+                                noAuxiliar->noIrmao = $3;
+                                $$ = inserirNo(NULL,"Store",$1);
+                        }
         | Expr COMMA Expr {     noAuxiliar=$1;
                                 while(noAuxiliar->noIrmao!=NULL){
                                         noAuxiliar=noAuxiliar->noIrmao;
@@ -334,7 +376,7 @@ Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);}
         | INTLIT {$$=inserirNo($1,"IntLit",NULL);}
         | CHRLIT  {$$=inserirNo($1,"ChrLit",NULL);}
         | REALLIT    {$$=inserirNo($1,"RealLit",NULL);}
-        | LPAR Expr RPAR      {$$ = inserirNo(NULL,"Comma",$2);} 
+        | LPAR Expr RPAR      {$$ = $2;} 
         | LPAR error RPAR {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         ;
 

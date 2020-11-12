@@ -68,7 +68,8 @@ LE  "<="
 <COMMENT>.        {coluna+=yyleng;}
 <COMMENT>\n       {linha++;coluna=1;}
 <COMMENT>\*\/     {BEGIN 0;coluna+=yyleng;}
-<COMMENT><<EOF>>   {if(flagError)printf("Line %d, col %d: unterminated comment\n",erroL,erroC); BEGIN 0;}
+<COMMENT><<EOF>>   {if(flagError)printf("Line %d, col %d: unterminated comment\n",erroL,erroC); yyterminate();}
+<<EOF>>             {coluna+=yyleng;yyterminate();}
 {CHAR}  {if(flag==1)printf("CHAR\n");coluna+=yyleng;return CHAR;}
 {ELSE} {if(flag==1)printf("ELSE\n");coluna+=yyleng;return ELSE;}
 {IF} {if(flag==1)printf("IF\n");coluna+=yyleng;return IF;}
@@ -139,6 +140,7 @@ int main(int argc, char **argv){
             flagError=1;    
         }
         else if(argv[1][0]=='-' && argv[1][1]=='t'){
+            flagError=1;
             flag=2;
         }
     }

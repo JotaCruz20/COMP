@@ -1,22 +1,17 @@
-intttt;
-$
-short abc, asd = ;
-int a = 'c';
-char char ;
-int {};
-void {;};
-short ;{;};
-int main() {
-
+int main(void) {
+  =;
+  char i = 'A';
+  while (i <= 'Z')
+  {
+    putchar(i);
+    i = i + 1;
+  }
+  =;
+  return 0;
 }
-int for;
-int for = 2;
-int for
-int 1;
-char main2(int a, );;
 
-int* main3(char *a) {
-
+char e(void) {
+  while(==);
+  func(==);
+  { == };
 }
-a = 2;
-
