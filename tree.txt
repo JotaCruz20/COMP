@@ -17,11 +17,15 @@
                                 FunctionBody
                                 /     |    \
                             LBRACE  DAndS  RBRACE
+                                      |
+                                   Statement
                                       / \
-                                  DAndS  Statement
-                                  / \            \
-                             DAndS  Statement     Return
-                               |           \
-                            Declaration    While
-                               |
-                            Char ...
+                                    Expr SEMI
+                                    / | \
+                                Expr  MUL  Expr
+                                / \          \
+                           Minus  Expr        2
+                                    |
+                                  INTLIT
+                                     |
+                                     1

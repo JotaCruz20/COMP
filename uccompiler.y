@@ -103,6 +103,7 @@
 %type <no> StatementIrmao
 %type <no> Expr
 %type <no> ExprFunctions
+%type <no> ExprMath
 
 %token <id> CHRLIT 
 %token <id> ID
@@ -338,19 +339,9 @@ StatementReturn: SEMI  {$$ = inserirNo(NULL,"Return",inserirNo(NULL,"Null",NULL)
         |  Expr SEMI {$$ = inserirNo(NULL,"Return",$1);}
         ;
 
-Expr:   Expr ASSIGN Expr  { noAuxiliar=$1;
-                                while(noAuxiliar->noIrmao!=NULL){
-                                        noAuxiliar=noAuxiliar->noIrmao;
-                                }
-                                noAuxiliar->noIrmao = $3;
-                                $$ = inserirNo(NULL,"Store",$1);
+Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);
                         }
-        | Expr COMMA Expr {     noAuxiliar=$1;
-                                while(noAuxiliar->noIrmao!=NULL){
-                                        noAuxiliar=noAuxiliar->noIrmao;
-                                }
-                                noAuxiliar->noIrmao = $3;
-                                }
+        | Expr COMMA Expr {addIrmao($1,$3) ;$$ = inserirNo(NULL,"Comma",$1);}
         | Expr PLUS Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Add",$1);}
         | Expr MINUS Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Sub",$1);}
         | Expr MUL Expr {addIrmao($1,$3);$$ = inserirNo(NULL,"Mul",$1);}
@@ -367,9 +358,7 @@ Expr:   Expr ASSIGN Expr  { noAuxiliar=$1;
         | Expr GE Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Ge",$1);}
         | Expr LT Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Lt",$1);}
         | Expr GT Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Gt",$1);}
-        | PLUS Expr     {$$ = inserirNo(NULL,"Plus",$2);}
-        | MINUS Expr    {$$ = inserirNo(NULL,"Minus",$2);}
-        | NOT Expr      {$$ = inserirNo(NULL,"Not",$2);}
+        | ExprMath          
         | ExprFunctions {$$ = inserirNo(NULL,"Call",$1);}
         | ID LPAR error RPAR   {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         | ID {$$=inserirNo($1,"Id",NULL);}
@@ -380,6 +369,11 @@ Expr:   Expr ASSIGN Expr  { noAuxiliar=$1;
         | LPAR error RPAR {$$ = inserirNo(NULL,NULL,NULL);errorFlag=1;}
         ;
 
+
 ExprFunctions:    ID LPAR RPAR  {$$ = inserirNo($1,"Id",NULL);}  
                 | ID LPAR Expr RPAR    {$$ = inserirNo($1,"Id",NULL);
                                         addIrmao($$,$3);} 
+
+ExprMath:  PLUS Expr  %prec NOT   {$$ = inserirNo(NULL,"Plus",$2);}
+        | MINUS Expr  %prec NOT  {$$ = inserirNo(NULL,"Minus",$2);}
+        | NOT Expr      {$$ = inserirNo(NULL,"Not",$2);}
