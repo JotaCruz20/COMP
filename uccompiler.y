@@ -341,7 +341,7 @@ StatementIrmao : StatementIrmao StatementError {
                 | StatementError {$$=$1;}
 
 StatementReturn: SEMI  {$$ = inserirNo(NULL,"Return",inserirNo(NULL,"Null",NULL));}
-        |  Expr SEMI {$$ = inserirNo(NULL,"Return",$1);}
+        |  CommaExpr SEMI {$$ = inserirNo(NULL,"Return",$1);}
         ;
 
 Expr:   Expr ASSIGN Expr  {addIrmao($1,$3);$$ = inserirNo(NULL,"Store",$1);}
