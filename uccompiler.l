@@ -4,6 +4,9 @@
         André Cristóvão Ferreira da Silva  2018277921
     */
     #include "y.tab.h"
+    #include "tree.h"
+    #include "symtab.h"
+    #include "semantics.h"
     #include <stdio.h>
     #include <stdlib.h>
     int linha=1;
@@ -11,6 +14,8 @@
     int flag=0,printM=0;
     int flagError=0;
     int erroC = 0, erroL =0;
+    int errorFlag = 0;
+    struct no * noAST;
 %}
 %X COMMENT
 INTLIT         [0-9]+
@@ -138,12 +143,22 @@ int main(int argc, char **argv){
         }
         else if(argv[1][0]=='-' && argv[1][1]=='e' && argv[1][2]=='2'){
             flagError=1;    
+            yyparse();
         }
         else if(argv[1][0]=='-' && argv[1][1]=='t'){
             flagError=1;
             flag=2;
+            yyparse();
+            if (errorFlag==0)
+                printTree(noAST,0);    
+        }
+        else if(argv[1][0]=='-' && argv[1][1]=='s'){
+            yyparse();
+            checkProgram(noAST);
+            printTabela();
+            if (errorFlag==0)
+                printTreeAnotada(noAST,0);  
         }
     }
-    yyparse();
     return 0;
 }

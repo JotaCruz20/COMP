@@ -7,19 +7,12 @@
     #include <stdio.h>
     #include <stdlib.h>  
     #include <string.h>  
+    #include "tree.h"
     int yylex(void);
     void yyerror (char * s);
 
-
-
-    typedef struct no{
-        char * id;
-        char * type;
-        struct no * noFilho; // cada no tem 1 filho e 1 irmao(podem ser null)
-        struct no * noIrmao; // facilita, pois so temos de ter 1 pointer para o filho
-    } no;                    // e o filho terá pointer para os irmaos (nao e necessario array de ponteiros)
-
-    int errorFlag = 0;
+    extern int errorFlag;
+    extern struct no * noAST;
     int counter = 0;
     extern int flag;
 
@@ -77,7 +70,7 @@
                 }
 
         }
-        free(auxNode);
+        //free(auxNode);
     }
 
 %}
@@ -167,7 +160,7 @@
 
 %%
 
-Programa: FunctionsAndDeclarations {$$=inserirNo(NULL,"Program",$1);if (flag==2 && errorFlag==0)printTree($$,0);}
+Programa: FunctionsAndDeclarations {noAST=inserirNo(NULL,"Program",$1);}
 	    ;
 
 FunctionsAndDeclarations: FunctionDefinition  {$$ = $1;}
