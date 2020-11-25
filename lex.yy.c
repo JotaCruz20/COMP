@@ -2191,6 +2191,7 @@ int main(int argc, char **argv){
             yyparse();
             checkProgram(noAST);
             printTabela();
+            anotateBody(noAST);
             if (errorFlag==0)
                 printTreeAnotada(noAST,0);  
         }

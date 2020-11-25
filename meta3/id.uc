@@ -3,5 +3,5 @@ int main(int a,int b){
 }
 
 int r(void){
-    a=2;
+   int  a=2;
 }

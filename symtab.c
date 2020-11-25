@@ -103,3 +103,50 @@ void printTabela(){
 		auxTabela = auxTabela->next;
 	}
 }
+
+
+char* searchId(int nTabela,char * id){
+	char * type = (char *) calloc(2,sizeof(char));
+	int counter = 0;
+	tabela * aux = tabelaSimbolos;
+	if(aux!=NULL){
+			noTabela * auxTab = aux->tabelaAtual;
+			//ve se está no global -> se estiver guarda e verifica se n foi definido no atual
+			while(auxTab!=NULL){
+				if(strcmp(auxTab->id,id)==0){
+					if(auxTab->params!=NULL){
+						type = (char *) malloc((strlen(auxTab->tipo)+strlen(auxTab->params)+4)*sizeof(char));
+						strcpy(type,auxTab->tipo);
+						strcat(type,auxTab->params);
+					}
+					else{
+						type = (char *) malloc((strlen(auxTab->tipo)+4)*sizeof(char));
+						strcpy(type,auxTab->tipo);
+					}
+				}
+				auxTab=auxTab->next;
+			}
+			while(counter!= nTabela){
+				aux = aux ->next;
+				if(aux->tabelaAtual!=NULL){
+					counter+=1;
+				}
+			}
+			auxTab = aux->tabelaAtual;
+			while(auxTab!=NULL){
+				if(strcmp(auxTab->id,id)==0){
+					type = (char *) malloc((strlen(auxTab->tipo)+4)*sizeof(char));
+					strcpy(type,auxTab->tipo);
+				}
+				auxTab=auxTab->next;
+			}
+			if(strcmp(type,"")!=0){
+				return strdup(type);
+			}
+			else{
+				return strdup("undef");
+			}
+			
+	}
+	return strdup("undef");;
+}

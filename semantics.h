@@ -11,7 +11,9 @@ void addParamsFunction(no * atual, char * nameTable);
 void checkFuncDefinition(no * atual);
 void checkFuncDeclaration(no * atual);
 void checkDeclaration(no * atual);
-void checkBody(no * atual);
+void checkBody(no * atual, char* pai);
 void printTreeAnotada(no * auxNode, int pontos);
+void anotateBody(no * atual);
+char * prioridade(no * atual);
 
 #endif 

@@ -1,6 +1,6 @@
 int a=3;
-char b='a';
-void fun(int a);
+char b=2;
+void function(int a);
 int random(char e, int b);
 
 

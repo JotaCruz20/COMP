@@ -28,5 +28,6 @@ void insert(char * id, char * tipo, char * params, char * nomeTabela);
 tabela * searchTabela(char * nome);
 void initFunctionTabela(char * name, int flag);
 void printTabela();
+char* searchId(int nTabela,char * id);
 
 #endif
