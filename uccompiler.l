@@ -155,8 +155,8 @@ int main(int argc, char **argv){
         else if(argv[1][0]=='-' && argv[1][1]=='s'){
             yyparse();
             checkProgram(noAST);
-            printTabela();
             anotateBody(noAST);
+            printTabela();
             if (errorFlag==0)
                 printTreeAnotada(noAST,0);  
         }

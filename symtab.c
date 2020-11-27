@@ -1,6 +1,8 @@
 #include "symtab.h"
 
 tabela * tabelaSimbolos;
+extern int linha;
+extern int coluna;
 
 void initTabela(){
     tabelaSimbolos = (tabela *)malloc(sizeof(tabela));
@@ -25,23 +27,30 @@ void insert(char * id, char * tipo, char * params, char * nomeTabela){
     strcpy(tab->tipo,tipo);
     strcpy(tab->params,params);
     tabela * aux = searchTabela(nomeTabela);
-    if (aux->tabelaAtual == NULL)
+    if (aux->tabelaAtual == NULL){
 		aux->tabelaAtual = tab;
+	}
 	else{
 		noTabela * auxNoTabela = aux->tabelaAtual;
 		while (auxNoTabela->next != NULL){
 			if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
 				free(tab);
+				printf("Line %d,col %d: Symbol %s already  defined\n",linha,coluna,id);
 				return;
 			}
 			auxNoTabela = auxNoTabela->next;
 		}
 		if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
 			free(tab);
+			printf("Line %d,col %d: Symbol %s already  defined\n",linha,coluna,id);
 			return;
 		}
 		auxNoTabela->next = tab;
 	}
+}
+
+void insertError(char *id){
+
 }
 
 tabela * searchTabela(char * nome){
@@ -105,9 +114,8 @@ void printTabela(){
 }
 
 
-char* searchId(int nTabela,char * id){
+char* searchId(char* nTabela,char * id){
 	char * type = (char *) calloc(2,sizeof(char));
-	int counter = 0;
 	tabela * aux = tabelaSimbolos;
 	if(aux!=NULL){
 			noTabela * auxTab = aux->tabelaAtual;
@@ -126,11 +134,8 @@ char* searchId(int nTabela,char * id){
 				}
 				auxTab=auxTab->next;
 			}
-			while(counter!= nTabela){
+			while( strcmp(aux->name,nTabela)!=0 && aux->next!=NULL){
 				aux = aux ->next;
-				if(aux->tabelaAtual!=NULL){
-					counter+=1;
-				}
 			}
 			auxTab = aux->tabelaAtual;
 			while(auxTab!=NULL){

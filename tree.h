@@ -4,6 +4,8 @@
    typedef struct no{
         char * id;
         char * type;
+        int line;
+        int col;
         char * exprType;
         struct no * noFilho; // cada no tem 1 filho e 1 irmao(podem ser null)
         struct no * noIrmao; // facilita, pois so temos de ter 1 pointer para o filho

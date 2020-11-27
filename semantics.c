@@ -7,7 +7,9 @@
 #include "tree.h"
 
 char name[20];
-int bodys = 0;
+char * funcName;
+extern int linha;
+extern int coluna;
 
 void checkProgram(no * atual){ 
 	if (atual == NULL)
@@ -17,12 +19,18 @@ void checkProgram(no * atual){
 			initTabela();
 		}
 		if (strcmp(atual->type, "FuncDefinition")==0){
+			funcName = (char *) malloc(strlen(atual->noFilho->noIrmao->id)*sizeof(char));
+			strcpy(funcName,atual->noFilho->noIrmao->id);
 			checkFuncDefinition(atual);
 		}
 		if (strcmp(atual->type, "FuncDeclaration")==0){
 			checkFuncDeclaration(atual);
 		}
 		if (strcmp(atual->type, "Declaration")==0){
+			if(funcName==NULL){
+				funcName = (char *) malloc(strlen("Global")*sizeof(char));
+				strcpy(funcName,"Global");
+			}
 			checkDeclaration(atual);
 		}
 	}
@@ -63,13 +71,14 @@ char * checkParams(no * atual){
 
 void addParamsFunction(no * atual, char * nameTable){
 	no * auxNode = atual->noFilho;
-
 	while(auxNode != NULL){
 		if (auxNode->noFilho != NULL){
 			char * type =	strdup(auxNode->noFilho->type);	
             toLowerCase(type);
 			if(strcmp(type,"void")!=0){
-				insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable);
+				if(auxNode->noFilho->noIrmao!=NULL){
+					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable);
+				}
 			}
 		}
 		auxNode = auxNode->noIrmao;
@@ -120,7 +129,7 @@ void addType(no * atual){
 			aux->exprType= (char *) strdup("- int");
 		}
 		else if (strcmp(aux->type,"Store") == 0 || strcmp(aux->type,"Minus")==0 || strcmp(aux->type,"Plus")==0){
-				char * type = searchId(bodys,aux->noFilho->id);
+				char * type = searchId(funcName,aux->noFilho->id);
 				if(strcmp(type,"undef")==0){
 					if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->noFilho->type,"ChrLit")==0){
 						strcpy(type, "int");
@@ -133,7 +142,7 @@ void addType(no * atual){
 				sprintf(aux->exprType,"- %s",type);
 		}
 		else if(aux->id!=NULL){
-			char * type = searchId(bodys,aux->id);
+			char * type = searchId(funcName,aux->id);
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}
@@ -206,14 +215,14 @@ char * prioridade(no * atual){ // vai buscar o tipo para por no Add/Mul/Sub/Mod
 		tipo1 = prioridade(filho1);
 	}
 	else{
-		tipo1 = searchId(bodys,filho1->id);
+		tipo1 = searchId(funcName,filho1->id);
 	}
 	if(filho2!=NULL){
 		if(filho2->id==NULL){
 			tipo2 = prioridade(filho2);
 		}
 		else{
-			tipo2 = searchId(bodys,filho2->id);
+			tipo2 = searchId(funcName,filho2->id);
 		}
 	}
 	else{
@@ -257,7 +266,7 @@ char * prioridade(no * atual){ // vai buscar o tipo para por no Add/Mul/Sub/Mod
 char * searchComma(no * atual){
 	no * filho2 = atual->noFilho->noIrmao;
 	if(filho2->id!=NULL){
-		char * id = searchId(bodys,filho2->id);
+		char * id = searchId(funcName,filho2->id);
 		if(strcmp(id,"undef")==0){
 			if(strcmp(filho2->type,"IntLit")==0 || strcmp(filho2->type,"ChrLit")==0){
 				return strdup("- int");
@@ -292,7 +301,10 @@ char * searchComma(no * atual){
 				return strdup("- int");
 			}	
 			else{
-				char * type = searchId(bodys,filho2->noFilho->id);
+				char * type = searchId(funcName,filho2->noFilho->id);
+				if(strcmp(type,"undef")==0){
+					printf("Line %d,col %d: Symbol %s is not a function", linha,coluna, filho2->noFilho->id);
+				}
 				char * token;
     			token = strtok(type,"(");
 				char * tokenF = (char *) malloc((strlen(token)+3)*sizeof(char));
@@ -303,7 +315,7 @@ char * searchComma(no * atual){
 			}
 		}
 		else if (strcmp(filho2->type,"Store") == 0 || strcmp(filho2->type,"Minus")==0 || strcmp(filho2->type,"Plus")==0){
-				char * type = searchId(bodys,filho2->noFilho->id);
+				char * type = searchId(funcName,filho2->noFilho->id);
 				if(strcmp(type,"undef")==0){
 					if(strcmp(filho2->noFilho->type,"IntLit")==0 || strcmp(filho2->noFilho->type,"ChrLit")==0){
 						strcpy(type, "- int");
@@ -328,7 +340,7 @@ char * searchComma(no * atual){
 
 void checkBody(no * atual,char * pai){
 	no * aux = atual;
-	if(aux!=NULL){
+	if(aux->type!=NULL){
 		if(strcmp(aux->type,"ChrLit")==0 || strcmp(aux->type,"IntLit")==0){
 			aux->exprType= (char *) strdup("- int");
 		}
@@ -355,7 +367,10 @@ void checkBody(no * atual,char * pai){
 				strcpy(aux->exprType, "- int");
 			}	
 			else{
-				char * type = searchId(bodys,aux->noFilho->id);
+				char * type = searchId(funcName,aux->noFilho->id);
+				if(strcmp(type,"undef")==0){
+					printf("Line %d,col %d: Symbol %s is not a function\n", linha,coluna, aux->noFilho->id);
+				}
 				aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 				char * token;
     			token = strtok(type,"(");
@@ -363,8 +378,8 @@ void checkBody(no * atual,char * pai){
 
 			}
 		}
-		else if (strcmp(aux->type,"Store") == 0 || strcmp(aux->type,"Minus")==0 || strcmp(aux->type,"Plus")==0){
-				char * type = searchId(bodys,aux->noFilho->id);
+		else if (strcmp(aux->type,"Store") == 0){
+				char * type = searchId(funcName,aux->noFilho->id);
 				if(strcmp(type,"undef")==0){
 					if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->noFilho->type,"ChrLit")==0){
 						strcpy(type, "int");
@@ -376,8 +391,27 @@ void checkBody(no * atual,char * pai){
 				aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 				sprintf(aux->exprType,"- %s",type);
 		}
+		else if(strcmp(aux->type,"Minus")==0 || strcmp(aux->type,"Plus")==0){
+			char * type;
+			if(aux->noFilho->id==NULL){
+				type = searchId(funcName,aux->noFilho->noFilho->id);
+			}
+			else{
+				type = searchId(funcName,aux->noFilho->id);
+			}
+			if(strcmp(type,"undef")==0){
+				if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->noFilho->type,"ChrLit")==0){
+					strcpy(type, "int");
+				}
+				else if(strcmp(aux->noFilho->type,"RealLit")==0){
+					strcpy(type, "double");
+				}
+			}
+			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
+			sprintf(aux->exprType,"- %s",type);
+		}
 		else if(aux->id!=NULL && strcmp(pai,"Declaration")!=0){
-			char * type = searchId(bodys,aux->id);
+			char * type = searchId(funcName,aux->id);
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}
@@ -394,8 +428,11 @@ void anotateBody(no * atual){
 	if (atual == NULL)
 		return;
 	if (atual->type != NULL){
-		if(strcmp(atual->type,"FuncBody")==0){
-			bodys+=1;
+		if(strcmp(atual->type, "FuncDefinition")==0){
+			funcName = (char *) malloc(strlen(atual->noFilho->noIrmao->id)*sizeof(char));
+			strcpy(funcName,atual->noFilho->noIrmao->id);
+		}
+		else if(strcmp(atual->type,"FuncBody")==0){
 			checkBody(atual,"FuncBody");
 		}
 	}
@@ -407,4 +444,3 @@ void anotateBody(no * atual){
 		auxNode = auxNode->noIrmao;	
 	}
 }
-
