@@ -11,18 +11,21 @@
     #include <stdlib.h>
     int linha=1;
     int coluna=1;
+    int length = 0;
+    int lenghtSTR=0;
     int flag=0,printM=0;
     int flagError=0;
     int erroC = 0, erroL =0;
     int errorFlag = 0;
     struct no * noAST;
+
 %}
 %X COMMENT
 INTLIT         [0-9]+
 signal        [+-]
 exp [eE]
 nExp    {exp}{signal}?{INTLIT}
-SPACE           ([ ]|"\t")
+SPACE           (" "|"\t")+
 ENTER   \\n 
 ASPAS           \\\"
 BARRA       \\\\
@@ -68,56 +71,56 @@ GT  ">"
 LBRACE  "{"
 LE  "<="
 %%
-\/\*              {BEGIN COMMENT;erroC=coluna;erroL=linha;coluna+=yyleng;}
-\/\/.*            {coluna+=yyleng;}         
-<COMMENT>.        {coluna+=yyleng;}
-<COMMENT>\n       {linha++;coluna=1;}
-<COMMENT>\*\/     {BEGIN 0;coluna+=yyleng;}
+\/\*              {BEGIN COMMENT;erroC=coluna;erroL=linha;coluna+=yyleng;lenghtSTR=(int)yyleng;}
+\/\/.*            {coluna+=yyleng;lenghtSTR=(int)yyleng;}         
+<COMMENT>.        {coluna+=yyleng;lenghtSTR=(int)yyleng;}
+<COMMENT>\n       {linha++;coluna=1;lenghtSTR=(int)yyleng;}
+<COMMENT>\*\/     {BEGIN 0;coluna+=yyleng;lenghtSTR=(int)yyleng;}
 <COMMENT><<EOF>>   {if(flagError)printf("Line %d, col %d: unterminated comment\n",erroL,erroC); yyterminate();}
-<<EOF>>             {coluna+=yyleng;yyterminate();}
-{CHAR}  {if(flag==1)printf("CHAR\n");coluna+=yyleng;return CHAR;}
-{ELSE} {if(flag==1)printf("ELSE\n");coluna+=yyleng;return ELSE;}
-{IF} {if(flag==1)printf("IF\n");coluna+=yyleng;return IF;}
-{WHILE} {if(flag==1)printf("WHILE\n");coluna+=yyleng;return WHILE;}
-{INT}   {if(flag==1)printf("INT\n");coluna+=yyleng;return INT;}
-{DOUBLE}   {if(flag==1)printf("DOUBLE\n");coluna+=yyleng;return DOUBLE;}
-{SHORT} {if(flag==1)printf("SHORT\n");coluna+=yyleng;return SHORT;}
-{RETURN}   {if(flag==1)printf("RETURN\n");coluna+=yyleng;return RETURN;}
-{VOID} {if(flag==1)printf("VOID\n");coluna+=yyleng;return VOID;}
-{BAND} {if(flag==1)printf("BITWISEAND\n");coluna+=yyleng;return BAND;}
-{BOR} {if(flag==1)printf("BITWISEOR\n");coluna+=yyleng;return BOR;}
-{BXOR} {if(flag==1)printf("BITWISEXOR\n");coluna+=yyleng;return BXOR;}
-{AND}    {if(flag==1)printf("AND\n");coluna+=yyleng;return AND;}
-{ASSIGN} {if(flag==1)printf("ASSIGN\n");coluna+=yyleng;return ASSIGN;}
-{MUL}   {if(flag==1)printf("MUL\n");coluna+=yyleng;return MUL;}
-{COMMA} {if(flag==1)printf("COMMA\n");coluna+=yyleng;return COMMA;}
-{DIV} {if(flag==1)printf("DIV\n");coluna+=yyleng;return DIV;}
-{EQ}   {if(flag==1)printf("EQ\n");coluna+=yyleng;return EQ;}
-{GE}    {if(flag==1)printf("GE\n");coluna+=yyleng;return GE;}
-{GT} {if(flag==1)printf("GT\n");coluna+=yyleng;return GT;}
-{LBRACE} {if(flag==1)printf("LBRACE\n");coluna+=yyleng;return LBRACE;}
-{LE} {if(flag==1)printf("LE\n");coluna+=yyleng;return LE;}
-{LPAR}  {if(flag==1)printf("LPAR\n");coluna+=yyleng;return LPAR;}
-{LT}    {if(flag==1)printf("LT\n");coluna+=yyleng;return LT;}
-{MINUS} {if(flag==1)printf("MINUS\n");coluna+=yyleng;return MINUS;}
-{MOD}               {if(flag==1)printf("MOD\n");coluna+=yyleng;return MOD;}
-{NE}                  {if(flag==1)printf("NE\n");coluna+=yyleng;return NE;}
-{NOT}                 {if(flag==1)printf("NOT\n");coluna+=yyleng;return NOT;}
-{OR}                  {if(flag==1)printf("OR\n");coluna+=yyleng;return OR;}
-{PLUS}               {if(flag==1)printf("PLUS\n");coluna+=yyleng;return PLUS;}
-{RBRACE}             {if(flag==1)printf("RBRACE\n");coluna+=yyleng;return RBRACE;}
-{RPAR}                {if(flag==1)printf("RPAR\n");coluna+=yyleng;return RPAR;}
-{SEMI}  {if(flag==1)printf("SEMI\n");coluna+=yyleng;return SEMI;}
-{RESERVED}  {if(flag==1)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;return RESERVED;}
-{ID}    {if(flag==1)printf("ID(%s)\n",yytext);coluna+=yyleng;yylval.id = strdup(yytext);return ID;}
-{INTLIT}  {if(flag==1)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;yylval.id = strdup(yytext);return INTLIT;}
-{REALLIT}   {if(flag==1)printf("REALLIT(%s)\n",yytext);coluna+=yyleng; yylval.id = strdup(yytext);return REALLIT;} 
-\'{CHRLIT}\'    {if(flag==1)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;yylval.id = strdup(yytext);return CHRLIT;} 
-\'([^\n\'\\]|\\.)*\'  {printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
-\'([^\n\'\\]|\\.)*(\\)?    {printf("Line %d, col %d: unterminated char constant\n",linha,coluna);coluna+=yyleng;}
-\n|"\r\n"|"\r"    {linha++;coluna=1;}
+<<EOF>>             {coluna+=yyleng;lenghtSTR=(int)yyleng;yyterminate();}
+{CHAR}  {if(flag==1)printf("CHAR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return CHAR;}
+{ELSE} {if(flag==1)printf("ELSE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return ELSE;}
+{IF} {if(flag==1)printf("IF\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return IF;}
+{WHILE} {if(flag==1)printf("WHILE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return WHILE;}
+{INT}   {if(flag==1)printf("INT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return INT;}
+{DOUBLE}   {if(flag==1)printf("DOUBLE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return DOUBLE;}
+{SHORT} {if(flag==1)printf("SHORT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return SHORT;}
+{RETURN}   {if(flag==1)printf("RETURN\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return RETURN;}
+{VOID} {if(flag==1)printf("VOID\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return VOID;}
+{BAND} {if(flag==1)printf("BITWISEAND\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return BAND;}
+{BOR} {if(flag==1)printf("BITWISEOR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return BOR;}
+{BXOR} {if(flag==1)printf("BITWISEXOR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return BXOR;}
+{AND}    {if(flag==1)printf("AND\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return AND;}
+{ASSIGN} {if(flag==1)printf("ASSIGN\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return ASSIGN;}
+{MUL}   {if(flag==1)printf("MUL\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return MUL;}
+{COMMA} {if(flag==1)printf("COMMA\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return COMMA;}
+{DIV} {if(flag==1)printf("DIV\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return DIV;}
+{EQ}   {if(flag==1)printf("EQ\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return EQ;}
+{GE}    {if(flag==1)printf("GE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return GE;}
+{GT} {if(flag==1)printf("GT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return GT;}
+{LBRACE} {if(flag==1)printf("LBRACE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LBRACE;}
+{LE} {if(flag==1)printf("LE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LE;}
+{LPAR}  {if(flag==1)printf("LPAR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LPAR;}
+{LT}    {if(flag==1)printf("LT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LT;}
+{MINUS} {if(flag==1)printf("MINUS\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return MINUS;}
+{MOD}               {if(flag==1)printf("MOD\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return MOD;}
+{NE}                  {if(flag==1)printf("NE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return NE;}
+{NOT}                 {if(flag==1)printf("NOT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return NOT;}
+{OR}                  {if(flag==1)printf("OR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return OR;}
+{PLUS}               {if(flag==1)printf("PLUS\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return PLUS;}
+{RBRACE}             {if(flag==1)printf("RBRACE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return RBRACE;}
+{RPAR}                {if(flag==1)printf("RPAR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return RPAR;}
+{SEMI}  {if(flag==1)printf("SEMI\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return SEMI;}
 {SPACE} {coluna+=yyleng;}
-.   {if(flagError)printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
+{RESERVED}  {if(flag==1)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;lenghtSTR=(int)yyleng;return RESERVED;}
+{ID}    {if(flag==1)printf("ID(%s)\n",yytext);coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);lenghtSTR=(int)yyleng;return ID;}
+{INTLIT}  {if(flag==1)printf("INTLIT(%s)\n",yytext);coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);lenghtSTR=(int)yyleng;return INTLIT;}
+{REALLIT}   {if(flag==1)printf("REALLIT(%s)\n",yytext);coluna+=yyleng; yylval.noCol = addNo(yytext,coluna,linha);lenghtSTR=(int)yyleng;return REALLIT;} 
+\'{CHRLIT}\'    {if(flag==1)printf("CHRLIT(%s)\n",yytext);coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);lenghtSTR=(int)yyleng;return CHRLIT;} 
+\'([^\n\'\\]|\\.)*\'  {printf("Line %d, col %d: invalid char constant (%s)\n",linha,coluna,yytext);lenghtSTR=(int)yyleng;coluna+=yyleng;}
+\'([^\n\'\\]|\\.)*(\\)?    {printf("Line %d, col %d: unterminated char constant\n",linha,coluna);lenghtSTR=(int)yyleng;coluna+=yyleng;}
+\n|"\r\n"|"\r"    {linha++;coluna=1;lenghtSTR=(int)yyleng;}
+.   {lenghtSTR=(int)yyleng;if(flagError)printf("Line %d, col %d: illegal character (%s)\n",linha,coluna,yytext);coluna+=yyleng;}
 %%   
 
 int yywrap(){
@@ -154,8 +157,10 @@ int main(int argc, char **argv){
         }
         else if(argv[1][0]=='-' && argv[1][1]=='s'){
             yyparse();
+            //initErrors();
             checkProgram(noAST);
             anotateBody(noAST);
+            //printErros();
             printTabela();
             if (errorFlag==0)
                 printTreeAnotada(noAST,0);  

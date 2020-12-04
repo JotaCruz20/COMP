@@ -303,7 +303,7 @@ char * searchComma(no * atual){
 			else{
 				char * type = searchId(funcName,filho2->noFilho->id);
 				if(strcmp(type,"undef")==0){
-					printf("Line %d,col %d: Symbol %s is not a function", linha,coluna, filho2->noFilho->id);
+					//printf("Line %d,col %d: Symbol %s is not a function", linha,coluna, filho2->noFilho->id);
 				}
 				char * token;
     			token = strtok(type,"(");
@@ -369,7 +369,7 @@ void checkBody(no * atual,char * pai){
 			else{
 				char * type = searchId(funcName,aux->noFilho->id);
 				if(strcmp(type,"undef")==0){
-					printf("Line %d,col %d: Symbol %s is not a function\n", linha,coluna, aux->noFilho->id);
+					//printf("Line %d,col %d: Symbol %s is not a function\n", linha,coluna, aux->noFilho->id);
 				}
 				aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 				char * token;
