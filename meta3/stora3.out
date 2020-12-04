@@ -38,6 +38,7 @@ g0	void(void)
 g1	char(void)
 g2	double(void)
 main	int(void)
+
 ===== Function f Symbol Table =====
 return	void
 A0	int

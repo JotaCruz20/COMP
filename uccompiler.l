@@ -161,6 +161,8 @@ int main(int argc, char **argv){
             initErrors();
             checkProgram(noAST);
             anotateBody(noAST);
+            checkProgramError(noAST);
+            anotateBodyError(noAST);
             //printErros();
             printTabela();
             if (errorFlag==0)

@@ -18,15 +18,15 @@ void checkProgram(no * atual){
 		if (strcmp(atual->type, "Program")==0){ // quando começa a analise sintatica tem de inicializar as vars globais
 			initTabela();
 		}
-		if (strcmp(atual->type, "FuncDefinition")==0){
+		else if (strcmp(atual->type, "FuncDefinition")==0){
 			funcName = (char *) malloc(strlen(atual->noFilho->noIrmao->id)*sizeof(char));
 			strcpy(funcName,atual->noFilho->noIrmao->id);
 			checkFuncDefinition(atual);
 		}
-		if (strcmp(atual->type, "FuncDeclaration")==0){
+		else if (strcmp(atual->type, "FuncDeclaration")==0){
 			checkFuncDeclaration(atual);
 		}
-		if (strcmp(atual->type, "Declaration")==0){
+		else if (strcmp(atual->type, "Declaration")==0){
 			if(funcName==NULL){
 				funcName = (char *) malloc(strlen("Global")*sizeof(char));
 				strcpy(funcName,"Global");
@@ -77,7 +77,7 @@ void addParamsFunction(no * atual, char * nameTable){
             toLowerCase(type);
 			if(strcmp(type,"void")!=0){
 				if(auxNode->noFilho->noIrmao!=NULL){
-					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col);
+					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->line,auxNode->col);
 				}
 			}
 		}
@@ -157,10 +157,10 @@ void addType(no * atual){
 
 
 void checkDeclaration(no * atual){
-    char * type = (char *) strdup(atual->noFilho->type); 
+     char * type = (char *) strdup(atual->noFilho->type); 
     toLowerCase(type);
     char * id = (char *) strdup(atual->noFilho->noIrmao->id);
-	insert(id, type, "", name,atual->noFilho->line,atual->noFilho->col);
+	insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
 	if(atual->noFilho->noIrmao->noIrmao!=NULL){
 		if(strcmp(atual->noFilho->noIrmao->noIrmao->type,"ChrLit")==0 || strcmp(atual->noFilho->noIrmao->noIrmao->type,"IntLit")==0){
 				atual->noFilho->noIrmao->noIrmao->exprType= (char *) strdup("- int");
@@ -262,7 +262,6 @@ char * prioridade(no * atual){ // vai buscar o tipo para por no Add/Mul/Sub/Mod
 	}
 }
 
-
 char * searchComma(no * atual){
 	no * filho2 = atual->noFilho->noIrmao;
 	if(filho2->id!=NULL){
@@ -336,7 +335,64 @@ char * searchComma(no * atual){
 	return strdup("- undef");
 }
 
+void searchStore(no *atual, char* typeBrother){
+	no * aux = atual;
+	if(aux->noFilho->id!=NULL){
+		char * type = searchId(funcName,aux->noFilho->id);
+		if(strcmp(aux->noFilho->noIrmao->type,"Add")==0 ||strcmp(aux->noFilho->noIrmao->type, "Sub") == 0 ||  strcmp(aux->noFilho->noIrmao->type, "Mul") == 0 || strcmp(aux->noFilho->noIrmao->type, "Div") == 0 ){
+			typeBrother = prioridade(aux->noFilho->noIrmao);
+			typeBrother = strtok(typeBrother,"- ");
+		}
+		else if(strcmp(aux->noFilho->noIrmao->type,"Call")==0 || strcmp(aux->noFilho->noIrmao->type, "Or") == 0 || strcmp(aux->noFilho->noIrmao->type, "And") == 0 ||  strcmp(aux->noFilho->noIrmao->type, "BitWiseAnd") == 0 || strcmp(aux->noFilho->noIrmao->type, "BitWiseOr") == 0 || strcmp(aux->noFilho->noIrmao->type, "BitWiseXor") == 0 || strcmp(aux->noFilho->noIrmao->type, "Mod") == 0){
+			typeBrother = searchId(funcName,aux->noFilho->noIrmao->noFilho->id);
+			if(strcmp(typeBrother,"undef")==0){
+				if(strcmp(aux->noFilho->noIrmao->type,"IntLit")==0 || strcmp(aux->noFilho->noIrmao->type,"ChrLit")==0){
+					strcpy(typeBrother, "int");
+				}
+				else if(strcmp(aux->noFilho->noIrmao->type,"RealLit")==0){
+					strcpy(typeBrother, "double");
+				}
+			}
+		}
+		else if(strcmp(aux->noFilho->noIrmao->type,"Store")==0){
+			searchStore(aux->noFilho->noIrmao,typeBrother);
+		}
+		else if(strcmp(aux->noFilho->noIrmao->type,"Minus")==0 || strcmp(aux->noFilho->noIrmao->type,"Plus")==0){
+			char * type;
+			if(aux->noFilho->noIrmao->noFilho->id==NULL){
+				type = searchId(funcName,aux->noFilho->noIrmao->noFilho->noFilho->id);
+			}
+			else{
+				type = searchId(funcName,aux->noFilho->noIrmao->noFilho->id);
+			}
+			if(strcmp(type,"undef")==0){
+				if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->noFilho->type,"ChrLit")==0){
+					strcpy(type, "int");
+				}
+				else if(strcmp(aux->noFilho->type,"RealLit")==0){
+					strcpy(type, "double");
+				}
+			}
+			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
+			sprintf(aux->exprType,"- %s",type);
+		}
+		else{
+			typeBrother = searchId(funcName,aux->noFilho->noIrmao->id);
+			if(strcmp(typeBrother,"undef")==0){
+				if(strcmp(aux->noFilho->noIrmao->type,"IntLit")==0 || strcmp(aux->noFilho->noIrmao->type,"ChrLit")==0){
+					strcpy(typeBrother, "int");
+				}
+				else if(strcmp(aux->noFilho->noIrmao->type,"RealLit")==0){
+					strcpy(typeBrother, "double");
+				}
+			}
+		}
+		aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
+		sprintf(aux->exprType,"- %s",type);
 
+	}
+
+}
 
 void checkBody(no * atual,char * pai){
 	no * aux = atual;
@@ -379,17 +435,8 @@ void checkBody(no * atual,char * pai){
 			}
 		}
 		else if (strcmp(aux->type,"Store") == 0){
-				char * type = searchId(funcName,aux->noFilho->id);
-				if(strcmp(type,"undef")==0){
-					if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->noFilho->type,"ChrLit")==0){
-						strcpy(type, "int");
-					}
-					else if(strcmp(aux->noFilho->type,"RealLit")==0){
-						strcpy(type, "double");
-					}
-				}
-				aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
-				sprintf(aux->exprType,"- %s",type);
+			char * typeBrother = NULL;
+			searchStore(aux,typeBrother);
 		}
 		else if(strcmp(aux->type,"Minus")==0 || strcmp(aux->type,"Plus")==0){
 			char * type;

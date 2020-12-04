@@ -5,7 +5,6 @@ main	int(void)
 
 ===== Function main Symbol Table =====
 return	int
-
 A0	int
 A1	int
 A2	int

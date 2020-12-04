@@ -103,13 +103,11 @@ void checkParamsError(no * atual){
 		toLowerCase(type);
 		if(strcmp(type,"void")==0 && auxNode->noFilho->noIrmao!=NULL && strcmp(auxNode->noFilho->noIrmao->type,"Id")==0){
 			char error[100];
-			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->line,atual->noFilho->col);
-			addErros(auxNode->noFilho->line,auxNode->noFilho->col,error);
+			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
+			addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col,error);
 		}
 	}
 }
-
-
 
 void checkFuncDefinitionError(no * atual){ 
 	checkParams(atual->noFilho->noIrmao->noIrmao);
@@ -124,8 +122,8 @@ void checkDeclarationError(no * atual){
     toLowerCase(type);
 	if(strcmp(type,"void")==0){
 		char error[100];
-		sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->line,atual->noFilho->col);
-		addErros(atual->noFilho->line,atual->noFilho->col,error);
+		sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
+		addErros(atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,error);
 	}
 }
 
