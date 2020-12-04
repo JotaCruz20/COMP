@@ -5,6 +5,7 @@
     */
     #include "y.tab.h"
     #include "tree.h"
+    #include "error.h"
     #include "symtab.h"
     #include "semantics.h"
     #include <stdio.h>
@@ -157,7 +158,7 @@ int main(int argc, char **argv){
         }
         else if(argv[1][0]=='-' && argv[1][1]=='s'){
             yyparse();
-            //initErrors();
+            initErrors();
             checkProgram(noAST);
             anotateBody(noAST);
             //printErros();

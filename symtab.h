@@ -24,7 +24,7 @@ typedef struct tabela
 
 //ver oq faz a flag
 void initTabela();
-void insert(char * id, char * tipo, char * params, char * nomeTabela);
+void insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col);
 tabela * searchTabela(char * nome);
 void initFunctionTabela(char * name, int flag);
 void printTabela();

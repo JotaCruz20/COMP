@@ -12,4 +12,12 @@ typedef struct erros{
 void initErrors();
 void addErros(int line,int col,char * erro);
 void printErros();
+void checkProgramError(no * atual);
+void checkParamsError(no * atual);
+void checkFuncDefinitionError(no * atual);
+void checkFuncDeclarationError(no * atual);
+void checkDeclarationError(no * atual);
+void checkBodyError(no * atual,char * pai);
+void anotateBodyError(no * atual);
+void addParamsFunctionError(no * atual, char * nameTable);
 #endif 

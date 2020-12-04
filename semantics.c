@@ -77,7 +77,7 @@ void addParamsFunction(no * atual, char * nameTable){
             toLowerCase(type);
 			if(strcmp(type,"void")!=0){
 				if(auxNode->noFilho->noIrmao!=NULL){
-					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable);
+					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col);
 				}
 			}
 		}
@@ -94,9 +94,9 @@ void checkFuncDefinition(no * atual){
 
 	strcpy(name, id);
 
-	insert(id, type, params, "Global");
+	insert(id, type, params, "Global",0,0);
 	initFunctionTabela(id, 1);
-	insert("return", type, "", id);
+	insert("return", type, "", id,0,0);
 	addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
 }
 
@@ -106,7 +106,7 @@ void checkFuncDeclaration(no * atual){
 	char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	char * params = checkParams(atual->noFilho->noIrmao->noIrmao);
 
-	insert(id, type, params, "Global");
+	insert(id, type, params, "Global",0,0);
 	initFunctionTabela(id, 0);
 }
 
@@ -160,7 +160,7 @@ void checkDeclaration(no * atual){
     char * type = (char *) strdup(atual->noFilho->type); 
     toLowerCase(type);
     char * id = (char *) strdup(atual->noFilho->noIrmao->id);
-	insert(id, type, "", name);
+	insert(id, type, "", name,atual->noFilho->line,atual->noFilho->col);
 	if(atual->noFilho->noIrmao->noIrmao!=NULL){
 		if(strcmp(atual->noFilho->noIrmao->noIrmao->type,"ChrLit")==0 || strcmp(atual->noFilho->noIrmao->noIrmao->type,"IntLit")==0){
 				atual->noFilho->noIrmao->noIrmao->exprType= (char *) strdup("- int");
