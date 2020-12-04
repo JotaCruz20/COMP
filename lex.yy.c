@@ -2198,7 +2198,7 @@ int main(int argc, char **argv){
             anotateBody(noAST);
             checkProgramError(noAST);
             anotateBodyError(noAST);
-            //printErros();
+            printErros();
             printTabela();
             if (errorFlag==0)
                 printTreeAnotada(noAST,0);  

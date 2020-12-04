@@ -24,10 +24,12 @@ typedef struct tabela
 
 //ver oq faz a flag
 void initTabela();
-void insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col);
+void insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col,int flag);
 tabela * searchTabela(char * nome);
 void initFunctionTabela(char * name, int flag);
 void printTabela();
 char* searchId(char* nTabela,char * id);
+int checkFunc(char * nome);
+int nParams(char * nome);
 
 #endif

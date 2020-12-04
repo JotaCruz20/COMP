@@ -102,9 +102,9 @@ void checkParamsError(no * atual){
 		char * type =	(char *) strdup(auxNode->noFilho->type);	
 		toLowerCase(type);
 		if(strcmp(type,"void")==0 && auxNode->noFilho->noIrmao!=NULL && strcmp(auxNode->noFilho->noIrmao->type,"Id")==0){
-			char error[100];
-			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
-			addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col,error);
+			//char error[100]; //este erro diminui os 400
+			//sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
+			//addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col,error);
 		}
 	}
 }
@@ -130,7 +130,161 @@ void checkDeclarationError(no * atual){
 void checkBodyError(no * atual,char * pai){
 	no * aux = atual;
 	if(aux->type!=NULL){
-		
+		if(strcmp(aux->type,"Store")==0){
+            if(aux->noFilho->id==NULL){
+                char error[100];
+		        sprintf(error,"Line %d, col %d: Lvalue required\n", aux->noFilho->noFilho->line,aux->noFilho->noFilho->col);
+		        addErros(aux->noFilho->noFilho->line,aux->noFilho->noFilho->col,error);
+            }
+            else if (strcmp(aux->noFilho->type,"Call")==0){
+                char error[100];
+		        sprintf(error,"Line %d, col %d: Lvalue required\n", aux->noFilho->noFilho->line,aux->noFilho->noFilho->col);
+		        addErros(aux->noFilho->noFilho->line,aux->noFilho->noFilho->col,error);
+            }
+            else if(strcmp(aux->exprType,"- double")!=0 && strcmp(aux->noFilho->noIrmao->exprType,"- double")==0 ){
+                char error[100];
+                char* rest = aux->exprType; 
+                char * token = strtok_r(aux->exprType,"- ",&rest);
+		        sprintf(error,"Line %d, col %d: Operator = cannot be applied to types %s, double\n", aux->noFilho->line,aux->noFilho->col,token);
+		        addErros(aux->noFilho->line,aux->noFilho->col,error);
+            }
+        }
+        else if(strcmp(aux->type,"Call")==0){
+            int n = checkFunc(aux->noFilho->id);
+            if(n==1){
+                int count = 0;
+                int countParams = nParams(aux->noFilho->id);
+                no * irmaos = atual->noFilho;
+                while(irmaos->noIrmao!=NULL){
+                    count+=1;
+                    irmaos=irmaos->noIrmao;
+                }
+                if(count!=countParams){//este erro diminui os 400
+                    char error[100];
+		            sprintf(error,"Line %d, col %d: Wrong number of arguments to function %s (got %d,required %d)\n", aux->noFilho->line,aux->noFilho->col,aux->noFilho->id,count,countParams);
+		            addErros(aux->noFilho->line,aux->noFilho->col,error);
+                }
+            }
+            else{
+                char error[100];
+		        sprintf(error,"Line %d, col %d: Symbol %s is not a function\n", aux->noFilho->line,aux->noFilho->col,aux->noFilho->id);
+		        addErros(aux->noFilho->line,aux->noFilho->col,error);
+            }
+        }
+        else if(strcmp(aux->type,"If")==0 || strcmp(aux->type,"While")==0){
+            if(strcmp(aux->noFilho->exprType,"- double")==0){
+                char error[100];
+		        sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->noFilho->line,aux->noFilho->noFilho->col);
+		        addErros(aux->noFilho->line,aux->noFilho->col,error);
+            }
+        }
+        else if(strcmp(aux->type, "Or") == 0 || strcmp(aux->type, "And") == 0 ||  strcmp(aux->type, "BitWiseAnd") == 0 || strcmp(aux->type, "BitWiseOr") == 0 || strcmp(aux->type, "BitWiseXor") == 0 || strcmp(aux->type, "Mod") == 0){
+			char * type, *brotherType;
+			type = aux->noFilho->exprType;
+			brotherType = aux->noFilho->noIrmao->exprType;
+			char operator[3];
+			if(strcmp(type,"- double")==0 || strcmp(brotherType,"- double")==0){
+				char error[100];
+				if(strcmp(aux->type, "Or") == 0 ){
+					strcpy(operator,"||");
+				}
+				else if(strcmp(aux->type, "And") == 0){
+					strcpy(operator,"&&");
+				}
+				else if(strcmp(aux->type, "BitWiseAnd") == 0){
+					strcpy(operator,"&");
+				}
+				else if(strcmp(aux->type, "BitWiseOr") == 0){
+					strcpy(operator,"|");
+				}
+				else if(strcmp(aux->type, "BitWiseXor") == 0){
+					strcpy(operator,"^");
+				}
+				else if(strcmp(aux->type, "Mod") == 0){
+					strcpy(operator,"%");
+				}
+                 char* rest = aux->noFilho->exprType, *rest2 = aux->noFilho->noIrmao->exprType; 
+                char * token1 = strtok_r(type,"- ",&rest), *token2 =strtok_r(brotherType,"- ",&rest2);
+                
+				sprintf(error,"Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", aux->noFilho->line,aux->noFilho->col, operator,token1,token2);
+				addErros(aux->noFilho->line,aux->noFilho->col,error);
+			}
+		}
+        else if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type, "Add") == 0 || strcmp(aux->type, "Sub") == 0 ||  strcmp(aux->type, "Mul") == 0 || strcmp(aux->type, "Div") == 0){
+			if(strcmp(aux->noFilho->exprType,"- undef")==0 || strcmp(aux->noFilho->noIrmao->exprType,"- undef")==0){
+                char error[100];
+                char operator[3];
+                if(strcmp(aux->type, "Lt") == 0 ){
+					strcpy(operator,"<");
+				}
+				else if(strcmp(aux->type, "Le") == 0){
+					strcpy(operator,"<=");
+				}
+				else if(strcmp(aux->type, "Gt") == 0){
+					strcpy(operator,">");
+				}
+				else if(strcmp(aux->type, "Ge") == 0){
+					strcpy(operator,">=");
+				}
+				else if(strcmp(aux->type, "Ne") == 0){
+					strcpy(operator,"!=");
+				}
+				else if(strcmp(aux->type, "Eq") == 0){
+					strcpy(operator,"==");
+				}
+                else if(strcmp(aux->type, "Not") == 0){
+					strcpy(operator,"!");
+				}
+				else if(strcmp(aux->type, "Add") == 0){
+					strcpy(operator,"+");
+				}
+				else if(strcmp(aux->type, "Sub") == 0){
+					strcpy(operator,"-");
+				}
+				else if(strcmp(aux->type, "Mul") == 0){
+					strcpy(operator,"*");
+				}
+                else if(strcmp(aux->type, "Div") == 0){
+					strcpy(operator,"/");
+				}
+                char* rest = aux->noFilho->exprType, *rest2 = aux->noFilho->noIrmao->exprType; 
+                char * token1 = strtok_r(aux->noFilho->exprType,"- ",&rest), *token2 =strtok_r(aux->noFilho->noIrmao->exprType,"- ",&rest2);
+                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", aux->noFilho->line,aux->noFilho->col, operator,token1,token2);
+				addErros(aux->noFilho->line,aux->noFilho->col,error);
+            }
+		}
+        else if(strcmp(aux->type,"Not")==0 || strcmp(aux->type,"Plus")==0 || strcmp(aux->type,"Minus")==0){
+            if(strcmp(aux->noFilho->exprType,"- undef")==0){
+                char error[100];
+                char operator[3];
+                if(strcmp(aux->type, "Plus") == 0 ){
+					strcpy(operator,"+");
+				}
+				else if(strcmp(aux->type, "Not") == 0){
+					strcpy(operator,"!");
+				}
+				else if(strcmp(aux->type, "Minus") == 0){
+					strcpy(operator,"-");
+				}
+                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type undef\n", aux->noFilho->line,aux->noFilho->col, operator);
+				addErros(aux->noFilho->line,aux->noFilho->col,error);
+            }
+        }
+        else if(aux->id!=NULL){
+            if(aux->exprType!=NULL){
+                if(strcmp(aux->exprType,"- undef")==0){
+                    char error[100];
+                    sprintf(error,"Line %d, col %d: Unknown symbol %s\n", aux->line,aux->col,aux->id);
+                    addErros(aux->line,aux->col,error);
+                }
+            }
+        }
+        if(aux->noFilho!=NULL){
+			checkBodyError(aux->noFilho,aux->type);
+        }
+        if(aux->noIrmao!=NULL){
+			checkBodyError(aux->noIrmao,pai);
+        }
 	}
 }
 

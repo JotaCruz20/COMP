@@ -1,13 +1,28 @@
 int main(void){
 	char a = 'a';
-	int i=1;
-	double d = 2.0;
-    if(a=d){
-
-    }
+    short b = 2;
+    int c = 3;
+    double d = 3.0;
+    if(a>d){}
+    if(a=d){}
+    if(a=b){}
+    if(a=c){}
+    if(a=d){}
+    if(b=b){}
+    if(b=c){}
+    if(b=d){}
+    if(c=c){}
+    if(c=d){}
     if(d=d){}
-    if(a,d,i){
-
-    }
+    if(a,a){}
+    if(a,b){}
+    if(a,c){}
+    if(a,d){}
+    if(b,b){}
+    if(b,c){}
+    if(b,d){}
+    if(c,c){}
+    if(c,d){}
+    if(d,d){}
     return i;
 }

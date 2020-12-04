@@ -45,7 +45,6 @@ void checkProgram(no * atual){
 	}
 }
 
-
 void toLowerCase(char* str){
     for(int i = 0; str[i]; i++){
         str[i] = tolower(str[i]);
@@ -77,14 +76,13 @@ void addParamsFunction(no * atual, char * nameTable){
             toLowerCase(type);
 			if(strcmp(type,"void")!=0){
 				if(auxNode->noFilho->noIrmao!=NULL){
-					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->line,auxNode->col);
+					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->line,auxNode->col,1);
 				}
 			}
 		}
 		auxNode = auxNode->noIrmao;
 	}
 }
-
 
 void checkFuncDefinition(no * atual){ 
 	char * type = (char *) strdup(atual->noFilho->type); 
@@ -94,9 +92,9 @@ void checkFuncDefinition(no * atual){
 
 	strcpy(name, id);
 
-	insert(id, type, params, "Global",0,0);
+	insert(id, type, params, "Global",0,0,0);
 	initFunctionTabela(id, 1);
-	insert("return", type, "", id,0,0);
+	insert("return", type, "", id,0,0,0);
 	addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
 }
 
@@ -106,7 +104,7 @@ void checkFuncDeclaration(no * atual){
 	char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	char * params = checkParams(atual->noFilho->noIrmao->noIrmao);
 
-	insert(id, type, params, "Global",0,0);
+	insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,1);
 	initFunctionTabela(id, 0);
 }
 
@@ -155,12 +153,11 @@ void addType(no * atual){
 	}
 }
 
-
 void checkDeclaration(no * atual){
      char * type = (char *) strdup(atual->noFilho->type); 
     toLowerCase(type);
     char * id = (char *) strdup(atual->noFilho->noIrmao->id);
-	insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
+	insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,1);
 	if(atual->noFilho->noIrmao->noIrmao!=NULL){
 		if(strcmp(atual->noFilho->noIrmao->noIrmao->type,"ChrLit")==0 || strcmp(atual->noFilho->noIrmao->noIrmao->type,"IntLit")==0){
 				atual->noFilho->noIrmao->noIrmao->exprType= (char *) strdup("- int");
@@ -344,7 +341,12 @@ void searchStore(no *atual, char* typeBrother){
 			typeBrother = strtok(typeBrother,"- ");
 		}
 		else if(strcmp(aux->noFilho->noIrmao->type,"Call")==0 || strcmp(aux->noFilho->noIrmao->type, "Or") == 0 || strcmp(aux->noFilho->noIrmao->type, "And") == 0 ||  strcmp(aux->noFilho->noIrmao->type, "BitWiseAnd") == 0 || strcmp(aux->noFilho->noIrmao->type, "BitWiseOr") == 0 || strcmp(aux->noFilho->noIrmao->type, "BitWiseXor") == 0 || strcmp(aux->noFilho->noIrmao->type, "Mod") == 0){
-			typeBrother = searchId(funcName,aux->noFilho->noIrmao->noFilho->id);
+			if(aux->noFilho->noIrmao->noFilho->id!=NULL){
+				typeBrother = searchId(funcName,aux->noFilho->noIrmao->noFilho->id);
+			}
+			else{
+				typeBrother = searchId(funcName,aux->noFilho->noIrmao->noFilho->noFilho->id);
+			}
 			if(strcmp(typeBrother,"undef")==0){
 				if(strcmp(aux->noFilho->noIrmao->type,"IntLit")==0 || strcmp(aux->noFilho->noIrmao->type,"ChrLit")==0){
 					strcpy(typeBrother, "int");
@@ -357,7 +359,7 @@ void searchStore(no *atual, char* typeBrother){
 		else if(strcmp(aux->noFilho->noIrmao->type,"Store")==0){
 			searchStore(aux->noFilho->noIrmao,typeBrother);
 		}
-		else if(strcmp(aux->noFilho->noIrmao->type,"Minus")==0 || strcmp(aux->noFilho->noIrmao->type,"Plus")==0){
+		else if(strcmp(aux->noFilho->noIrmao->type,"Minus")==0 || strcmp(aux->noFilho->noIrmao->type,"Plus")==0 || strcmp(aux->noFilho->noIrmao->type,"Not")==0 ){
 			char * type;
 			if(aux->noFilho->noIrmao->noFilho->id==NULL){
 				type = searchId(funcName,aux->noFilho->noIrmao->noFilho->noFilho->id);

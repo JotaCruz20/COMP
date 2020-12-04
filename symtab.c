@@ -13,12 +13,12 @@ void initTabela(){
 	tabelaSimbolos->name = "";
 	tabelaSimbolos->flag = 1;
 
-	insert("putchar","int(int)","","Global",0,0);
-	insert("getchar","int(void)","","Global",0,0);
+	insert("putchar","int(int)","","Global",0,0,0);
+	insert("getchar","int(void)","","Global",0,0,0);
 }
 
 
-void insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col){
+void insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col, int flag){
     noTabela * tab = (noTabela*)malloc(sizeof(noTabela));
     tab->id=(char *)malloc((strlen(id)+1)*sizeof(char));
     tab->tipo=(char *)malloc((strlen(tipo)+1)*sizeof(char));
@@ -35,39 +35,50 @@ void insert(char * id, char * tipo, char * params, char * nomeTabela,int line, i
 		while (auxNoTabela->next != NULL){
 			if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
 				free(tab);
-				char error[100];
-				sprintf(error, "Line %d, col %d: Symbol %s already defined\n",line,col,id);
-				addErros(line,col,error);
+				if(flag==1){//este erro diminui os 400
+					char error[100];
+					sprintf(error, "Line %d, col %d: Symbol %s already defined\n",line,col,id);
+					addErros(line,col,error);
+				}
 				return;
 			}
 			auxNoTabela = auxNoTabela->next;
 		}
 		if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
 			free(tab);
-			char error[100];
-			sprintf(error, "Line %d, col %d: Symbol %s already defined\n",line,col,id);
-			addErros(line,col,error);
+			if(flag==1){//este erro diminui os 400
+				char error[100];
+				sprintf(error, "Line %d, col %d: Symbol %s already defined\n",line,col,id);
+				addErros(line,col,error);
+			}
 			return;
 		}
 		auxNoTabela->next = tab;
 	}
 }
 
-tabela * searchTabela(char * nome){
-    tabela * aux;
-    if (strcmp(nome, "Global")==0)
-		return tabelaSimbolos;
-	else{
-		aux = tabelaSimbolos->next;
-		while (aux != NULL && strcmp(nome,aux->name)!=0)
-			aux = aux->next;
-        return aux;
+int checkFunc(char * nome){
+	tabela * aux = tabelaSimbolos;
+	if(aux!=NULL){
+		if(strcmp(nome,"putchar")==0 || strcmp(nome,"getchar")==0){
+			return 1;
+		}
+		while(aux!=NULL){
+			if(strcmp(aux->name,nome)==0){
+				return 1;
+			}
+			aux=aux->next;
+		}
 	}
+	return 0;
 }
 
 int nParams(char * nome){
 	tabela * aux = tabelaSimbolos;
 	int counter=0;
+	if(strcmp(nome,"putchar")==0 || strcmp(nome,"getchar")==0){
+			return 0;
+		}
 	if(aux!=NULL){
 		while (aux!=NULL && strcmp(aux->name,nome)!=0)
 		{
@@ -83,6 +94,18 @@ int nParams(char * nome){
 		}
 	}
 	return counter;
+}
+
+tabela * searchTabela(char * nome){
+    tabela * aux;
+    if (strcmp(nome, "Global")==0)
+		return tabelaSimbolos;
+	else{
+		aux = tabelaSimbolos->next;
+		while (aux != NULL && strcmp(nome,aux->name)!=0)
+			aux = aux->next;
+        return aux;
+	}
 }
 
 char * typeParams(char * nome,int n,char* type){
