@@ -19,6 +19,7 @@ typedef struct tabela
 	char * type;
 	int flag;
 	int print;
+	int params;
 	struct noTabela * tabelaAtual;
 	struct tabela * next;
 } tabela;
@@ -27,7 +28,7 @@ typedef struct tabela
 void initTabela();
 int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col,int flag);
 tabela * searchTabela(char * nome);
-void initFunctionTabela(char * name, int flag,int print);
+void initFunctionTabela(char * name, int flag,int print,int params);
 void printTabela();
 char* searchId(char* nTabela,char * id);
 int checkFunc(char * nome);

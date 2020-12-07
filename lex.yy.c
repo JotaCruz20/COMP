@@ -935,167 +935,167 @@ case YY_STATE_EOF(INITIAL):
 case 6:
 YY_RULE_SETUP
 #line 82 "uccompiler.l"
-{if(flag==1)printf("CHAR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return CHAR;}
+{if(flag==1)printf("CHAR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return CHAR;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 83 "uccompiler.l"
-{if(flag==1)printf("ELSE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return ELSE;}
+{if(flag==1)printf("ELSE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return ELSE;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 84 "uccompiler.l"
-{if(flag==1)printf("IF\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return IF;}
+{if(flag==1)printf("IF\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return IF;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 85 "uccompiler.l"
-{if(flag==1)printf("WHILE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return WHILE;}
+{if(flag==1)printf("WHILE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return WHILE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 86 "uccompiler.l"
-{if(flag==1)printf("INT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return INT;}
+{if(flag==1)printf("INT\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return INT;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 87 "uccompiler.l"
-{if(flag==1)printf("DOUBLE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return DOUBLE;}
+{if(flag==1)printf("DOUBLE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return DOUBLE;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 88 "uccompiler.l"
-{if(flag==1)printf("SHORT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return SHORT;}
+{if(flag==1)printf("SHORT\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return SHORT;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 89 "uccompiler.l"
-{if(flag==1)printf("RETURN\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return RETURN;}
+{if(flag==1)printf("RETURN\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return RETURN;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 90 "uccompiler.l"
-{if(flag==1)printf("VOID\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return VOID;}
+{if(flag==1)printf("VOID\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return VOID;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 91 "uccompiler.l"
-{if(flag==1)printf("BITWISEAND\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return BAND;}
+{if(flag==1)printf("BITWISEAND\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return BAND;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 92 "uccompiler.l"
-{if(flag==1)printf("BITWISEOR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return BOR;}
+{if(flag==1)printf("BITWISEOR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return BOR;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 93 "uccompiler.l"
-{if(flag==1)printf("BITWISEXOR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return BXOR;}
+{if(flag==1)printf("BITWISEXOR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return BXOR;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 94 "uccompiler.l"
-{if(flag==1)printf("AND\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return AND;}
+{if(flag==1)printf("AND\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return AND;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 95 "uccompiler.l"
-{if(flag==1)printf("ASSIGN\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return ASSIGN;}
+{if(flag==1)printf("ASSIGN\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return ASSIGN;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 96 "uccompiler.l"
-{if(flag==1)printf("MUL\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return MUL;}
+{if(flag==1)printf("MUL\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return MUL;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 97 "uccompiler.l"
-{if(flag==1)printf("COMMA\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return COMMA;}
+{if(flag==1)printf("COMMA\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return COMMA;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 98 "uccompiler.l"
-{if(flag==1)printf("DIV\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return DIV;}
+{if(flag==1)printf("DIV\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return DIV;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 99 "uccompiler.l"
-{if(flag==1)printf("EQ\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return EQ;}
+{if(flag==1)printf("EQ\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return EQ;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 100 "uccompiler.l"
-{if(flag==1)printf("GE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return GE;}
+{if(flag==1)printf("GE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return GE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 101 "uccompiler.l"
-{if(flag==1)printf("GT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return GT;}
+{if(flag==1)printf("GT\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return GT;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 102 "uccompiler.l"
-{if(flag==1)printf("LBRACE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LBRACE;}
+{if(flag==1)printf("LBRACE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return LBRACE;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 103 "uccompiler.l"
-{if(flag==1)printf("LE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LE;}
+{if(flag==1)printf("LE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return LE;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 104 "uccompiler.l"
-{if(flag==1)printf("LPAR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LPAR;}
+{if(flag==1)printf("LPAR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return LPAR;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 105 "uccompiler.l"
-{if(flag==1)printf("LT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return LT;}
+{if(flag==1)printf("LT\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return LT;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 106 "uccompiler.l"
-{if(flag==1)printf("MINUS\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return MINUS;}
+{if(flag==1)printf("MINUS\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return MINUS;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 107 "uccompiler.l"
-{if(flag==1)printf("MOD\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return MOD;}
+{if(flag==1)printf("MOD\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return MOD;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 108 "uccompiler.l"
-{if(flag==1)printf("NE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return NE;}
+{if(flag==1)printf("NE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return NE;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 109 "uccompiler.l"
-{if(flag==1)printf("NOT\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return NOT;}
+{if(flag==1)printf("NOT\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return NOT;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 110 "uccompiler.l"
-{if(flag==1)printf("OR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return OR;}
+{if(flag==1)printf("OR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return OR;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 111 "uccompiler.l"
-{if(flag==1)printf("PLUS\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return PLUS;}
+{if(flag==1)printf("PLUS\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return PLUS;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 112 "uccompiler.l"
-{if(flag==1)printf("RBRACE\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return RBRACE;}
+{if(flag==1)printf("RBRACE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return RBRACE;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 113 "uccompiler.l"
-{if(flag==1)printf("RPAR\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return RPAR;}
+{if(flag==1)printf("RPAR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return RPAR;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 114 "uccompiler.l"
-{if(flag==1)printf("SEMI\n");coluna+=yyleng;lenghtSTR=(int)yyleng;return SEMI;}
+{if(flag==1)printf("SEMI\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return SEMI;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
@@ -1105,7 +1105,7 @@ YY_RULE_SETUP
 case 40:
 YY_RULE_SETUP
 #line 116 "uccompiler.l"
-{if(flag==1)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;lenghtSTR=(int)yyleng;return RESERVED;}
+{if(flag==1)printf("RESERVED(%s)\n",yytext);coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return RESERVED;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP

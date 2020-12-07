@@ -89,11 +89,20 @@ void checkFuncDefinition(no * atual){
     toLowerCase(type);
 	char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	char * params = checkParams(atual->noFilho->noIrmao->noIrmao);
+	char * token;
+	char * rest = (char *)malloc((strlen(params)+1)*sizeof(char));
+	int counter = 0;
+	strcpy(rest,params);
+	while ((token = strtok_r(rest, ",", &rest))){
+		if(strcmp(token,"void")!=0 && strcmp(token,"(void")!=0 && strcmp(token,"void)")!=0 && strcmp(token,"(void)")!=0){
+			counter+=1; 
+		}
+	}
 
 	strcpy(name, id);
 
 	int n= insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
-	initFunctionTabela(id, 1,n);
+	initFunctionTabela(id, 1,n,counter);
 	insert("return", type, "", id,0,0,0);
 	addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
 }
@@ -103,9 +112,18 @@ void checkFuncDeclaration(no * atual){
     toLowerCase(type);
 	char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	char * params = checkParams(atual->noFilho->noIrmao->noIrmao);
+	char* token; 
+	char * rest = (char *)malloc((strlen(params)+1)*sizeof(char));
+	int counter = 0;
+	strcpy(rest,params);
+	while ((token = strtok_r(rest, ",", &rest))){
+		if(strcmp(token,"void")!=0 && strcmp(token,"(void")!=0 && strcmp(token,"void)")!=0 && strcmp(token,"(void)")!=0){
+			counter+=1; 
+		} 
+	}
 
 	insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
-	initFunctionTabela(id, 0,1);
+	initFunctionTabela(id, 0,1, counter);
 }
 
 void addType(no * atual){

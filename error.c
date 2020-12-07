@@ -159,10 +159,10 @@ void checkBodyError(no * atual,char * pai){
                     count+=1;
                     irmaos=irmaos->noIrmao;
                 }
-                if(count!=countParams){//este erro diminui os 400
-                    //char error[100];
-		            //sprintf(error,"Line %d, col %d: Wrong number of arguments to function %s (got %d,required %d)\n", aux->noFilho->line,aux->noFilho->col,aux->noFilho->id,count,countParams);
-		            //addErros(aux->noFilho->line,aux->noFilho->col,error);
+                if(count!=countParams){
+                    char error[100];
+		            sprintf(error,"Line %d, col %ld: Wrong number of arguments to function %s (got %d, required %d)\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),aux->noFilho->id,count,countParams);
+		            addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error);
                 }
             }
             else{
@@ -173,9 +173,21 @@ void checkBodyError(no * atual,char * pai){
         }
         else if(strcmp(aux->type,"If")==0 || strcmp(aux->type,"While")==0){
             if(strcmp(aux->noFilho->exprType,"- double")==0){
-                char error[100];
-		        sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->noFilho->line,aux->noFilho->noFilho->col);
-		        addErros(aux->noFilho->line,aux->noFilho->col,error);
+                if(strcmp(aux->noFilho->type,"Plus")==0 || strcmp(aux->noFilho->type,"Minus")==0 || strcmp(aux->noFilho->type,"Not")==0){
+                    char error[100];
+                    sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                }
+                else if(strcmp(aux->noFilho->type,"Call")==0){
+                    char error  [100];
+                    sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                }
+                else{
+                    char error[100];
+                    sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->noFilho->line,aux->noFilho->noFilho->col);
+                    addErros(aux->noFilho->line,aux->noFilho->col,error);
+                }
             }
         }
         else if(strcmp(aux->type, "Or") == 0 || strcmp(aux->type, "And") == 0 ||  strcmp(aux->type, "BitWiseAnd") == 0 || strcmp(aux->type, "BitWiseOr") == 0 || strcmp(aux->type, "BitWiseXor") == 0 || strcmp(aux->type, "Mod") == 0){
