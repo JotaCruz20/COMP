@@ -19,7 +19,7 @@ void checkProgram(no * atual){
 			initTabela();
 		}
 		else if (strcmp(atual->type, "FuncDefinition")==0){
-			funcName = (char *) malloc(strlen(atual->noFilho->noIrmao->id)*sizeof(char));
+			funcName = (char *) malloc(strlen((atual->noFilho->noIrmao->id)+1)*sizeof(char));
 			strcpy(funcName,atual->noFilho->noIrmao->id);
 			checkFuncDefinition(atual);
 		}
@@ -76,7 +76,7 @@ void addParamsFunction(no * atual, char * nameTable){
             toLowerCase(type);
 			if(strcmp(type,"void")!=0){
 				if(auxNode->noFilho->noIrmao!=NULL){
-					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->line,auxNode->col,1);
+					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->line,auxNode->col,0);
 				}
 			}
 		}
@@ -92,8 +92,8 @@ void checkFuncDefinition(no * atual){
 
 	strcpy(name, id);
 
-	insert(id, type, params, "Global",0,0,0);
-	initFunctionTabela(id, 1);
+	int n= insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
+	initFunctionTabela(id, 1,n);
 	insert("return", type, "", id,0,0,0);
 	addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
 }
@@ -104,8 +104,8 @@ void checkFuncDeclaration(no * atual){
 	char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	char * params = checkParams(atual->noFilho->noIrmao->noIrmao);
 
-	insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,1);
-	initFunctionTabela(id, 0);
+	insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
+	initFunctionTabela(id, 0,1);
 }
 
 void addType(no * atual){
@@ -157,7 +157,7 @@ void checkDeclaration(no * atual){
      char * type = (char *) strdup(atual->noFilho->type); 
     toLowerCase(type);
     char * id = (char *) strdup(atual->noFilho->noIrmao->id);
-	insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,1);
+	insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
 	if(atual->noFilho->noIrmao->noIrmao!=NULL){
 		if(strcmp(atual->noFilho->noIrmao->noIrmao->type,"ChrLit")==0 || strcmp(atual->noFilho->noIrmao->noIrmao->type,"IntLit")==0){
 				atual->noFilho->noIrmao->noIrmao->exprType= (char *) strdup("- int");
@@ -478,7 +478,7 @@ void anotateBody(no * atual){
 		return;
 	if (atual->type != NULL){
 		if(strcmp(atual->type, "FuncDefinition")==0){
-			funcName = (char *) malloc(strlen(atual->noFilho->noIrmao->id)*sizeof(char));
+			funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
 			strcpy(funcName,atual->noFilho->noIrmao->id);
 		}
 		else if(strcmp(atual->type,"FuncBody")==0){

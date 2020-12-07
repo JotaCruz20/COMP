@@ -34,7 +34,7 @@ void addErros(int line,int col,char * erro){
 		aux->noIrmao = (erros *) malloc(sizeof(erros));
 		aux->noIrmao->line=line;
 		aux->noIrmao->col=col;
-		aux->noIrmao->erro=(char *)malloc(strlen(erro)*sizeof(char));
+		aux->noIrmao->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
 		strcpy(aux->noIrmao->erro,erro);
 	}
 	else{
@@ -44,7 +44,7 @@ void addErros(int line,int col,char * erro){
 		create = (erros *) malloc(sizeof(erros));
 		create->line=line;
 		create->col=col;
-		create->erro=(char *)malloc(strlen(erro)*sizeof(char));
+		create->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
 		strcpy(create->erro,erro);
 		create->noIrmao=aux->noIrmao;
 		aux->noIrmao=create;
@@ -70,7 +70,7 @@ void checkProgramError(no * atual){
 		return;
 	if (atual->type != NULL){
 		if (strcmp(atual->type, "FuncDefinition")==0){
-			funcName = (char *) malloc(strlen(atual->noFilho->noIrmao->id)*sizeof(char));
+			funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
 			strcpy(funcName,atual->noFilho->noIrmao->id);
 			checkFuncDefinitionError(atual);
 		}
@@ -79,7 +79,7 @@ void checkProgramError(no * atual){
 		}
 		if (strcmp(atual->type, "Declaration")==0){
 			if(funcName==NULL){
-				funcName = (char *) malloc(strlen("Global")*sizeof(char));
+				funcName = (char *) malloc((strlen("Global")+1)*sizeof(char));
 				strcpy(funcName,"Global");
 			}
 			checkDeclarationError(atual);
@@ -102,9 +102,9 @@ void checkParamsError(no * atual){
 		char * type =	(char *) strdup(auxNode->noFilho->type);	
 		toLowerCase(type);
 		if(strcmp(type,"void")==0 && auxNode->noFilho->noIrmao!=NULL && strcmp(auxNode->noFilho->noIrmao->type,"Id")==0){
-			//char error[100]; //este erro diminui os 400
-			//sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
-			//addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col,error);
+			char error[100];
+			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
+			addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col,error);
 		}
 	}
 }
@@ -160,9 +160,9 @@ void checkBodyError(no * atual,char * pai){
                     irmaos=irmaos->noIrmao;
                 }
                 if(count!=countParams){//este erro diminui os 400
-                    char error[100];
-		            sprintf(error,"Line %d, col %d: Wrong number of arguments to function %s (got %d,required %d)\n", aux->noFilho->line,aux->noFilho->col,aux->noFilho->id,count,countParams);
-		            addErros(aux->noFilho->line,aux->noFilho->col,error);
+                    //char error[100];
+		            //sprintf(error,"Line %d, col %d: Wrong number of arguments to function %s (got %d,required %d)\n", aux->noFilho->line,aux->noFilho->col,aux->noFilho->id,count,countParams);
+		            //addErros(aux->noFilho->line,aux->noFilho->col,error);
                 }
             }
             else{
@@ -293,7 +293,7 @@ void anotateBodyError(no * atual){
 		return;
 	if (atual->type != NULL){
 		if(strcmp(atual->type, "FuncDefinition")==0){
-			funcName = (char *) malloc(strlen(atual->noFilho->noIrmao->id)*sizeof(char));
+			funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
 			strcpy(funcName,atual->noFilho->noIrmao->id);
 		}
 		else if(strcmp(atual->type,"FuncBody")==0){
