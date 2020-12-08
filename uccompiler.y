@@ -263,7 +263,7 @@ Declaration:TypeSpec DeclarationCD SEMI  {      no * noDeclarate;
                                                 noAuxiliar=$2;
                                                 while(noAuxiliar!=NULL){
                                                         noDeclarate=noAuxiliar->noFilho;
-                                                        noAuxiliar->noFilho=inserirNo($1->id,$1->type,$1->noFilho,linha,coluna);
+                                                        noAuxiliar->noFilho=inserirNo($1->id,$1->type,$1->noFilho,$1->line,$1->col);
                                                         addIrmao(noAuxiliar->noFilho,noDeclarate);
                                                         noAuxiliar=noAuxiliar->noIrmao;
                                                 }
@@ -285,7 +285,7 @@ TypeSpec: CHAR  {$$ = inserirNo(NULL,"Char",NULL,$1->line,$1->col);}
         | INT   {$$ = inserirNo(NULL,"Int",NULL,$1->line,$1->col);}
         | VOID  {$$ = inserirNo(NULL,"Void",NULL,$1->line,$1->col);}
         | SHORT {$$ = inserirNo(NULL,"Short",NULL,$1->line,$1->col);}
-        | DOUBLE {$$ = inserirNo(NULL,"Double",NULL,linha,coluna);}
+        | DOUBLE {$$ = inserirNo(NULL,"Double",NULL,$1->line,$1->col);}
         ;
 
 Declarator: ID {$$ = inserirNo($1->id,"Id",NULL,$1->line,$1->col);}

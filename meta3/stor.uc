@@ -1,9 +1,23 @@
-int f0( int, short, char, double);
+int a;
+int a;
+void f1(void);
+void f1(void);
+char f1(void);
 
-int main(void){
-    putchar(64);
-    getchar();
-    putchar('a');
+int main(void) {
     int a;
-    f0(1,1,'a',2.0);
+    int a;
+    double d;
+    void a;
+    a = d;
+    a = a % d;
+    f2() + 1;
+    !f2();
+    -f2();
+    +f2();
+    f2() || f2();
+    f2(1);
+}
+void f2(void){
+
 }

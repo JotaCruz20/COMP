@@ -31,23 +31,38 @@ void addErros(int line,int col,char * erro){
 		aux=aux->noIrmao;
 	}
 	if(aux->noIrmao==NULL){
-		aux->noIrmao = (erros *) malloc(sizeof(erros));
-		aux->noIrmao->line=line;
-		aux->noIrmao->col=col;
-		aux->noIrmao->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
-		strcpy(aux->noIrmao->erro,erro);
+        if(aux->line==line && aux->col==col){
+            aux->line=line;
+            aux->col=col;
+            free(aux->erro);
+            aux->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
+            strcpy(aux->noIrmao->erro,erro);
+		}
+        else{
+            aux->noIrmao = (erros *) malloc(sizeof(erros));
+            aux->noIrmao->line=line;
+            aux->noIrmao->col=col;
+            aux->noIrmao->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
+            strcpy(aux->noIrmao->erro,erro);
+        }
 	}
 	else{
-		if(aux->noIrmao->line==line && aux->noIrmao->col==col && strcmp(aux->noIrmao->erro,erro)==0){
-			return;
+		if(aux->noIrmao->line==line && aux->noIrmao->col==col){
+			aux->noIrmao->line=line;
+            aux->noIrmao->col=col;
+            free(aux->noIrmao->erro);
+            aux->noIrmao->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
+            strcpy(aux->noIrmao->erro,erro);
 		}
-		create = (erros *) malloc(sizeof(erros));
-		create->line=line;
-		create->col=col;
-		create->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
-		strcpy(create->erro,erro);
-		create->noIrmao=aux->noIrmao;
-		aux->noIrmao=create;
+        else{
+            create = (erros *) malloc(sizeof(erros));
+            create->line=line;
+            create->col=col;
+            create->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
+            strcpy(create->erro,erro);
+            create->noIrmao=aux->noIrmao;
+            aux->noIrmao=create;
+        }
 	}
 }
 
@@ -56,9 +71,9 @@ void printErros(){
 	if(aux->noIrmao!=NULL){
 		aux=aux->noIrmao;
 		while(aux!=NULL){
-			char * ptr = strchr(aux->erro, '\n');
-			*ptr='\0';
-			printf("%s\n",aux->erro);
+			//char * ptr = strchr(aux->erro, '\n');
+			//*ptr='\0';
+			printf("%s",aux->erro);
 			aux=aux->noIrmao;
 		}
 	}
@@ -70,6 +85,7 @@ void checkProgramError(no * atual){
 		return;
 	if (atual->type != NULL){
 		if (strcmp(atual->type, "FuncDefinition")==0){
+            //free(funcName);
 			funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
 			strcpy(funcName,atual->noFilho->noIrmao->id);
 			checkFuncDefinitionError(atual);
@@ -98,23 +114,25 @@ void checkProgramError(no * atual){
 
 void checkParamsError(no * atual){
 	no * auxNode = atual->noFilho;
-	while(auxNode != NULL){
-		char * type =	(char *) strdup(auxNode->noFilho->type);	
+	while(auxNode->noFilho != NULL){
+		char * type = (char *) malloc(strlen(auxNode->noFilho->type)*sizeof(char));
+        strcpy(type,auxNode->noFilho->type); 
 		toLowerCase(type);
 		if(strcmp(type,"void")==0 && auxNode->noFilho->noIrmao!=NULL && strcmp(auxNode->noFilho->noIrmao->type,"Id")==0){
 			char error[100];
-			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
-			addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col,error);
+			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", auxNode->noFilho->line,auxNode->noFilho->col);
+			addErros(auxNode->noFilho->line,auxNode->noFilho->col,error);
 		}
+        auxNode = auxNode->noFilho;
 	}
 }
 
 void checkFuncDefinitionError(no * atual){ 
-	checkParams(atual->noFilho->noIrmao->noIrmao);
+	checkParamsError(atual->noFilho->noIrmao->noIrmao);
 }
 
 void checkFuncDeclarationError(no * atual){
-    checkParams(atual->noFilho->noIrmao->noIrmao);
+    checkParamsError(atual->noFilho->noIrmao->noIrmao);
 }
 
 void checkDeclarationError(no * atual){
@@ -122,8 +140,8 @@ void checkDeclarationError(no * atual){
     toLowerCase(type);
 	if(strcmp(type,"void")==0){
 		char error[100];
-		sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col);
-		addErros(atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,error);
+		sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->line,atual->noFilho->col-4);
+		addErros(atual->noFilho->line,atual->noFilho->col-4,error);
 	}
 }
 
@@ -145,8 +163,8 @@ void checkBodyError(no * atual,char * pai){
                 char error[100];
                 char* rest = aux->exprType; 
                 char * token = strtok_r(aux->exprType,"- ",&rest);
-		        sprintf(error,"Line %d, col %d: Operator = cannot be applied to types %s, double\n", aux->noFilho->line,aux->noFilho->col,token);
-		        addErros(aux->noFilho->line,aux->noFilho->col,error);
+		        sprintf(error,"Line %d, col %d: Operator = cannot be applied to types %s, double\n", aux->line,aux->col-1,token);
+		        addErros(aux->line,aux->col-1,error);
             }
         }
         else if(strcmp(aux->type,"Call")==0){
@@ -195,7 +213,7 @@ void checkBodyError(no * atual,char * pai){
 			type = aux->noFilho->exprType;
 			brotherType = aux->noFilho->noIrmao->exprType;
 			char operator[3];
-			if(strcmp(type,"- double")==0 || strcmp(brotherType,"- double")==0){
+			if(strcmp(type,"- double")==0 || strcmp(brotherType,"- double")==0 || strcmp(aux->noFilho->type,"Call")==0 || strcmp(aux->noFilho->noIrmao->type,"Call")==0){
 				char error[100];
 				if(strcmp(aux->type, "Or") == 0 ){
 					strcpy(operator,"||");
@@ -215,15 +233,30 @@ void checkBodyError(no * atual,char * pai){
 				else if(strcmp(aux->type, "Mod") == 0){
 					strcpy(operator,"%");
 				}
-                 char* rest = aux->noFilho->exprType, *rest2 = aux->noFilho->noIrmao->exprType; 
-                char * token1 = strtok_r(type,"- ",&rest), *token2 =strtok_r(brotherType,"- ",&rest2);
-                
-				sprintf(error,"Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", aux->noFilho->line,aux->noFilho->col, operator,token1,token2);
-				addErros(aux->noFilho->line,aux->noFilho->col,error);
+                char* rest, *rest2; 
+                char * token1, *token2;
+                if( strcmp(aux->noFilho->type,"Call")==0 ){
+                    rest = aux->noFilho->noFilho->exprType;
+                    token1 = strtok_r(aux->noFilho->noFilho->exprType,"- ",&rest);
+                }
+                else{
+                    rest = aux->noFilho->exprType;
+                    token1 = strtok_r(aux->noFilho->exprType,"- ",&rest);
+                }
+                if(strcmp(aux->noFilho->noIrmao->type,"Call")==0){
+                    rest2 = aux->noFilho->noIrmao->noFilho->exprType;
+                    token2 =strtok_r(aux->noFilho->noIrmao->noFilho->exprType,"- ",&rest2);
+                }
+                else{
+                    rest2 = aux->noFilho->noIrmao->exprType;
+                    token2 =strtok_r(aux->noFilho->noIrmao->exprType,"- ",&rest2);
+                }
+				sprintf(error,"Line %d, col %ld: Operator %s cannot be applied to types %s, %s\n", aux->line,aux->col-strlen(operator), operator,token1,token2);
+				addErros(aux->line,aux->col-strlen(operator),error);
 			}
 		}
         else if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type, "Add") == 0 || strcmp(aux->type, "Sub") == 0 ||  strcmp(aux->type, "Mul") == 0 || strcmp(aux->type, "Div") == 0){
-			if(strcmp(aux->noFilho->exprType,"- undef")==0 || strcmp(aux->noFilho->noIrmao->exprType,"- undef")==0){
+			if(strcmp(aux->noFilho->exprType,"- undef")==0 || strcmp(aux->noFilho->noIrmao->exprType,"- undef")==0 || strcmp(aux->noFilho->type,"Call")==0 || strcmp(aux->noFilho->noIrmao->type,"Call")==0 ){
                 char error[100];
                 char operator[3];
                 if(strcmp(aux->type, "Lt") == 0 ){
@@ -259,27 +292,51 @@ void checkBodyError(no * atual,char * pai){
                 else if(strcmp(aux->type, "Div") == 0){
 					strcpy(operator,"/");
 				}
-                char* rest = aux->noFilho->exprType, *rest2 = aux->noFilho->noIrmao->exprType; 
-                char * token1 = strtok_r(aux->noFilho->exprType,"- ",&rest), *token2 =strtok_r(aux->noFilho->noIrmao->exprType,"- ",&rest2);
-                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", aux->noFilho->line,aux->noFilho->col, operator,token1,token2);
-				addErros(aux->noFilho->line,aux->noFilho->col,error);
+                char* rest, *rest2; 
+                char * token1, *token2;
+                if( strcmp(aux->noFilho->type,"Call")==0 ){
+                    rest = aux->noFilho->noFilho->exprType;
+                    token1 = strtok_r(aux->noFilho->noFilho->exprType,"- ",&rest);
+                }
+                else{
+                    rest = aux->noFilho->exprType;
+                    token1 = strtok_r(aux->noFilho->exprType,"- ",&rest);
+                }
+                if(strcmp(aux->noFilho->noIrmao->type,"Call")==0){
+                    rest2 = aux->noFilho->noIrmao->noFilho->exprType;
+                    token2 =strtok_r(aux->noFilho->noIrmao->noFilho->exprType,"- ",&rest2);
+                }
+                else{
+                    rest2 = aux->noFilho->noIrmao->exprType;
+                    token2 =strtok_r(aux->noFilho->noIrmao->exprType,"- ",&rest2);
+                }
+                sprintf(error,"Line %d, col %ld: Operator %s cannot be applied to types %s, %s\n", aux->line,aux->col-strlen(operator), operator,token1,token2);
+				addErros(aux->line,aux->col-strlen(operator),error);
             }
 		}
         else if(strcmp(aux->type,"Not")==0 || strcmp(aux->type,"Plus")==0 || strcmp(aux->type,"Minus")==0){
+            char error[100];
+            char operator[3];
+            if(strcmp(aux->type, "Plus") == 0 ){
+                strcpy(operator,"+");
+            }
+            else if(strcmp(aux->type, "Not") == 0){
+                strcpy(operator,"!");
+            }
+            else if(strcmp(aux->type, "Minus") == 0){
+                strcpy(operator,"-");
+            }
             if(strcmp(aux->noFilho->exprType,"- undef")==0){
-                char error[100];
-                char operator[3];
-                if(strcmp(aux->type, "Plus") == 0 ){
-					strcpy(operator,"+");
-				}
-				else if(strcmp(aux->type, "Not") == 0){
-					strcpy(operator,"!");
-				}
-				else if(strcmp(aux->type, "Minus") == 0){
-					strcpy(operator,"-");
-				}
-                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type undef\n", aux->noFilho->line,aux->noFilho->col, operator);
-				addErros(aux->noFilho->line,aux->noFilho->col,error);
+                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type undef\n", aux->noFilho->line,aux->noFilho->col-1, operator);
+				addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+            }
+            if(strcmp(aux->noFilho->type,"Call")==0 ){
+                char* rest; 
+                char * token1;
+                rest = aux->noFilho->noFilho->exprType;
+                token1 = strtok_r(aux->noFilho->noFilho->exprType,"- ",&rest);
+                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to types %s\n", aux->line,aux->col-1, operator,token1);
+				addErros(aux->line,aux->col,error-1);
             }
         }
         else if(aux->id!=NULL){
@@ -305,6 +362,7 @@ void anotateBodyError(no * atual){
 		return;
 	if (atual->type != NULL){
 		if(strcmp(atual->type, "FuncDefinition")==0){
+            //free(funcName);
 			funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
 			strcpy(funcName,atual->noFilho->noIrmao->id);
 		}

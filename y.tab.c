@@ -1788,7 +1788,7 @@ yyreduce:
                                                 noAuxiliar=(yyvsp[-1].no);
                                                 while(noAuxiliar!=NULL){
                                                         noDeclarate=noAuxiliar->noFilho;
-                                                        noAuxiliar->noFilho=inserirNo((yyvsp[-2].no)->id,(yyvsp[-2].no)->type,(yyvsp[-2].no)->noFilho,linha,coluna);
+                                                        noAuxiliar->noFilho=inserirNo((yyvsp[-2].no)->id,(yyvsp[-2].no)->type,(yyvsp[-2].no)->noFilho,(yyvsp[-2].no)->line,(yyvsp[-2].no)->col);
                                                         addIrmao(noAuxiliar->noFilho,noDeclarate);
                                                         noAuxiliar=noAuxiliar->noIrmao;
                                                 }
@@ -1846,7 +1846,7 @@ yyreduce:
 
   case 30:
 #line 288 "uccompiler.y" /* yacc.c:1646  */
-    {(yyval.no) = inserirNo(NULL,"Double",NULL,linha,coluna);}
+    {(yyval.no) = inserirNo(NULL,"Double",NULL,(yyvsp[0].noCol)->line,(yyvsp[0].noCol)->col);}
 #line 1851 "y.tab.c" /* yacc.c:1646  */
     break;
 

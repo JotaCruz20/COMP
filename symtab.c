@@ -17,6 +17,16 @@ void initTabela(){
 	insert("getchar","int(void)","","Global",0,0,0);
 }
 
+noTabela *  searchFunc(char* nomeTabela){
+	noTabela * aux = tabelaSimbolos->tabelaAtual;
+	while(aux!=NULL && strcmp(nomeTabela,aux->id)!=0){
+		aux=aux->next;
+	}
+	return aux;
+}
+
+
+
 int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col, int flag){
     noTabela * tab = (noTabela*)malloc(sizeof(noTabela));
     tab->id=(char *)malloc((strlen(id)+1)*sizeof(char));
@@ -26,10 +36,15 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, in
     strcpy(tab->tipo,tipo);
     strcpy(tab->params,params);
     tabela * aux = searchTabela(nomeTabela);
+	//noTabela * procuraFuncGlobal = searchFunc(nomeTabela);
     if (aux->tabelaAtual == NULL){
 		aux->tabelaAtual = tab;
+
 	}
 	else{
+		if(strcmp("return",id)==0){
+			return 1;
+		}
 		noTabela * auxNoTabela = aux->tabelaAtual;
 		while (auxNoTabela->next != NULL){
 			if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
@@ -208,7 +223,7 @@ char * typeParams(char * nome,int n,char* type){
 	return " ";
 }
 
-void initFunctionTabela(char * name, int flag, int print, int params){
+void initFunctionTabela(char * name, int flag, int print, int params, int def,int line,int col,int error){
 	tabela * novaTabela = (tabela *)malloc(sizeof(tabela));
 
 	novaTabela->type = (char *)malloc((strlen("Function") + 1)*sizeof(char));
@@ -218,12 +233,23 @@ void initFunctionTabela(char * name, int flag, int print, int params){
 	novaTabela->flag = flag;
 	novaTabela->print = print;
 	novaTabela->params=params;
+	novaTabela->definida = def;
 	tabela * auxTabela = tabelaSimbolos;
 
     while (auxTabela->next != NULL){
         if (strcmp(auxTabela->name, name)==0){
             auxTabela->flag = 1;
 			auxTabela->print=print;
+			if(def==1){
+				if(auxTabela->definida==1){
+					char error[100];
+					sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(name),name);
+					addErros(line,col-strlen(name),error);
+				}
+				else if(error==1){
+					auxTabela->definida=def;
+				}
+			}
             free(novaTabela);
             return;
         }
@@ -232,6 +258,16 @@ void initFunctionTabela(char * name, int flag, int print, int params){
     if (strcmp(auxTabela->name, name)==0){
         auxTabela->flag = 1;
 		auxTabela->print=print;
+		if(def==1){
+			if(auxTabela->definida==1){
+				char error[100];
+				sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(name),name);
+				addErros(line,col-strlen(name),error);
+			}
+			else if(error==1){
+				auxTabela->definida=def;
+			}
+		}
         free(novaTabela);
         return;
     }
@@ -253,7 +289,7 @@ void printTabela(){
 				}
 				printf("\n");
 			}
-			else if(auxTabela->print==1){
+			else if(auxTabela->print==1 && auxTabela->tabelaAtual!=NULL){
 				printf("===== %s %s Symbol Table =====\n", auxTabela->type, auxTabela->name);
 				auxNoTabela = auxTabela->tabelaAtual;
 				while ( auxNoTabela != NULL){
