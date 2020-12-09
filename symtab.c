@@ -1,6 +1,7 @@
 #include "symtab.h"
 #include "semantics.h"
 #include "error.h"
+#include "tree.h"
 
 tabela * tabelaSimbolos;
 
@@ -27,7 +28,7 @@ noTabela *  searchFunc(char* nomeTabela){
 
 
 
-int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col, int flag){
+int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, int col, int flag){
     noTabela * tab = (noTabela*)malloc(sizeof(noTabela));
     tab->id=(char *)malloc((strlen(id)+1)*sizeof(char));
     tab->tipo=(char *)malloc((strlen(tipo)+1)*sizeof(char));
@@ -36,15 +37,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, in
     strcpy(tab->tipo,tipo);
     strcpy(tab->params,params);
     tabela * aux = searchTabela(nomeTabela);
+	tabela * auxFunc = searchTabela(id);
 	//noTabela * procuraFuncGlobal = searchFunc(nomeTabela);
-    if (aux->tabelaAtual == NULL){
+    if (aux->tabelaAtual == NULL || strcmp("return",id)==0){
 		aux->tabelaAtual = tab;
-
 	}
 	else{
-		if(strcmp("return",id)==0){
-			return 1;
-		}
 		noTabela * auxNoTabela = aux->tabelaAtual;
 		while (auxNoTabela->next != NULL){
 			if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
@@ -70,9 +68,16 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, in
 						return 0;
 					}
 					else if(strcmp(auxNoTabela->tipo,tipo)!=0 || strcmp(params,auxNoTabela->params)!=0){//é uma função
-						char error[500];
-						sprintf(error, "Line %d, col %ld: Conflicting types (got %s%s, expected %s%s)\n",line,col-strlen(id),tipo,params,auxNoTabela->tipo,auxNoTabela->params);
-						addErros(line,col-strlen(id),error);
+						if(auxFunc->definida==1){
+							char error[100];
+							sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
+							addErros(line,col-strlen(id),error);
+						}
+						else{
+							char error[500];
+							sprintf(error, "Line %d, col %ld: Conflicting types (got %s%s, expected %s%s)\n",line,col-strlen(id),tipo,params,auxNoTabela->tipo,auxNoTabela->params);
+							addErros(line,col-strlen(id),error);
+						}
 						return 0;
 					}
 					return 1;
@@ -105,10 +110,17 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, in
 						return 0;
 					}
 					else if(strcmp(auxNoTabela->tipo,tipo)!=0 || strcmp(params,auxNoTabela->params)!=0){//é uma função
-						char error[500];
-						sprintf(error, "Line %d, col %ld: Conflicting types (got %s%s, expected %s%s)\n",line,col-strlen(id),tipo,params,auxNoTabela->tipo,auxNoTabela->params);
-						addErros(line,col-strlen(id),error);
-						return 0;
+						if(auxFunc->definida==1){
+							char error[100];
+							sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
+							addErros(line,col-strlen(id),error);
+						}
+						else{
+							char error[500];
+							sprintf(error, "Line %d, col %ld: Conflicting types (got %s%s, expected %s%s)\n",line,col-strlen(id),tipo,params,auxNoTabela->tipo,auxNoTabela->params);
+							addErros(line,col-strlen(id),error);
+							return 0;
+						}
 					}
 					return 1;
 				}
@@ -151,34 +163,37 @@ int nParams(char * nome){
 			aux=aux->next;
 		}
 		counter = aux->params;
-		/*if(aux->tabelaAtual==NULL){
-			aux= tabelaSimbolos;
-			noTabela * auxTab = aux->tabelaAtual;
-			while(auxTab!=NULL && strcmp(auxTab->id,nome)!=0){
-				auxTab=auxTab->next;
-			}
-			if(auxTab!=NULL){
-				char* token; 
-				char * rest = (char *)malloc((strlen(auxTab->params)+1)*sizeof(char));
-    			strcpy(rest,auxTab->params);
-				while ((token = strtok_r(rest, ",", &rest))){
-        			counter+=1; 
-				}
-			}
-		}
-		else{
-			noTabela * auxTab = aux->tabelaAtual;
-			while (auxTab!=NULL){
-				if (strcmp(auxTab->params,"\tparam")==0)
-				{
-					counter+=1;
-				}
-				auxTab=auxTab->next;
-			}
-			counter = aux->params;
-		}*/
 	}
 	return counter;
+}
+
+int checkParamsType(tabela * aux, no * atual){
+	if(aux!=NULL){
+		noTabela * paramsTabela = aux->tabelaAtual->next;
+		while(paramsTabela!=NULL && strcmp(paramsTabela->params,"")!=0){
+			if(atual==NULL){
+				return 0;
+			}
+			char * type = (char *) malloc(strlen(atual->noFilho->type)*sizeof(char));
+			strcpy(type,atual->noFilho->type);
+			toLowerCase(type);
+			if(strcmp(type,paramsTabela->tipo)!=0){
+				return 0;
+			}
+			atual=atual->noIrmao;
+			paramsTabela=paramsTabela->next;
+		}
+		if(atual!=NULL){
+			if(strcmp(atual->noFilho->type,"Void")==0){
+				return 1;
+			}
+			else{
+				return 0;
+			}
+		}
+		return 1;
+	}
+	return 0;
 }
 
 tabela * searchTabela(char * nome){

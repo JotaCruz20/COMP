@@ -102,9 +102,11 @@ void checkFuncDefinition(no * atual){
 	strcpy(name, id);
 
 	int n= insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
-	initFunctionTabela(id, 1,n,counter,1,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
-	insert("return", type, "", id,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
-	addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
+	if(n==1){
+		initFunctionTabela(id, 1,1,counter,1,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+		insert("return", type, "", id,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+		addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
+	}
 }
 
 void checkFuncDeclaration(no * atual){

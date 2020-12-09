@@ -12,6 +12,7 @@ char name[20];
 char * funcName;
 extern int linha;
 extern int coluna;
+int flagCheckError = 1;
 
 void initErrors(){
 	errorsHead = (erros *) malloc(sizeof(erros));
@@ -44,7 +45,7 @@ void addErros(int line,int col,char * erro){
             aux->noIrmao->col=col;
             aux->noIrmao->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
             strcpy(aux->noIrmao->erro,erro);
-        }
+       }
 	}
 	else{
 		if(aux->noIrmao->line==line && aux->noIrmao->col==col){
@@ -71,8 +72,6 @@ void printErros(){
 	if(aux->noIrmao!=NULL){
 		aux=aux->noIrmao;
 		while(aux!=NULL){
-			//char * ptr = strchr(aux->erro, '\n');
-			//*ptr='\0';
 			printf("%s",aux->erro);
 			aux=aux->noIrmao;
 		}
@@ -114,16 +113,41 @@ void checkProgramError(no * atual){
 
 void checkParamsError(no * atual){
 	no * auxNode = atual->noFilho;
-	while(auxNode->noFilho != NULL){
+    struct params{
+        char * param;
+        struct params * next;
+    };
+    struct params * parametros = (struct params *) malloc(sizeof(struct params));
+	while(auxNode!= NULL){
 		char * type = (char *) malloc(strlen(auxNode->noFilho->type)*sizeof(char));
         strcpy(type,auxNode->noFilho->type); 
 		toLowerCase(type);
+        struct params * auxPar = parametros;
+        while(auxPar->next!=NULL){
+            if(auxPar->param!=NULL && auxNode->noFilho->noIrmao!=NULL &&  strcmp(auxPar->param,auxNode->noFilho->noIrmao->id)==0){
+                char error[100];
+                sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),auxNode->noFilho->noIrmao->id);
+                addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),error);
+            }
+            auxPar=auxPar->next;
+        }
+        if(auxPar->param!=NULL && auxNode->noFilho->noIrmao!=NULL && strcmp(auxPar->param,auxNode->noFilho->noIrmao->id)==0){
+            char error[100];
+            sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),auxNode->noFilho->noIrmao->id);
+            addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),error);
+        }
+        if(auxNode->noFilho->noIrmao!=NULL){
+            auxPar->next = (struct params *) malloc(sizeof(struct params));
+            auxPar->next->param = (char *) malloc(strlen(auxNode->noFilho->noIrmao->id)*sizeof(char));
+            strcpy(auxPar->next->param,auxNode->noFilho->noIrmao->id);
+        }
+
 		if(strcmp(type,"void")==0 && auxNode->noFilho->noIrmao!=NULL && strcmp(auxNode->noFilho->noIrmao->type,"Id")==0){
 			char error[100];
 			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", auxNode->noFilho->line,auxNode->noFilho->col);
 			addErros(auxNode->noFilho->line,auxNode->noFilho->col,error);
 		}
-        auxNode = auxNode->noFilho;
+        auxNode = auxNode->noIrmao;
 	}
 }
 
@@ -363,11 +387,26 @@ void anotateBodyError(no * atual){
 	if (atual->type != NULL){
 		if(strcmp(atual->type, "FuncDefinition")==0){
             //free(funcName);
-			funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
-			strcpy(funcName,atual->noFilho->noIrmao->id);
+            tabela * tipoF = searchTabela(atual->noFilho->noIrmao->id);
+            int n = checkParamsType(tipoF,atual->noFilho->noIrmao->noIrmao->noFilho);
+            char * type = (char *) malloc(strlen(atual->noFilho->type)*sizeof(char));
+            strcpy(type,atual->noFilho->type);
+            toLowerCase(type);
+            if(strcmp(tipoF->tabelaAtual->tipo,type)==0 && n==1){
+                funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
+                strcpy(funcName,atual->noFilho->noIrmao->id);
+                flagCheckError=1;
+            }
+            else
+            {
+                flagCheckError =0;
+            }
+            
 		}
 		else if(strcmp(atual->type,"FuncBody")==0){
-			checkBodyError(atual,"FuncBody");
+            if(flagCheckError==1){
+			    checkBodyError(atual,"FuncBody");
+            }
 		}
 	}
 	no * auxNode = atual->noFilho;

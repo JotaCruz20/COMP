@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "tree.h"
 
 typedef struct noTabela
 {
@@ -34,5 +35,6 @@ void printTabela();
 char* searchId(char* nTabela,char * id);
 int checkFunc(char * nome);
 int nParams(char * nome);
+int checkParamsType(tabela * aux, no * atual);
 
 #endif
