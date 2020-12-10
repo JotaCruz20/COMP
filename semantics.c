@@ -5,6 +5,7 @@
 #include "semantics.h"
 #include "symtab.h"
 #include "tree.h"
+#include "error.h"
 
 char name[20];
 char * funcName;
@@ -89,23 +90,37 @@ void checkFuncDefinition(no * atual){
     toLowerCase(type);
 	char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	char * params = checkParams(atual->noFilho->noIrmao->noIrmao);
-	char * token;
-	char * rest = (char *)malloc((strlen(params)+1)*sizeof(char));
 	int counter = 0;
-	strcpy(rest,params);
-	while ((token = strtok_r(rest, ",", &rest))){
-		if(strcmp(token,"void")!=0 && strcmp(token,"(void")!=0 && strcmp(token,"void)")!=0 && strcmp(token,"(void)")!=0){
+	int flagErrorVoid = 0,flagBrother = 0;
+	no * paramsNo = atual->noFilho->noIrmao->noIrmao->noFilho;
+	while (paramsNo!=NULL && strcmp(paramsNo->type,"ParamDeclaration")==0){
+		if(paramsNo->noFilho!=NULL && strcmp(paramsNo->noFilho->type,"Void")!=0){
 			counter+=1; 
+		} 
+		else if(flagBrother ==0 && strcmp(paramsNo->noFilho->type,"Void")==0 && paramsNo->noFilho->noIrmao==NULL && paramsNo->noIrmao==NULL){
+			counter+=0;             
 		}
+		else{
+			flagErrorVoid=1;
+			char error[100];
+			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", paramsNo->noFilho->line,paramsNo->noFilho->col-4);
+			addErros(paramsNo->noFilho->line,paramsNo->noFilho->col-4,error);
+			break;
+		}
+		flagBrother = 1;
+		paramsNo=paramsNo->noIrmao;
 	}
+
 
 	strcpy(name, id);
 
-	int n= insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
-	if(n==1){
-		initFunctionTabela(id, 1,1,counter,1,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
-		insert("return", type, "", id,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
-		addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
+	if(flagErrorVoid==0){
+		int n= insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
+		if(n==1){
+			initFunctionTabela(id, 1,1,counter,1,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+			insert("return", type, "", id,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+			addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
+		}
 	}
 }
 
@@ -114,21 +129,34 @@ void checkFuncDeclaration(no * atual){
     toLowerCase(type);
 	char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	char * params = checkParams(atual->noFilho->noIrmao->noIrmao);
-	char* token; 
-	char * rest = (char *)malloc((strlen(params)+1)*sizeof(char));
+	no * paramsNo = atual->noFilho->noIrmao->noIrmao->noFilho;
 	int counter = 0;
-	strcpy(rest,params);
-	while ((token = strtok_r(rest, ",", &rest))){
-		if(strcmp(token,"void")!=0 && strcmp(token,"(void")!=0 && strcmp(token,"void)")!=0 && strcmp(token,"(void)")!=0){
+	int flagErrorVoid = 0, flagBrother=0;
+	while (paramsNo!=NULL && strcmp(paramsNo->type,"ParamDeclaration")==0){
+		if(paramsNo->noFilho!=NULL && strcmp(paramsNo->noFilho->type,"Void")!=0){
 			counter+=1; 
 		} 
+		else if(flagBrother==0 &&strcmp(paramsNo->noFilho->type,"Void")==0 && paramsNo->noFilho->noIrmao==NULL && paramsNo->noIrmao==NULL){
+			counter+=0;             
+		}
+		else{
+			flagErrorVoid=1;
+			char error[100];
+			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", paramsNo->noFilho->line,paramsNo->noFilho->col-4);
+			addErros(paramsNo->noFilho->line,paramsNo->noFilho->col-4,error);
+			break;
+		}
+		flagBrother=1;
+		paramsNo=paramsNo->noIrmao;
 	}
 
-	int n = insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
-	initFunctionTabela(id, 0,1, counter,0,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+	if(flagErrorVoid==0){
+		int n = insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,3);
+		initFunctionTabela(id, 0,1, counter,0,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+	}
 }
 
-void addType(no * atual){
+void addType(no * atual, char* pai){
 	no  * aux =atual;
 	if(aux!=NULL){
 		if(strcmp(aux->type,"ChrLit")==0 || strcmp(aux->type,"IntLit")==0){
@@ -161,14 +189,18 @@ void addType(no * atual){
 		}
 		else if(aux->id!=NULL){
 			char * type = searchId(funcName,aux->id);
+			if(strcmp(pai,"Call")==0){
+				char * params = getTypeParams(funcName);
+				strcat(type,params);
+			}
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}
 		if(aux->noFilho!=NULL){
-			addType(aux->noFilho);
+			addType(aux->noFilho,aux->type);
 		}
 		if(aux->noIrmao!=NULL){
-			addType(aux->noIrmao);
+			addType(aux->noIrmao,pai);
 		}
 	}
 }
@@ -191,7 +223,7 @@ void checkDeclaration(no * atual){
 				atual->noFilho->noIrmao->noIrmao->exprType= (char *) strdup("- double");
 		}
 		else{
-			addType(atual->noFilho->noIrmao->noIrmao);
+			addType(atual->noFilho->noIrmao->noIrmao,atual->type);
 		}
 	}
 }
@@ -267,7 +299,15 @@ char * prioridade(no * atual){ // vai buscar o tipo para por no Add/Mul/Sub/Mod
 			strcpy(tipo2, "double");
 		}
 	}
-	if(strcmp(tipo1,"undef")==0 || strcmp(tipo2,"undef")==0 || strcmp(tipo1,"- undef")==0 || strcmp(tipo2,"- undef")==0){
+	tipo1 = strtok(tipo1,"- (");
+	tipo2 = strtok(tipo2,"- ("); 
+
+	if(tipo2==NULL){
+		tipo2 = (char *)malloc(sizeof(char));
+	}
+
+
+	if(strcmp(tipo1,"undef")==0 || strcmp(tipo2,"undef")==0 || strcmp(tipo1,"- undef")==0 || strcmp(tipo2,"- undef")==0 || strcmp(tipo1,"void")==0 || strcmp(tipo2,"void")==0 || strcmp(tipo1,"- void")==0 || strcmp(tipo2,"- void")==0){
 		return strdup("- undef");
 	}
 	if(strcmp(tipo1,"double")==0 || strcmp(tipo2,"double")==0 || strcmp(tipo1,"- double")==0 || strcmp(tipo2,"- double")==0){
@@ -323,9 +363,6 @@ char * searchComma(no * atual){
 			}	
 			else{
 				char * type = searchId(funcName,filho2->noFilho->id);
-				if(strcmp(type,"undef")==0){
-					//printf("Line %d,col %d: Symbol %s is not a function", linha,coluna, filho2->noFilho->id);
-				}
 				char * token;
     			token = strtok(type,"(");
 				char * tokenF = (char *) malloc((strlen(token)+3)*sizeof(char));
@@ -361,6 +398,14 @@ void searchStore(no *atual, char* typeBrother){
 	no * aux = atual;
 	if(aux->noFilho->id!=NULL){
 		char * type = searchId(funcName,aux->noFilho->id);
+		if(strcmp(type,"undef")==0){
+				if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->type,"ChrLit")==0){
+					strcpy(type, "int");
+				}
+				else if(strcmp(aux->noFilho->type,"RealLit")==0){
+					strcpy(type, "double");
+				}
+			}
 		if(strcmp(aux->noFilho->noIrmao->type,"Add")==0 ||strcmp(aux->noFilho->noIrmao->type, "Sub") == 0 ||  strcmp(aux->noFilho->noIrmao->type, "Mul") == 0 || strcmp(aux->noFilho->noIrmao->type, "Div") == 0 ){
 			typeBrother = prioridade(aux->noFilho->noIrmao);
 			typeBrother = strtok(typeBrother,"- ");
@@ -451,9 +496,6 @@ void checkBody(no * atual,char * pai){
 			}	
 			else{
 				char * type = searchId(funcName,aux->noFilho->id);
-				if(strcmp(type,"undef")==0){
-					//printf("Line %d,col %d: Symbol %s is not a function\n", linha,coluna, aux->noFilho->id);
-				}
 				aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 				char * token;
     			token = strtok(type,"(");
@@ -482,10 +524,15 @@ void checkBody(no * atual,char * pai){
 				}
 			}
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
+			strtok(type,"()");
 			sprintf(aux->exprType,"- %s",type);
 		}
 		else if(aux->id!=NULL && strcmp(pai,"Declaration")!=0){
 			char * type = searchId(funcName,aux->id);
+			if(strcmp(pai,"Call")==0){
+				char * params = getTypeParams(funcName);
+				strcat(type,params);
+			}
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}

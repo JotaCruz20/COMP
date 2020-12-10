@@ -11,6 +11,3 @@ int main(void){
 int f0( int a , short b, char c, double d, int e){
     a=1;
 }
-
-if(+d){}
-if(f1()){}

@@ -36,5 +36,6 @@ char* searchId(char* nTabela,char * id);
 int checkFunc(char * nome);
 int nParams(char * nome);
 int checkParamsType(tabela * aux, no * atual);
-
+void checkParamsTypeError(char * nome, char * nomeFunc, no * atual,no* pai);
+char * getTypeParams(char * nome);
 #endif
