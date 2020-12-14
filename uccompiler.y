@@ -8,14 +8,14 @@
     #include <stdlib.h>  
     #include <string.h>  
     #include "tree.h"
+    #include "error.h"
     int yylex(void);
     void yyerror (char * s);
 
     extern int errorFlag;
     extern struct no * noAST;
-    int counter = 0;
-    extern int flag;
     extern int linha;
+    int counter = 0;
     extern int coluna;
 
     char * auxType;
@@ -37,11 +37,13 @@
         else{
                 noAtual->id = NULL;
         }
+        //noAtual->noCount = counter;
+        //counter+=1;
         noAtual->line = line;
         noAtual->col= col;
         noAtual->noFilho = noFilho;
         noAtual->noIrmao = NULL;
-    return noAtual;
+        return noAtual;
     }
 
     void addIrmao(no * no1, no * no2)
@@ -164,7 +166,7 @@
 
 %%
 
-Programa: FunctionsAndDeclarations {noAST=inserirNo(NULL,"Program",$1,linha,coluna);}
+Programa: FunctionsAndDeclarations {noAST=inserirNo(NULL,"Program",$1,linha,coluna);counter+=1;}
 	    ;
 
 FunctionsAndDeclarations: FunctionDefinition  {$$ = $1;}

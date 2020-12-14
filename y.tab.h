@@ -130,7 +130,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 82 "uccompiler.y" /* yacc.c:1909  */
+#line 84 "uccompiler.y" /* yacc.c:1909  */
 
     struct no * no;
     struct noLex * noCol;

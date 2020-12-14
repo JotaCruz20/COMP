@@ -77,7 +77,7 @@ void addParamsFunction(no * atual, char * nameTable){
             toLowerCase(type);
 			if(strcmp(type,"void")!=0){
 				if(auxNode->noFilho->noIrmao!=NULL){
-					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->line,auxNode->col,0);
+					insert(auxNode->noFilho->noIrmao->id, type, "\tparam", nameTable, auxNode->line,auxNode->col,0,auxNode->noFilho->noIrmao->noCount);
 				}
 			}
 		}
@@ -104,7 +104,7 @@ void checkFuncDefinition(no * atual){
 			flagErrorVoid=1;
 			char error[100];
 			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", paramsNo->noFilho->line,paramsNo->noFilho->col-4);
-			addErros(paramsNo->noFilho->line,paramsNo->noFilho->col-4,error);
+			addErros(paramsNo->noFilho->line,paramsNo->noFilho->col-4,error,paramsNo->noFilho->noCount);
 			break;
 		}
 		flagBrother = 1;
@@ -115,10 +115,10 @@ void checkFuncDefinition(no * atual){
 	strcpy(name, id);
 
 	if(flagErrorVoid==0){
-		int n= insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
+		int n= insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2,atual->noFilho->noIrmao->noCount);
 		if(n==1){
-			initFunctionTabela(id, 1,1,counter,1,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
-			insert("return", type, "", id,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+			initFunctionTabela(id, 1,1,counter,1,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n,atual->noFilho->noIrmao->noCount);
+			insert("return", type, "", id,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n,atual->noFilho->noIrmao->noCount);
 			addParamsFunction(atual->noFilho->noIrmao->noIrmao, id);
 		}
 	}
@@ -143,7 +143,7 @@ void checkFuncDeclaration(no * atual){
 			flagErrorVoid=1;
 			char error[100];
 			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", paramsNo->noFilho->line,paramsNo->noFilho->col-4);
-			addErros(paramsNo->noFilho->line,paramsNo->noFilho->col-4,error);
+			addErros(paramsNo->noFilho->line,paramsNo->noFilho->col-4,error,paramsNo->noFilho->noCount);
 			break;
 		}
 		flagBrother=1;
@@ -151,8 +151,8 @@ void checkFuncDeclaration(no * atual){
 	}
 
 	if(flagErrorVoid==0){
-		int n = insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,3);
-		initFunctionTabela(id, 0,1, counter,0,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n);
+		int n = insert(id, type, params, "Global",atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,3,atual->noFilho->noIrmao->noCount);
+		initFunctionTabela(id, 0,1, counter,0,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,n,atual->noFilho->noIrmao->noCount);
 	}
 }
 
@@ -189,10 +189,6 @@ void addType(no * atual, char* pai){
 		}
 		else if(aux->id!=NULL){
 			char * type = searchId(funcName,aux->id);
-			if(strcmp(pai,"Call")==0){
-				char * params = getTypeParams(funcName);
-				strcat(type,params);
-			}
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}
@@ -210,10 +206,10 @@ void checkDeclaration(no * atual){
     toLowerCase(type);
     char * id = (char *) strdup(atual->noFilho->noIrmao->id);
 	if(strcmp(name,"Global")==0){
-		insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2);
+		insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,2,atual->noFilho->noIrmao->noCount);
 	}
 	else{
-		insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,1);
+		insert(id, type, "", name,atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col,1,atual->noFilho->noIrmao->noCount);
 	}
 	if(atual->noFilho->noIrmao->noIrmao!=NULL){
 		if(strcmp(atual->noFilho->noIrmao->noIrmao->type,"ChrLit")==0 || strcmp(atual->noFilho->noIrmao->noIrmao->type,"IntLit")==0){
@@ -236,17 +232,21 @@ void printTreeAnotada(no * auxNode, int pontos){
                 }
 				if(auxNode->id!=NULL){
 					if(auxNode->exprType==NULL){
+						//printf("%s(%s) %d\n", auxNode->type,auxNode->id,auxNode->noCount);
 						printf("%s(%s)\n", auxNode->type,auxNode->id);
 					}
 					else{
+						//printf("%s(%s) %s %d\n", auxNode->type,auxNode->id,auxNode->exprType,auxNode->noCount);
 						printf("%s(%s) %s\n", auxNode->type,auxNode->id,auxNode->exprType);
 					}
 					}
 				else{
 					if(auxNode->exprType==NULL){
+						//printf("%s %d\n", auxNode->type,auxNode->noCount);
 						printf("%s\n", auxNode->type);
 					}
 					else{
+						//printf("%s %s %d\n", auxNode->type, auxNode->exprType,auxNode->noCount);
 						printf("%s %s\n", auxNode->type, auxNode->exprType);
 					}
 				}
@@ -529,10 +529,6 @@ void checkBody(no * atual,char * pai){
 		}
 		else if(aux->id!=NULL && strcmp(pai,"Declaration")!=0){
 			char * type = searchId(funcName,aux->id);
-			if(strcmp(pai,"Call")==0){
-				char * params = getTypeParams(funcName);
-				strcat(type,params);
-			}
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}

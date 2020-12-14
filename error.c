@@ -6,6 +6,7 @@
 #include "symtab.h"
 #include "tree.h"
 #include "error.h"
+#include "geradorLLVM.h"
 
 erros * errorsHead;
 char name[20];
@@ -22,19 +23,20 @@ void initErrors(){
 	strcpy(errorsHead->erro,"header");
 }
 
-void addErros(int line,int col,char * erro){
+void addErros(int line,int col,char * erro,int noOrder){
 	erros * aux = errorsHead;
 	erros * create;
 	while (aux->noIrmao!=NULL && aux->noIrmao->line<line){
 		aux=aux->noIrmao;
 	}
-	while (aux->noIrmao!=NULL && aux->noIrmao->col<col && aux->noIrmao->line==line){
+    while (aux->noIrmao!=NULL && aux->noIrmao->noOrder<noOrder && aux->noIrmao->line==line){
 		aux=aux->noIrmao;
 	}
 	if(aux->noIrmao==NULL){
         if(aux->line==line && aux->col==col){
             aux->line=line;
             aux->col=col;
+            aux->noOrder=noOrder;
             free(aux->erro);
             aux->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
             strcpy(aux->noIrmao->erro,erro);
@@ -43,6 +45,7 @@ void addErros(int line,int col,char * erro){
             aux->noIrmao = (erros *) malloc(sizeof(erros));
             aux->noIrmao->line=line;
             aux->noIrmao->col=col;
+            aux->noOrder=noOrder;
             aux->noIrmao->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
             strcpy(aux->noIrmao->erro,erro);
        }
@@ -51,6 +54,7 @@ void addErros(int line,int col,char * erro){
 		if(aux->noIrmao->line==line && aux->noIrmao->col==col){
 			aux->noIrmao->line=line;
             aux->noIrmao->col=col;
+            aux->noOrder=noOrder;
             free(aux->noIrmao->erro);
             aux->noIrmao->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
             strcpy(aux->noIrmao->erro,erro);
@@ -59,6 +63,7 @@ void addErros(int line,int col,char * erro){
             create = (erros *) malloc(sizeof(erros));
             create->line=line;
             create->col=col;
+            create->noOrder=noOrder;
             create->erro=(char *)malloc((strlen(erro)+1)*sizeof(char));
             strcpy(create->erro,erro);
             create->noIrmao=aux->noIrmao;
@@ -127,14 +132,14 @@ void checkParamsError(no * atual){
             if(auxPar->param!=NULL && auxNode->noFilho->noIrmao!=NULL &&  strcmp(auxPar->param,auxNode->noFilho->noIrmao->id)==0){
                 char error[100];
                 sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),auxNode->noFilho->noIrmao->id);
-                addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),error);
+                addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),error,auxNode->noFilho->noIrmao->noCount);
             }
             auxPar=auxPar->next;
         }
         if(auxPar->param!=NULL && auxNode->noFilho->noIrmao!=NULL && strcmp(auxPar->param,auxNode->noFilho->noIrmao->id)==0){
             char error[100];
             sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),auxNode->noFilho->noIrmao->id);
-            addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),error);
+            addErros(auxNode->noFilho->noIrmao->line,auxNode->noFilho->noIrmao->col-strlen(auxNode->noFilho->noIrmao->id),error,auxNode->noFilho->noIrmao->noCount);
         }
         if(auxNode->noFilho->noIrmao!=NULL){
             auxPar->next = (struct params *) malloc(sizeof(struct params));
@@ -161,7 +166,7 @@ void checkFuncDefinitionError(no * atual){
 			flagErrorVoid=1;
 			char error[100];
 			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", params->noFilho->line,params->noFilho->col-4);
-			addErros(params->noFilho->line,params->noFilho->col-4,error);
+			addErros(params->noFilho->line,params->noFilho->col-4,error,params->noFilho->noCount);
             break;
 		}
         flagBrother = 1;
@@ -188,7 +193,7 @@ void checkFuncDeclarationError(no * atual){
 			flagErrorVoid=1;
 			char error[100];
 			sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", params->noFilho->line,params->noFilho->col-4);
-			addErros(params->noFilho->line,params->noFilho->col-4,error);
+			addErros(params->noFilho->line,params->noFilho->col-4,error,params->noFilho->noCount);
             break;
 		}
         flagBrother = 1;
@@ -205,7 +210,7 @@ void checkDeclarationError(no * atual){
 	if(strcmp(type,"void")==0){
 		char error[100];
 		sprintf(error,"Line %d, col %d: Invalid use of void type in declaration\n", atual->noFilho->line,atual->noFilho->col-4);
-		addErros(atual->noFilho->line,atual->noFilho->col-4,error);
+		addErros(atual->noFilho->line,atual->noFilho->col-4,error,atual->noFilho->noCount);
 	}
     checkDeclarationBodyErrors(atual->noFilho);
 }
@@ -217,12 +222,12 @@ void checkBodyError(no * atual,char * pai){
             if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->noFilho->type,"ChrLit")==0 || strcmp(aux->noFilho->type,"RealLit")==0){
                 char error[100];
 		        sprintf(error,"Line %d, col %ld: Lvalue required\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id));
-		        addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error);
+		        addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
             }
             else if (strcmp(aux->noFilho->type,"Call")==0){
                 char error[100];
 		        sprintf(error,"Line %d, col %d: Lvalue required\n", aux->noFilho->noFilho->line,aux->noFilho->noFilho->col);
-		        addErros(aux->noFilho->noFilho->line,aux->noFilho->noFilho->col,error);
+		        addErros(aux->noFilho->noFilho->line,aux->noFilho->noFilho->col,error,aux->noFilho->noFilho->noCount);
             }
             else if(strcmp(aux->exprType,"- double")!=0 && strcmp(aux->noFilho->noIrmao->exprType,"- double")==0 ){
                 char error[100];
@@ -230,7 +235,7 @@ void checkBodyError(no * atual,char * pai){
                 strcpy(rest,aux->exprType);
                 char * token = strtok_r(rest,"- ",&rest);   
 		        sprintf(error,"Line %d, col %d: Operator = cannot be applied to types %s, double\n", aux->line,aux->col-1,token);
-		        addErros(aux->line,aux->col-1,error);
+		        addErros(aux->line,aux->col-1,error,aux->noCount);
             }
             else if(strcmp(aux->exprType,"- undef")!=0 && strcmp(aux->noFilho->noIrmao->exprType,"- undef")==0 ){
                 char error[100];
@@ -238,7 +243,7 @@ void checkBodyError(no * atual,char * pai){
                 strcpy(rest,aux->exprType);
                 char * token = strtok_r(rest,"- ",&rest);
 		        sprintf(error,"Line %d, col %d: Operator = cannot be applied to types %s, undef\n", aux->line,aux->col-1,token);
-		        addErros(aux->line,aux->col-1,error);
+		        addErros(aux->line,aux->col-1,error,aux->noCount);
             }
         }
         else if(strcmp(aux->type,"Call")==0){
@@ -254,13 +259,13 @@ void checkBodyError(no * atual,char * pai){
                 if(count!=countParams){
                     char error[100];
 		            sprintf(error,"Line %d, col %ld: Wrong number of arguments to function %s (got %d, required %d)\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),aux->noFilho->id,count,countParams);
-		            addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error);
+		            addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
                 }
             }
             else{
                 char error[100];
 		        sprintf(error,"Line %d, col %d: Symbol %s is not a function\n", aux->noFilho->line,aux->noFilho->col,aux->noFilho->id);
-		        addErros(aux->noFilho->line,aux->noFilho->col,error);
+		        addErros(aux->noFilho->line,aux->noFilho->col,error,aux->noFilho->noCount);
             }
             checkParamsTypeError(aux->noFilho->id,funcName,aux->noFilho->noIrmao,aux);
         }
@@ -269,17 +274,17 @@ void checkBodyError(no * atual,char * pai){
                 if(strcmp(aux->noFilho->type,"Plus")==0 || strcmp(aux->noFilho->type,"Minus")==0 || strcmp(aux->noFilho->type,"Not")==0){
                     char error[100];
                     sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
-                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error,aux->noFilho->noCount);
                 }
                 else if(strcmp(aux->noFilho->type,"Call")==0){
                     char error  [100];
                     sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
-                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error,aux->noFilho->noCount);
                 }
                 else{
                     char error[100];
                     sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
-                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error,aux->noFilho->noCount);
                 }
             }
         }
@@ -331,7 +336,7 @@ void checkBodyError(no * atual,char * pai){
                     token2 =strtok_r(rest2,"- ",&rest2);
                 }
 				sprintf(error,"Line %d, col %ld: Operator %s cannot be applied to types %s, %s\n", aux->line,aux->col-strlen(operator), operator,token1,token2);
-				addErros(aux->line,aux->col-strlen(operator),error);
+				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);
 			}
 		}
         else if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type, "Add") == 0 || strcmp(aux->type, "Sub") == 0 ||  strcmp(aux->type, "Mul") == 0 || strcmp(aux->type, "Div") == 0){
@@ -394,7 +399,7 @@ void checkBodyError(no * atual,char * pai){
                     token2 =strtok_r(rest,"- ",&rest2);
                 }
                 sprintf(error,"Line %d, col %ld: Operator %s cannot be applied to types %s, %s\n", aux->line,aux->col-strlen(operator), operator,token1,token2);
-				addErros(aux->line,aux->col-strlen(operator),error);
+				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);
             }
 		}
         else if(strcmp(aux->type,"Not")==0 || strcmp(aux->type,"Plus")==0 || strcmp(aux->type,"Minus")==0){
@@ -416,7 +421,7 @@ void checkBodyError(no * atual,char * pai){
                 strcpy(rest,aux->noFilho->noFilho->exprType);
                 token1 = strtok_r(rest,"- (",&rest);
                 sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
-				addErros(aux->line,aux->col,error-1);
+				addErros(aux->line,aux->col,error-1,aux->noCount);
             }
             if(strcmp(aux->noFilho->exprType,"- int")!=0 && /*strcmp(aux->noFilho->type,"Call")!=0 && strcmp(aux->noFilho->exprType,"- void")!=0 &&*/ strcmp(aux->noFilho->exprType,"- char")!=0 && strcmp(aux->noFilho->exprType,"- short")!=0 && strcmp(aux->noFilho->exprType,"- double")!=0){
                 char * token1;
@@ -424,7 +429,7 @@ void checkBodyError(no * atual,char * pai){
                 strcpy(rest,aux->noFilho->exprType);
                 token1 = strtok_r(rest,"- (",&rest);
                 sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
-				addErros(aux->line,aux->col-1,error);
+				addErros(aux->line,aux->col-1,error,aux->noCount);
             }
         }
         else if(aux->id!=NULL){
@@ -432,7 +437,7 @@ void checkBodyError(no * atual,char * pai){
                 if(strcmp(aux->exprType,"- undef")==0){
                     char error[100];
                     sprintf(error,"Line %d, col %ld: Unknown symbol %s\n", aux->line,aux->col-strlen(aux->id),aux->id);
-                    addErros(aux->line,aux->col-strlen(aux->id),error);
+                    addErros(aux->line,aux->col-strlen(aux->id),error,aux->noCount);
                 }
             }
         }
@@ -452,12 +457,12 @@ void checkDeclarationBodyErrors(no * atual){
             if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->noFilho->type,"ChrLit")==0 || strcmp(aux->noFilho->type,"RealLit")==0){
                 char error[100];
 		        sprintf(error,"Line %d, col %ld: Lvalue required\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id));
-		        addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error);
+		        addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
             }
             else if (strcmp(aux->noFilho->type,"Call")==0){
                 char error[100];
 		        sprintf(error,"Line %d, col %d: Lvalue required\n", aux->noFilho->noFilho->line,aux->noFilho->noFilho->col);
-		        addErros(aux->noFilho->noFilho->line,aux->noFilho->noFilho->col,error);
+		        addErros(aux->noFilho->noFilho->line,aux->noFilho->noFilho->col,error,aux->noFilho->noFilho->noCount);
             }
             else if(strcmp(aux->exprType,"- double")!=0 && strcmp(aux->noFilho->noIrmao->exprType,"- double")==0 ){
                 char error[100];
@@ -465,7 +470,7 @@ void checkDeclarationBodyErrors(no * atual){
                 strcpy(rest,aux->exprType);
                 char * token = strtok_r(rest,"- ",&rest);
 		        sprintf(error,"Line %d, col %d: Operator = cannot be applied to types %s, double\n", aux->line,aux->col-1,token);
-		        addErros(aux->line,aux->col-1,error);
+		        addErros(aux->line,aux->col-1,error,aux->noCount);
             }
             else if(strcmp(aux->exprType,"- undef")!=0 && strcmp(aux->noFilho->noIrmao->exprType,"- undef")==0 ){
                 char error[100];
@@ -473,7 +478,7 @@ void checkDeclarationBodyErrors(no * atual){
                 strcpy(rest,aux->exprType);
                 char * token = strtok_r(rest,"- ",&rest);
 		        sprintf(error,"Line %d, col %d: Operator = cannot be applied to types %s, undef\n", aux->line,aux->col-1,token);
-		        addErros(aux->line,aux->col-1,error);
+		        addErros(aux->line,aux->col-1,error,aux->noCount);
             }
         }
         else if(strcmp(aux->type,"Call")==0){
@@ -489,13 +494,13 @@ void checkDeclarationBodyErrors(no * atual){
                 if(count!=countParams){
                     char error[100];
 		            sprintf(error,"Line %d, col %ld: Wrong number of arguments to function %s (got %d, required %d)\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),aux->noFilho->id,count,countParams);
-		            addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error);
+		            addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
                 }
             }
             else{
                 char error[100];
 		        sprintf(error,"Line %d, col %d: Symbol %s is not a function\n", aux->noFilho->line,aux->noFilho->col,aux->noFilho->id);
-		        addErros(aux->noFilho->line,aux->noFilho->col,error);
+		        addErros(aux->noFilho->line,aux->noFilho->col,error,aux->noFilho->noCount);
             }
             checkParamsTypeError(aux->noFilho->id,funcName,aux->noFilho->noIrmao,aux);
         }
@@ -504,17 +509,17 @@ void checkDeclarationBodyErrors(no * atual){
                 if(strcmp(aux->noFilho->type,"Plus")==0 || strcmp(aux->noFilho->type,"Minus")==0 || strcmp(aux->noFilho->type,"Not")==0){
                     char error[100];
                     sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
-                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error,aux->noFilho->noCount);
                 }
                 else if(strcmp(aux->noFilho->type,"Call")==0){
                     char error  [100];
                     sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
-                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error,aux->noFilho->noCount);
                 }
                 else{
                     char error[100];
                     sprintf(error,"Line %d, col %d: Conflicting types (got double, expected int)\n", aux->noFilho->line,aux->noFilho->col-1);
-                    addErros(aux->noFilho->line,aux->noFilho->col-1,error);
+                    addErros(aux->noFilho->line,aux->noFilho->col-1,error,aux->noFilho->noCount);
                 }
             }
         }
@@ -566,7 +571,7 @@ void checkDeclarationBodyErrors(no * atual){
                     token2 =strtok_r(rest2,"- ",&rest2);
                 }
 				sprintf(error,"Line %d, col %ld: Operator %s cannot be applied to types %s, %s\n", aux->line,aux->col-strlen(operator), operator,token1,token2);
-				addErros(aux->line,aux->col-strlen(operator),error);
+				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);
 			}
 		}
         else if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type, "Add") == 0 || strcmp(aux->type, "Sub") == 0 ||  strcmp(aux->type, "Mul") == 0 || strcmp(aux->type, "Div") == 0){
@@ -629,7 +634,7 @@ void checkDeclarationBodyErrors(no * atual){
                     token2 =strtok_r(rest2,"- ",&rest2);
                 }
                 sprintf(error,"Line %d, col %ld: Operator %s cannot be applied to types %s, %s\n", aux->line,aux->col-strlen(operator), operator,token1,token2);
-				addErros(aux->line,aux->col-strlen(operator),error);
+				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);
             }
 		}
         else if(strcmp(aux->type,"Not")==0 || strcmp(aux->type,"Plus")==0 || strcmp(aux->type,"Minus")==0){
@@ -651,7 +656,7 @@ void checkDeclarationBodyErrors(no * atual){
                 strcpy(rest,aux->noFilho->noFilho->exprType);
                 token1 = strtok_r(rest,"- (",&rest);
                 sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
-				addErros(aux->line,aux->col,error-1);
+				addErros(aux->line,aux->col,error-1,aux->noCount);
             }
             else if(strcmp(aux->noFilho->exprType,"- int")!=0 && /*strcmp(aux->noFilho->type,"Call")!=0 && strcmp(aux->noFilho->exprType,"- void")!=0 &&*/ strcmp(aux->noFilho->exprType,"- char")!=0 && strcmp(aux->noFilho->exprType,"- short")!=0 && strcmp(aux->noFilho->exprType,"- double")!=0){
                 char * token1;
@@ -659,7 +664,7 @@ void checkDeclarationBodyErrors(no * atual){
                 strcpy(rest,aux->noFilho->noFilho->exprType);
                 token1 = strtok_r(rest,"- (",&rest);
                 sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
-				addErros(aux->line,aux->col-1,error);
+				addErros(aux->line,aux->col-1,error,aux->noCount);
             }    
         }
         else if(aux->id!=NULL){
@@ -667,7 +672,7 @@ void checkDeclarationBodyErrors(no * atual){
                 if(strcmp(aux->exprType,"- undef")==0){
                     char error[100];
                     sprintf(error,"Line %d, col %ld: Unknown symbol %s\n", aux->line,aux->col-strlen(aux->id),aux->id);
-                    addErros(aux->line,aux->col-strlen(aux->id),error);
+                    addErros(aux->line,aux->col-strlen(aux->id),error,aux->noCount);
                 }
             }
         }

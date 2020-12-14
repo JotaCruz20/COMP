@@ -8,6 +8,7 @@
     #include "error.h"
     #include "symtab.h"
     #include "semantics.h"
+    #include "geradorLLVM.h"
     #include <stdio.h>
     #include <stdlib.h>
     int linha=1;
@@ -168,6 +169,39 @@ int main(int argc, char **argv){
             if (errorFlag==0)
                 printTreeAnotada(noAST,0);  
         }
+        else if(argv[1][0]=='-' && argv[1][1]=='e' && argv[1][2]=='3'){
+            yyparse();
+            initErrors();
+            checkProgram(noAST);
+            anotateBody(noAST);
+            checkProgramError(noAST);
+            anotateBodyError(noAST);
+            printErros();
+        }
+        else{
+            yyparse();
+            initErrors();
+            checkProgram(noAST);
+            anotateBody(noAST);
+            checkProgramError(noAST);
+            anotateBodyError(noAST);
+            printErros();
+            printTabela();
+            if (errorFlag==0){
+                geracaoLLVM(noAST);
+            }
+        }
     }
+    else{
+            yyparse();
+            initErrors();
+            checkProgram(noAST);
+            anotateBody(noAST);
+            checkProgramError(noAST);
+            anotateBodyError(noAST);
+            if(errorFlag==0){
+                geracaoLLVM(noAST);
+            }
+        }
     return 0;
 }

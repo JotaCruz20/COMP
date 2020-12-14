@@ -6,6 +6,7 @@
 #include <string.h>
 #include "tree.h"
 
+
 typedef struct noTabela
 {
 	char * id;
@@ -28,14 +29,15 @@ typedef struct tabela
 
 //ver oq faz a flag
 void initTabela();
-int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col,int flag);
+int insert(char * id, char * tipo, char * params, char * nomeTabela,int line, int col,int flag,int noCount);
 tabela * searchTabela(char * nome);
-void initFunctionTabela(char * name, int flag,int print,int params, int def,int line,int col,int error);
+void initFunctionTabela(char * name, int flag,int print,int params, int def,int line,int col,int error,int noCount);
 void printTabela();
 char* searchId(char* nTabela,char * id);
 int checkFunc(char * nome);
 int nParams(char * nome);
 int checkParamsType(tabela * aux, no * atual);
 void checkParamsTypeError(char * nome, char * nomeFunc, no * atual,no* pai);
-char * getTypeParams(char * nome);
+int isGlobal(char *name);
+noTabela *  searchFunc(char* nomeTabela);
 #endif
