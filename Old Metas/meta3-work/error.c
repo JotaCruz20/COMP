@@ -281,6 +281,17 @@ void checkBodyError(no * atual,char * pai){
                 sprintf(error,"Line %d, col %d: Operator , cannot be applied to types %s, %s\n", aux->line,aux->col-1,token,token1);
                 addErros(aux->line,aux->col-1,error,aux->noCount);
             }
+            else if(strcmp(aux->noFilho->exprType,"- undef")==0 || strcmp(aux->noFilho->noIrmao->exprType,"- undef")==0){
+                char error[100];
+                char * token = (char *) malloc(strlen(aux->noFilho->exprType)*sizeof(char));
+                strcpy(token,aux->noFilho->exprType);
+                token=strtok(token,"- ");
+                char * token1 = (char *) malloc(strlen(aux->noFilho->noIrmao->exprType)*sizeof(char));
+                strcpy(token1,aux->noFilho->noIrmao->exprType);
+                token1=strtok(token1,"- ");
+                sprintf(error,"Line %d, col %d: Operator , cannot be applied to types %s, %s\n", aux->line,aux->col-1,token,token1);
+                addErros(aux->line,aux->col-1,error,aux->noCount);
+            }
         }
         else if(strcmp(aux->type,"Call")==0){
             int n = checkFunc(aux->noFilho->id);
