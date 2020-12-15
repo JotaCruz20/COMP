@@ -47,10 +47,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 			if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
 				if(flag==1){
 					if(strcmp(params,"")==0){ //é uma var
-						free(tab);
-						char error[100];
-						sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
-						addErros(line,col-strlen(id),error,noCount);
+						if(strcmp(auxNoTabela->tipo,"void")!=0){
+							free(tab);
+							char error[100];
+							sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
+							addErros(line,col-strlen(id),error,noCount);
+						}
 					}
 					else{// e uma funcao
 						char error[100];
@@ -61,10 +63,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 				else if(flag==2 || flag==3){
 					free(tab);
 					if(strcmp(auxNoTabela->tipo,tipo)!=0 && strcmp(params,"")==0){//é uma var
-						char error[100];
-						sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
-						addErros(line,col,error,noCount);
-						return 0;
+						if(strcmp(auxNoTabela->tipo,"void")!=0){
+							char error[100];
+							sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
+							addErros(line,col,error,noCount);
+							return 0;
+						}
 					}
 					else if(strcmp(auxNoTabela->tipo,tipo)!=0 || strcmp(params,auxNoTabela->params)!=0){//é uma função
 						if(auxFunc!=NULL && auxFunc->definida==1 && flag==2){
@@ -89,10 +93,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 			
 			if(flag==1){
 				if(strcmp(params,"")==0){ //é uma var
-					free(tab);
-					char error[100];
-					sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
-					addErros(line,col-strlen(id),error,noCount);
+					if(strcmp(auxNoTabela->tipo,"void")!=0){
+						free(tab);
+						char error[100];
+						sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
+						addErros(line,col-strlen(id),error,noCount);
+					}
 				}
 				else{//e uma funcao
 					char error[100];
@@ -103,10 +109,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 			else if(flag==2 || flag==3){
 					free(tab);
 					if(strcmp(auxNoTabela->tipo,tipo)!=0 && strcmp(params,"")==0){//é uma var
-						char error[100];
-						sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
-						addErros(line,col,error,noCount);
-						return 0;
+						if(strcmp(auxNoTabela->tipo,"void")!=0){
+							char error[100];
+							sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
+							addErros(line,col,error,noCount);
+							return 0;
+						}
 					}
 					else if(strcmp(auxNoTabela->tipo,tipo)!=0 || strcmp(params,auxNoTabela->params)!=0){//é uma função
 						if(auxFunc!=NULL && auxFunc->definida==1 && flag==2){
@@ -260,6 +268,12 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 				else if(strcmp(type,"int/short/double")==0 && strcmp(paramsTabela->tipo,"double")==0){
 					;
 				}
+				else if(strcmp(type,"char")==0 && (strcmp(paramsTabela->tipo,"short") || strcmp(paramsTabela->tipo,"int"))){
+					;
+				}
+				else if(strcmp(type,"short")==0 && (strcmp(paramsTabela->tipo,"char") || strcmp(paramsTabela->tipo,"int"))){
+					;
+				}
 				else{
 					char * typeError = (char *)malloc(strlen(atual->exprType)*sizeof(char));
 					strcpy(typeError,atual->exprType);
@@ -343,6 +357,12 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 						;
 					}
 					else if(strcmp(type,"int/short/double")==0 && strcmp(token,"double")==0){
+						;
+					}
+					else if(strcmp(type,"char")==0 && (strcmp(token,"short") || strcmp(token,"int"))){
+					;
+					}
+					else if(strcmp(type,"short")==0 && (strcmp(token,"char") || strcmp(token,"int"))){
 						;
 					}
 

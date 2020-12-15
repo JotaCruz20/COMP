@@ -23,7 +23,7 @@ Program
 ....Id(f)
 ....ParamList
 ......ParamDeclaration
-........Int 
+........Int
 ..FuncDeclaration
 ....Char
 ....Id(g)
