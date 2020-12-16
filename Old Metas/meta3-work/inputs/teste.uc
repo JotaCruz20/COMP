@@ -1,8 +1,6 @@
-int f(char a){
-    int b = a;
-}
+void a;
+int a;
 
-int main(void){
-    short b=1;
-    f(b);
+void main(void){
+    a=1;
 }

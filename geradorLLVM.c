@@ -4,12 +4,14 @@
 #include "geradorLLVM.h"
 #include "symtab.h"
 
+char tipoVar[100];
+
 char* tipoLLVM(char* type){ // retorna o tipo da variavel
 	type = strtok(type,"- ()");
-	if(strcmp(type, "Int")==0 || strcmp(type, "int")==0 || strcmp(type, "Short")==0 || strcmp(type, "short")==0 || strcmp(type, "Char")==0 || strcmp(type, "char")==0) {
+	if(strcmp(type, "Int")==0 || strcmp(type, "int")==0 || strcmp(type, "Short")==0 || strcmp(type, "short")==0 || strcmp(type, "Char")==0 || strcmp(type, "char")==0 || strcmp(type,"IntLit")==0 || strcmp(type,"ChrLit")==0) {
 		return strdup("i32");
 	} 
-	else if(strcmp(type, "Double")==0 || strcmp(type, "double")==0) {
+	else if(strcmp(type, "Double")==0 || strcmp(type, "double")==0 || strcmp(type,"RealLit")==0) {
 		return strdup("double");
 	} 
 	else if(strcmp(type, "Void")==0) {
@@ -41,6 +43,7 @@ void geracaoLLVM(no *node){
 		gerId(node);
 	} 
 	else if(0 == strcmp(node->type, "Store")) {
+		strcpy(tipoVar,node->exprType);
 		gerStore(node);
 	}
 	/*} else if(0 == strcmp(node->type, "Plus")) {
@@ -55,17 +58,22 @@ void geracaoLLVM(no *node){
 	else if(0 == strcmp(node->type, "Call")) {
 		gerCall(node);
 	} 
-	/*else if(0 == strcmp(node->type, "Add")) {
-		gerAdd(node);
-	} else if(0 == strcmp(node->type, "Sub")) {
-		gerSub(node);
-	} else if(0 == strcmp(node->type, "Mul")) {
-		gerMul(node);
-	} else if(0 == strcmp(node->type, "Div")) {
-		gerDiv(node);
-	} else if(0 == strcmp(node->type, "Mod")) {
+	else if(0 == strcmp(node->type, "Add")) {
+		gerArithemetic(node,"add","fadd");
+	} 
+	else if(0 == strcmp(node->type, "Sub")) {
+		gerArithemetic(node,"sub","fsub");
+	} 
+	else if(0 == strcmp(node->type, "Mul")) {
+		gerArithemetic(node,"mul","fmul");
+	} 
+	else if(0 == strcmp(node->type, "Div")) {
+		gerArithemetic(node,"sdiv","fdiv");
+	}
+	else if(0 == strcmp(node->type, "Mod")) {
 		gerMod(node);
-	} else if(0 == strcmp(node->type, "Or")) {
+	} 
+	/*else if(0 == strcmp(node->type, "Or")) {
 		gerOr(node);
 	} else if(0 == strcmp(node->type, "And")) {
 		gerAnd(node);
@@ -125,11 +133,12 @@ void gerLocalDec(no *node){//trata das declaracoes locais
 	printf("%%%s = alloca %s\n", name, type);
 	if(node->noFilho->noIrmao->noIrmao != NULL){
 		if(0 == strcmp(node->noFilho->noIrmao->noIrmao->type, "Id")){
+			typeConversion(node->noFilho->noIrmao->noIrmao,node->noFilho->type);
 			printf("%%%d = load %s, %s* ", temporary_var, type, type);
 			geracaoLLVM(node->noFilho->noIrmao->noIrmao); // dar print a variavel que esta no lado direito do igual
 			printf("\n");
-			temporary_var++;
 			printf("store %s %%%d, %s* %%%s\n", type, temporary_var, type, name);
+			temporary_var++;
 		} else if(0 == strcmp(node->noFilho->noIrmao->noIrmao->type, "IntLit") || 0 == strcmp(node->noFilho->noIrmao->noIrmao->type, "RealLit") || 0 == strcmp(node->noFilho->noIrmao->noIrmao->type, "ChrLit")){ /* Other Terminal */
 			printf("store %s ", type);
 			geracaoLLVM(node->noFilho->noIrmao->noIrmao);
@@ -252,8 +261,25 @@ void gerLits(no *node){//da print ao id do Lit(ChrList,RealLit e IntLit)
 				char tmp = '\"';
 				printf("%d", tmp);
 			}
-			else{
-				printf("%d", node->id[1]);
+			else{ //carcters de escape
+				if(node->id[3] == '\''){
+					char seq[2];
+					char *extra;
+					sprintf(seq,"%c",node->id[2]);
+					printf("%ld", strtol(seq, &extra, 8));
+				} 
+				else if(node->id[4] == '\''){
+					char seq[3];
+					char *extra;
+					sprintf(seq,"%c%c",node->id[2], node->id[3]);
+					printf("%ld", strtol(seq, &extra, 8));
+				} 
+				else {
+					char seq[4];
+					char *extra;
+					sprintf(seq,"%c%c%c",node->id[2], node->id[3], node->id[4]);
+					printf("%ld", strtol(seq, &extra, 8));
+				}
 			}
 		}
 		else{
@@ -277,10 +303,25 @@ void gerId(no *node){//verifica se é global, se não é local
 }
 
 void gerStore(no *node){
-	char *type = tipoLLVM(node->noFilho->type); //tipo do filho
+	char *type = tipoLLVM(node->noFilho->exprType); //tipo do filho
+	char * token = (char*)malloc(sizeof(char)*strlen(node->noFilho->noIrmao->exprType));
+	strcpy(token,node->noFilho->noIrmao->exprType);
+	token = strtok(token,"- ");
+	strtok(type,"- ");
 	char *name = node->noFilho->id;
 	int global = isGlobal(name); // ve se a variavel é global, pois se for é preciso alterar
-	if(0 == strcmp(node->noFilho->noIrmao->type, "IntLit") || 0 == strcmp(node->noFilho->noIrmao->type, "RealLit") || 0 == strcmp(node->noFilho->noIrmao->type, "ChrLit") || 0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+	if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+		/*if(strcmp(token,"double")!=0 && strcmp(type,"double")==0){
+			temporary_var++;	
+			typeConversion(node->noFilho->noIrmao,type);
+		*/
+		printf("%%%d = load %s, %s* ", temporary_var, type, type);
+		geracaoLLVM(node->noFilho->noIrmao); // dar print a variavel que esta no lado direito do igual
+		printf("\n");
+		printf("store %s %%%d, %s* %%%s\n", type, temporary_var, type, name);
+		temporary_var++;
+	}
+	else if(0 == strcmp(node->noFilho->noIrmao->type, "IntLit") || 0 == strcmp(node->noFilho->noIrmao->type, "RealLit") || 0 == strcmp(node->noFilho->noIrmao->type, "ChrLit")){
 		printf("store %s ", type);
 		geracaoLLVM(node->noFilho->noIrmao); // obter o valor que vai estar no lado direito do Store
 		if(global){ // se for global e preciso adicionar o @ 
@@ -305,7 +346,7 @@ void gerStore(no *node){
 					printf("store %s %%%d, %s* %%%s\n", type, temporary_var-1, type, name);
 				}
 			}
-	} else { //id
+	} else { //expressoiions
 		geracaoLLVM(node->noFilho->noIrmao);
 		if(global){
 			printf("store %s %%%d, %s* @%s\n", type, temporary_var-1, type, name);
@@ -460,27 +501,52 @@ void gerCall(no *node){
 }
 
 void typeConversion(no *received, char *expected){
-	if((0 == strcmp(received->type, "char") || 0 == strcmp(received->type, "short") || 0 == strcmp(received->type, "int")) && 0 == strcmp(expected, "double")){
-		if(strcmp(received->type, "int")){
+	char *token ;
+	if(received->exprType!=NULL){
+		token = (char*)malloc(sizeof(char)*strlen(received->exprType));
+		strcpy(token,received->exprType);
+		token = strtok(token,"- ");
+	}
+	else{
+		token = (char*)malloc(sizeof(char));
+		strcpy(token,received->type);
+	}
+
+	if((0 == strcmp(token, "char") || 0 == strcmp(token, "Char")  || 0 == strcmp(token, "short") || 0 == strcmp(token, "Short") || 0 == strcmp(token, "int") || 0 == strcmp(token, "Int")) && (0 == strcmp(expected, "double") || 0 == strcmp(expected, "Double"))){ //i32 para double
+		if(0 == strcmp(received->type, "IntLit") || 0 == strcmp(received->type, "ChrLit")){ //fazer conversao para double
+				printf("%%%d = sext ", temporary_var); //estende o numero de bits do valor
+				geracaoLLVM(received); // vai buscar o valor do Literal
+				printf(" to double\n");
+			} else {
+				printf("%%%d = sext i32 %%%d to double\n", temporary_var, temporary_var-1);
+			}
+			temporary_var++;
+
+	}
+	else if((0==strcmp(token,"double") || 0 == strcmp(token, "Double") )&& (0 == strcmp(expected, "char") || 0 == strcmp(expected, "Char") || 0 == strcmp(expected, "short") || 0 == strcmp(expected, "Short") || 0 == strcmp(expected, "int") || 0 == strcmp(expected, "Int"))){//passar double para i32
+		if(0 == strcmp(received->type, "RealLit")){
+			printf("%%%d = fptosi double ", temporary_var); //floating to double
+			geracaoLLVM(received);
+			printf(" to i32\n");
+		} else {
+			printf("%%%d = fptosi double %%%d to i32\n", temporary_var, temporary_var-1);
+		}
+	}
+
+	/*if((0 == strcmp(token, "char") || 0 == strcmp(token, "short") || 0 == strcmp(token, "int")) && 0 == strcmp(expected, "double")){
+		if(strcmp(token, "int")==0){
 			if(0 == strcmp(received->type, "IntLit") || 0 == strcmp(received->type, "ChrLit") || 0 == strcmp(received->type, "RealLit")){ //fazer conversao para double
 				printf("%%%d = sext ", temporary_var); //estende o numero de bits do valor
 				geracaoLLVM(received); // vai buscar o valor do Literal
 				printf(" to %s\n", expected);
 			} else {
-				printf("%%%d = sext %s %%%d to i32\n", temporary_var, tipoLLVM(received->type), temporary_var-1);
+				printf("%%%d = sext %s %%%d to i32\n", temporary_var, tipoLLVM(received->exprType), temporary_var-1);
 			}
 			temporary_var++;
 		}
 		printf("%%%d = sitofp i32 %%%d to %s\n", temporary_var, temporary_var-1, expected); // converte para floating pointer(double)
-	} else if(((0 == strcmp(received->type, "int") || 0 == strcmp(received->type, "short")) && 0 == strcmp(expected, "i8")) || (0 == strcmp(received->type, "int") && 0 == strcmp(expected, "i16"))){ //char -> int, short || short -> Got int
-		if(0 == strcmp(received->type, "IntLit") || 0 == strcmp(received->type, "ChrLit") || 0 == strcmp(received->type, "RealLit")){
-			printf("%%%d = trunc %s ", temporary_var, tipoLLVM(received->type)); // trunca o numero de bits
-			geracaoLLVM(received); // buscar o valor do literal
-			printf(" to %s\n", expected);
-		} else {
-			printf("%%%d = trunc %s %%%d to %s\n", temporary_var, tipoLLVM(received->type), temporary_var-1, expected);
-		}
-	} else if((0 == strcmp(expected, "i8") || 0 == strcmp(expected, "i16") || 0 == strcmp(expected, "i32")) && 0 == strcmp(received->type, "double")){ //char, short, int -> Got double 
+	} 
+	else if((0 == strcmp(expected, "i16") || 0 == strcmp(expected, "i32")) && 0 == strcmp(token, "double")){ //char, short, int -> Got double 
 		if(0 == strcmp(received->type, "IntLit") || 0 == strcmp(received->type, "ChrLit") || 0 == strcmp(received->type, "RealLit")){
 			printf("%%%d = fptosi double ", temporary_var); //floating to double
 			geracaoLLVM(received);
@@ -488,15 +554,16 @@ void typeConversion(no *received, char *expected){
 		} else {
 			printf("%%%d = fptosi double %%%d to %s\n", temporary_var, temporary_var-1, expected);
 		}
-	} else {
+	} 
+	else {
 		if(0 == strcmp(received->type, "IntLit") || 0 == strcmp(received->type, "ChrLit") || 0 == strcmp(received->type, "RealLit")){
 			printf("%%%d = sext ", temporary_var);
 			geracaoLLVM(received);
 			printf(" to %s\n", expected);
 		} else {
-			printf("%%%d = sext %s %%%d to %s\n", temporary_var, tipoLLVM(received->type), temporary_var-1, expected);
+			printf("%%%d = sext %s %%%d to %s\n", temporary_var, tipoLLVM(received->exprType), temporary_var-1, expected);
 		}
-	}
+	}*/
 	temporary_var++;
 }
 
@@ -507,3 +574,441 @@ int is_expression(no *node){//verifica se e uma expressao
 	return 0;
 }
 
+void gerArithemetic(no *node,char * op,char * opD){
+	int local_vars[2]; //guardar os operandos
+	char *first_type = (char *)malloc(sizeof(char)*strlen(node->noFilho->exprType));
+	strcpy(first_type,node->noFilho->exprType);
+	first_type=strtok(first_type,"- "); // expr type do 1º operando
+	char *second_type = (char *)malloc(sizeof(char)*strlen(node->noFilho->noIrmao->exprType));
+	strcpy(second_type,node->noFilho->noIrmao->exprType);
+	second_type=strtok(second_type,"- "); // expr type do 2º operando
+	char *token = (char *)malloc(sizeof(char)*strlen(tipoVar));
+	strcpy(token,tipoVar);
+	strtok(token,"- ");
+	char *result_type = tipoLLVM(token); // type da soma
+	if(0 == strcmp(node->noFilho->type, "Id")){ //caso a primeiro operando seja 
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(first_type), tipoLLVM(first_type));
+		geracaoLLVM(node->noFilho); // buscar o id
+		printf("\n");
+		local_vars[0] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(first_type), result_type)!=0){
+			typeConversion(node->noFilho, result_type); //converte para o tipo esperado
+			local_vars[0] = temporary_var-1;
+		}
+	} 
+	else if(is_expression(node->noFilho)){ //se for uma expressao(outro add,sub,mul,...)
+		geracaoLLVM(node->noFilho);
+		if(strcmp(tipoLLVM(first_type), result_type)!=0){
+			typeConversion(node->noFilho, result_type);
+		}
+		local_vars[0] = temporary_var-1;
+	}		
+	if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(second_type), tipoLLVM(second_type));
+		geracaoLLVM(node->noFilho->noIrmao); //vai dar load ao id
+		printf("\n");
+		local_vars[1] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+			local_vars[1] = temporary_var-1;
+		}
+	} 
+	else if(is_expression(node->noFilho->noIrmao)){
+		geracaoLLVM(node->noFilho->noIrmao); // da load a expr do irmao
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+		}
+		local_vars[1] = temporary_var-1;
+	}
+	if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho) || 0 == strcmp(first_type, result_type)){ // primeiro ID ou de tipos diferentes
+		if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){ // First + Second is ID or different type
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = %s %s %%%d, %%%d\n", temporary_var,opD, result_type, local_vars[0], local_vars[1]); //add para doubles
+			} else {
+				printf("%%%d = %s %s %%%d, %%%d\n", temporary_var,op, result_type, local_vars[0], local_vars[1]); //add normal
+			}
+		} 
+		else { // add normal
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = %s %s %%%d, ", temporary_var,opD, result_type, local_vars[0]);
+			} else {
+				printf("%%%d = %s %s %%%d, ", temporary_var,op, result_type, local_vars[0]);
+			}
+			geracaoLLVM(node->noFilho->noIrmao); 
+			printf("\n");
+		}
+	} 
+	else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){  // so segundo é id
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = %s %s ", temporary_var,opD, result_type);
+		} else {
+			printf("%%%d = %s %s ", temporary_var,op, result_type);	
+		}
+		geracaoLLVM(node->noFilho); 
+		printf(", %%%d\n", local_vars[1]);
+	} else { //nenhum é id 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = %s %s ", temporary_var,opD, result_type);	
+		} else {
+			printf("%%%d = %s %s ", temporary_var,op, result_type);	
+		}
+		geracaoLLVM(node->noFilho); // tem de fazer geracao do llvm para expressao de ambos
+		printf(", ");
+		geracaoLLVM(node->noFilho->noIrmao); // faz a geracao do llvm para o filho
+		printf("\n");
+	}
+	temporary_var++;
+}
+
+/*
+void gerAdd(no *node){
+	int local_vars[2]; //guardar os operandos
+	char *first_type = (char *)malloc(sizeof(char)*strlen(node->noFilho->exprType));
+	strcpy(first_type,node->noFilho->exprType);
+	first_type=strtok(first_type,"- "); // expr type do 1º operando
+	char *second_type = (char *)malloc(sizeof(char)*strlen(node->noFilho->noIrmao->exprType));
+	strcpy(second_type,node->noFilho->noIrmao->exprType);
+	second_type=strtok(second_type,"- "); // expr type do 2º operando
+	char *token = (char *)malloc(sizeof(char)*strlen(node->exprType));
+	strcpy(token,node->exprType);
+	strtok(token,"- ");
+	char *result_type = tipoLLVM(token); // type da soma
+	if(0 == strcmp(node->noFilho->type, "Id")){ //caso a primeiro operando seja 
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(first_type), tipoLLVM(first_type));
+		geracaoLLVM(node->noFilho); // buscar o id
+		printf("\n");
+		local_vars[0] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(first_type), result_type)!=0){
+			typeConversion(node->noFilho, result_type); //converte para o tipo esperado
+			local_vars[0] = temporary_var-1;
+		}
+	} 
+	else if(is_expression(node->noFilho)){ //se for uma expressao(outro add,sub,mul,...)
+		geracaoLLVM(node->noFilho);
+		if(strcmp(tipoLLVM(first_type), result_type)!=0){
+			typeConversion(node->noFilho, result_type);
+		}
+		local_vars[0] = temporary_var-1;
+	}		
+	if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(second_type), tipoLLVM(second_type));
+		geracaoLLVM(node->noFilho->noIrmao); //vai dar load ao id
+		printf("\n");
+		local_vars[1] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+			local_vars[1] = temporary_var-1;
+		}
+	} 
+	else if(is_expression(node->noFilho->noIrmao)){
+		geracaoLLVM(node->noFilho->noIrmao); // da load a expr do irmao
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+		}
+		local_vars[1] = temporary_var-1;
+	}
+	if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho) || 0 == strcmp(first_type, result_type)){ // primeiro ID ou de tipos diferentes
+		if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){ // First + Second is ID or different type
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fadd %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]); //add para doubles
+			} else {
+				printf("%%%d = add %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]); //add normal
+			}
+		} 
+		else { // add normal
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fadd %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			} else {
+				printf("%%%d = add %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			}
+			geracaoLLVM(node->noFilho); 
+			printf("\n");
+		}
+	} 
+	else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){  // so segundo é id
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fadd %s ", temporary_var, result_type);
+		} else {
+			printf("%%%d = add %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho); 
+		printf(", %%%d\n", local_vars[1]);
+	} else { //nenhum é id 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fadd %s ", temporary_var, result_type);	
+		} else {
+			printf("%%%d = add %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho); // tem de fazer geracao do llvm para expressao de ambos
+		printf(", ");
+		geracaoLLVM(node->noFilho->noIrmao); // faz a geracao do llvm para o filho
+		printf("\n");
+	}
+	temporary_var++;
+}
+
+void gerSub(no *node){
+	int local_vars[2];
+	char *first_type = node->noFilho->type;
+	char *second_type = node->noFilho->noIrmao->type;
+	char *result_type = tipoLLVM(node->type);
+	if(0 == strcmp(node->noFilho->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(first_type), tipoLLVM(first_type));
+		geracaoLLVM(node->noFilho);
+		printf("\n");
+		local_vars[0] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(first_type), result_type)){
+			typeConversion(node->noFilho, result_type);
+			local_vars[0] = temporary_var-1;
+		}
+	} else if(is_expression(node->noFilho)){
+		geracaoLLVM(node->noFilho);
+		local_vars[0] = temporary_var-1;
+	}		
+	if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(second_type), tipoLLVM(second_type));
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+		local_vars[1] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+			local_vars[1] = temporary_var-1;
+		}
+	} else if(is_expression(node->noFilho->noIrmao)){
+		geracaoLLVM(node->noFilho->noIrmao);
+		local_vars[1] = temporary_var-1;
+	}
+	if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho) || 0 == strcmp(first_type, result_type)){ // First is ID or different type
+		if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){ // First + Second is ID or different type
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fsub %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]);
+			} else {
+				printf("%%%d = sub %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]);
+			}
+		} else {
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fsub %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			} else {
+				printf("%%%d = sub %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			}
+			geracaoLLVM(node->noFilho); 
+			printf("\n");
+		}
+	} else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){  // Second is ID 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fsub %s ", temporary_var, result_type);
+		} else {
+			printf("%%%d = sub %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho); 
+		printf(", %%%d\n", local_vars[1]);
+	} else { // None is ID 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fsub %s ", temporary_var, result_type);	
+		} else {
+			printf("%%%d = sub %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho);
+		printf(", ");
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+	}
+	temporary_var++;
+}
+
+void gerMul(no *node){
+	int local_vars[2];
+	char *first_type = node->noFilho->type;
+	char *second_type = node->noFilho->noIrmao->type;
+	char *result_type = tipoLLVM(node->type);
+	if(0 == strcmp(node->noFilho->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(first_type), tipoLLVM(first_type));
+		geracaoLLVM(node->noFilho);
+		printf("\n");
+		local_vars[0] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(first_type), result_type)){
+			typeConversion(node->noFilho, result_type);
+			local_vars[0] = temporary_var-1;
+		}
+	} else if(is_expression(node->noFilho)){
+		geracaoLLVM(node->noFilho);
+		local_vars[0] = temporary_var-1;
+	}		
+	if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(second_type), tipoLLVM(second_type));
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+		local_vars[1] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+			local_vars[1] = temporary_var-1;
+		}
+	} else if(is_expression(node->noFilho->noIrmao)){
+		geracaoLLVM(node->noFilho->noIrmao);
+		local_vars[1] = temporary_var-1;
+	}
+	if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho) || 0 == strcmp(first_type, result_type)){ // First is ID or different type 
+		if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){ // First + Second is ID or different type
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fmul %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]);
+			} else {
+				printf("%%%d = mul %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]);
+			}
+		} else {
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fmul %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			} else {
+				printf("%%%d = mul %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			}
+			geracaoLLVM(node->noFilho); 
+			printf("\n");
+		}
+	} else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){  //Second is ID 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fmul %s ", temporary_var, result_type);
+		} else {
+			printf("%%%d = mul %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho); 
+		printf(", %%%d\n", local_vars[1]);
+	} else { // None is ID 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fmul %s ", temporary_var, result_type);	
+		} else {
+			printf("%%%d = mul %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho);
+		printf(", ");
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+	}
+	temporary_var++;
+}
+
+void gerDiv(no *node){
+	int local_vars[2];
+	char *first_type = node->noFilho->type;
+	char *second_type = node->noFilho->noIrmao->type;
+	char *result_type = tipoLLVM(node->type);
+	if(0 == strcmp(node->noFilho->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(first_type), tipoLLVM(first_type));
+		geracaoLLVM(node->noFilho);
+		printf("\n");
+		local_vars[0] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(first_type), result_type)){
+			typeConversion(node->noFilho, result_type);
+			local_vars[0] = temporary_var-1;
+		}
+	} else if(is_expression(node->noFilho)){
+		geracaoLLVM(node->noFilho);
+		local_vars[0] = temporary_var-1;
+	}		
+	if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(second_type), tipoLLVM(second_type));
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+		local_vars[1] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+			local_vars[1] = temporary_var-1;
+		}
+	} else if(is_expression(node->noFilho->noIrmao)){
+		geracaoLLVM(node->noFilho->noIrmao);
+		local_vars[1] = temporary_var-1;
+	}
+	if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho) || 0 == strcmp(first_type, result_type)){ // First is ID or different type
+		if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){ // First + Second is ID or different type
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fdiv %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]);
+			} else {
+				printf("%%%d = sdiv %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]);
+			}
+		} else {
+			if(0 == strcmp(result_type, "double")){
+				printf("%%%d = fdiv %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			} else {
+				printf("%%%d = sdiv %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			}
+			geracaoLLVM(node->noFilho); 
+			printf("\n");
+		}
+	} else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao) || 0 == strcmp(second_type, result_type)){  //Second is ID 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fdiv %s ", temporary_var, result_type);
+		} else {
+			printf("%%%d = sdiv %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho); 
+		printf(", %%%d\n", local_vars[1]);
+	} else { // None is ID 
+		if(0 == strcmp(result_type, "double")){
+			printf("%%%d = fdiv %s ", temporary_var, result_type);	
+		} else {
+			printf("%%%d = sdiv %s ", temporary_var, result_type);	
+		}
+		geracaoLLVM(node->noFilho);
+		printf(", ");
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+	}
+	temporary_var++;
+}*/
+
+void gerMod(no *node){
+	int local_vars[2];
+	char *first_type = node->noFilho->type;
+	char *second_type = node->noFilho->noIrmao->type;
+	char *result_type = tipoLLVM(node->type);
+	if(0 == strcmp(node->noFilho->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(first_type), tipoLLVM(first_type));
+		geracaoLLVM(node->noFilho);
+		printf("\n");
+		local_vars[0] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(first_type), result_type)){
+			typeConversion(node->noFilho, result_type);
+			local_vars[0] = temporary_var-1;
+		}
+	}
+	if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
+		printf("%%%d = load %s, %s* ", temporary_var, tipoLLVM(second_type), tipoLLVM(second_type));
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+		local_vars[1] = temporary_var;
+		temporary_var++;
+		if(strcmp(tipoLLVM(second_type), result_type)){
+			typeConversion(node->noFilho->noIrmao, result_type);
+			local_vars[1] = temporary_var-1;
+		}
+	}
+	if(0 == strcmp(node->noFilho->type, "Id") || 0 == strcmp(first_type, result_type)){ // First is ID or different type
+		if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || 0 == strcmp(second_type, result_type)){ // First + Second is ID or different type
+			printf("%%%d = srem %s %%%d, %%%d\n", temporary_var, result_type, local_vars[0], local_vars[1]);
+		} else {
+			printf("%%%d = srem %s %%%d, ", temporary_var, result_type, local_vars[0]);
+			geracaoLLVM(node->noFilho); 
+			printf("\n");
+		}
+	} else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || 0 == strcmp(second_type, result_type)){  // Second is ID
+		printf("%%%d = srem %s ", temporary_var, result_type);
+		geracaoLLVM(node->noFilho); 
+		printf(", %%%d\n", local_vars[1]);
+	} else { // None is ID 
+		printf("%%%d = srem %s ", temporary_var, result_type);
+		geracaoLLVM(node->noFilho);
+		printf(", ");
+		geracaoLLVM(node->noFilho->noIrmao);
+		printf("\n");
+	}
+	temporary_var++;
+}

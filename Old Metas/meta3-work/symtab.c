@@ -134,7 +134,9 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 				}
 				return 1;
 		}
-		auxNoTabela->next = tab;
+		if(strcmp(tipo,"void")!=0 ||  strstr(params,"(")!=NULL ){
+			auxNoTabela->next = tab;
+		}
 		return 1;
 	}
 		return 1;
