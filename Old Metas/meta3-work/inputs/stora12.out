@@ -1,0 +1,8 @@
+Line 10, col 10: Conflicting types (got double, expected int)
+Line 12, col 8: Conflicting types (got int(void), expected int)
+Line 14, col 10: Conflicting types (got double, expected int)
+Line 16, col 9: Conflicting types (got void(void), expected int)
+Line 23, col 13: Conflicting types (got double, expected int)
+Line 25, col 11: Conflicting types (got int(void), expected int)
+Line 27, col 13: Conflicting types (got double, expected int)
+Line 30, col 11: Conflicting types (got void(void), expected int)

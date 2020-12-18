@@ -16,4 +16,5 @@ void printTreeAnotada(no * auxNode, int pontos);
 void anotateBody(no * atual);
 char * prioridade(no * atual);
 void addCounter(no * atual);
+void clearTreeAnotada(no* auxNode);
 #endif 

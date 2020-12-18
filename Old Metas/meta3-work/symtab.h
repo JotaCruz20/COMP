@@ -38,4 +38,6 @@ int nParams(char * nome);
 int checkParamsType(tabela * aux, no * atual);
 void checkParamsTypeError(char * nome, char * nomeFunc, no * atual,no* pai);
 char * getTypeParams(char * nome);
+void clearSymTableParams(noTabela * aux);
+void clearSymTable();
 #endif

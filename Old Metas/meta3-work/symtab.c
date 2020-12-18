@@ -587,3 +587,22 @@ char* searchId(char* nTabela,char * id){
 	}
 	return strdup("undef");
 }
+
+void clearSymTableParams(noTabela * aux){
+	noTabela * clear;
+	while (aux != NULL){
+       clear = aux;
+       aux = aux->next;
+       free(clear);
+    }
+}
+
+void clearSymTable(){
+	tabela * clear;
+	while (tabelaSimbolos != NULL){
+		clearSymTableParams(tabelaSimbolos->tabelaAtual);
+       	clear = tabelaSimbolos;
+      	tabelaSimbolos = tabelaSimbolos->next;
+      	free(clear);
+    }
+}

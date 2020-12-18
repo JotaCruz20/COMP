@@ -9,10 +9,12 @@
 
 erros * errorsHead;
 char name[20];
+char * tipoFunc;
 char * funcName;
 extern int linha;
 extern int coluna;
 int flagCheckError = 1;
+int colDec= 0;
 
 void initErrors(){
 	errorsHead = (erros *) malloc(sizeof(erros));
@@ -215,6 +217,7 @@ void checkDeclarationError(no * atual){
 		sprintf(error,"Line %d, col %ld: Invalid use of void type in declaration\n", atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col-strlen(atual->noFilho->noIrmao->id));
 		addErros(atual->noFilho->noIrmao->line,atual->noFilho->noIrmao->col-strlen(atual->noFilho->noIrmao->id),error,atual->noFilho->noIrmao->noCount);
 	}
+    colDec = atual->noFilho->noIrmao->col-strlen(atual->noFilho->noIrmao->id);
     checkDeclarationBodyErrors(atual->noFilho,type);
     
     
@@ -272,7 +275,75 @@ void checkBodyError(no * atual,char * pai){
 		        addErros(aux->line,aux->col-1,error,aux->noCount);
             }
         }
-        else if(strcmp(aux->type,"Comma")==0){ //pode causar merda
+        else if(strcmp(aux->type,"Return")==0){
+            if(strcmp(tipoFunc,"void")==0){
+                if(aux->noFilho->exprType!=NULL){
+                    char * token = (char *)malloc(sizeof(char)*strlen(aux->noFilho->exprType));
+                    strcpy(token,aux->noFilho->exprType);
+                    token = strtok(token,"- ");
+                    if(strcmp(token,tipoFunc)!=0){
+                        char error[100];
+                        if(aux->noFilho->id!=NULL){
+                            sprintf(error,"Line %d, col %ld: Conflicting types (got %s, expected void)\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),token);
+                            addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
+                        }
+                    }
+                }
+            }
+            else if(strcmp(tipoFunc,"int")==0 || strcmp(tipoFunc,"char")==0 || strcmp(tipoFunc,"short")==0){
+                 if(aux->noFilho->exprType!=NULL){ 
+                    char * token = (char *)malloc(sizeof(char)*strlen(aux->noFilho->exprType));
+                    strcpy(token,aux->noFilho->exprType);
+                    token = strtok(token,"- ");
+
+                    char * token2 = (char *)malloc(sizeof(char)*strlen(aux->noFilho->exprType));
+                    strcpy(token2,aux->noFilho->exprType);
+                    token2 = strtok(token2,"-  (");
+
+                    if(strcmp(token2,"int")!=0 && strcmp(token2,"short")!=0 && strcmp(token2,"char")!=0){
+                        char error[100];
+                        if(aux->noFilho->id!=NULL){
+                            sprintf(error,"Line %d, col %ld: Conflicting types (got %s, expected %s)\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),token,tipoFunc);
+                            addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
+                        }
+                        else{
+
+                        }
+                    }
+                }
+                else{
+                    char error[100];
+                    sprintf(error,"Line %d, col %ld: Conflicting types (got void, expected %s)\n", aux->noFilho->line,aux->noFilho->col-strlen("return")-1,tipoFunc);
+                    addErros(aux->noFilho->col,aux->noFilho->col-strlen("return")-1,error,aux->noFilho->noCount);
+                }
+            }
+            else{
+                if(aux->noFilho->exprType!=NULL){
+                    char * token = (char *)malloc(sizeof(char)*strlen(aux->noFilho->exprType));
+                    strcpy(token,aux->noFilho->exprType);
+                    token = strtok(token,"- ");
+
+                    char * token2 = (char *)malloc(sizeof(char)*strlen(aux->noFilho->exprType));
+                    strcpy(token2,aux->noFilho->exprType);
+                    token2 = strtok(token2,"-  (");
+
+                    if(strcmp(token2,"double")!=0 && strcmp(token2,"int")!=0 && strcmp(token2,"short")!=0 && strcmp(token2,"char")!=0){
+                        char error[100];
+                        sprintf(error,"Line %d, col %ld: Conflicting types (got %s, expected double)\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),token);
+                        addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
+                    }
+                }
+                else{
+                    char error[100];
+                    sprintf(error,"Line %d, col %ld: Conflicting types (got void, expected %s)\n", aux->noFilho->line,aux->noFilho->col-strlen("return")-1,tipoFunc);
+                    addErros(aux->noFilho->line,aux->noFilho->col-strlen("return")-1,error,aux->noFilho->noCount);
+                
+                }
+
+            }
+
+        }
+        else if(strcmp(aux->type,"Comma")==0){ 
             if((strstr(aux->noFilho->exprType,"(")!=NULL || strstr(aux->noFilho->noIrmao->exprType,"(")!=NULL) && strcmp(aux->noFilho->exprType,aux->noFilho->noIrmao->exprType)!=0){
                 char error[100];
                 char * token = (char *) malloc(strlen(aux->noFilho->exprType)*sizeof(char));
@@ -340,6 +411,15 @@ void checkBodyError(no * atual,char * pai){
                     addErros(aux->noFilho->line,aux->noFilho->col-1,error,aux->noFilho->noCount);
                 }
             }
+            else if(strstr(aux->noFilho->exprType,"(")!=NULL){
+                char * token = (char *)malloc(sizeof(char)*strlen(aux->noFilho->exprType));
+                strcpy(token,aux->noFilho->exprType);
+                token = strtok(token,"- ");
+
+                char error[100];
+                sprintf(error,"Line %d, col %ld: Conflicting types (got %s, expected int)\n", aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),token);
+                addErros(aux->noFilho->line,aux->noFilho->col-strlen(aux->noFilho->id),error,aux->noFilho->noCount);
+            }
         }
         else if(strcmp(aux->type, "Or") == 0 || strcmp(aux->type, "And") == 0 ||  strcmp(aux->type, "BitWiseAnd") == 0 || strcmp(aux->type, "BitWiseOr") == 0 || strcmp(aux->type, "BitWiseXor") == 0 || strcmp(aux->type, "Mod") == 0){
 			char * type, *brotherType;
@@ -393,7 +473,7 @@ void checkBodyError(no * atual,char * pai){
 			}
 		}
         else if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type, "Add") == 0 || strcmp(aux->type, "Sub") == 0 ||  strcmp(aux->type, "Mul") == 0 || strcmp(aux->type, "Div") == 0){
-			if((strcmp(aux->noFilho->exprType,"- int")!=0 && /*strcmp(aux->noFilho->type,"Call")!=0 && strcmp(aux->noFilho->exprType,"- void")!=0 &&*/ strcmp(aux->noFilho->exprType,"- char")!=0 && strcmp(aux->noFilho->exprType,"- short")!=0 && strcmp(aux->noFilho->exprType,"- double")!=0) || (strcmp(aux->noFilho->noIrmao->exprType,"- int")!=0  && /*strcmp(aux->noFilho->noIrmao->type,"Call")!=0  && strcmp(aux->noFilho->noIrmao->exprType,"- void")!=0  &&*/ strcmp(aux->noFilho->noIrmao->exprType,"- char")!=0  && strcmp(aux->noFilho->noIrmao->exprType,"- short")!=0  && strcmp(aux->noFilho->noIrmao->exprType,"- double")!=0)){
+			if((strcmp(aux->noFilho->exprType,"- int")!=0 && strcmp(aux->noFilho->exprType,"- char")!=0 && strcmp(aux->noFilho->exprType,"- short")!=0 && strcmp(aux->noFilho->exprType,"- double")!=0) || (strcmp(aux->noFilho->noIrmao->exprType,"- int")!=0  && strcmp(aux->noFilho->noIrmao->exprType,"- char")!=0  && strcmp(aux->noFilho->noIrmao->exprType,"- short")!=0  && strcmp(aux->noFilho->noIrmao->exprType,"- double")!=0)){
                 char error[100];
                 char operator[3];
                 if(strcmp(aux->type, "Lt") == 0 ){
@@ -604,6 +684,38 @@ void checkDeclarationBodyErrors(no * atual, char * type){
 				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);
 			}
 		}
+       
+        else if(strcmp(aux->type,"Not")==0 || strcmp(aux->type,"Plus")==0 || strcmp(aux->type,"Minus")==0){
+            char error[100];
+            char operator[3];
+            if(strcmp(aux->type, "Plus") == 0 ){
+                strcpy(operator,"+");
+            }
+            else if(strcmp(aux->type, "Not") == 0){
+                strcpy(operator,"!");
+            }
+            else if(strcmp(aux->type, "Minus") == 0){
+                strcpy(operator,"-");
+            }
+            if(strcmp(aux->noFilho->type,"Call")==0 ){  
+                char* rest; 
+                char * token1;
+                rest = (char*) malloc(strlen(aux->noFilho->noFilho->exprType)*sizeof(char)); 
+                strcpy(rest,aux->noFilho->noFilho->exprType);
+                token1 = strtok_r(rest,"- (",&rest);
+                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
+				addErros(aux->line,aux->col,error-1,aux->noCount);
+            }
+            else if(strcmp(aux->noFilho->exprType,"- int")!=0 && /*strcmp(aux->noFilho->type,"Call")!=0 && strcmp(aux->noFilho->exprType,"- void")!=0 &&*/ strcmp(aux->noFilho->exprType,"- char")!=0 && strcmp(aux->noFilho->exprType,"- short")!=0 && strcmp(aux->noFilho->exprType,"- double")!=0){
+                char * token1;
+                char * rest = (char*) malloc(strlen(aux->noFilho->noFilho->exprType)*sizeof(char)); 
+                strcpy(rest,aux->noFilho->noFilho->exprType);
+                token1 = strtok_r(rest,"- (",&rest);
+                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
+				addErros(aux->line,aux->col-1,error,aux->noCount);
+            }    
+        }
+        
         else if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type, "Add") == 0 || strcmp(aux->type, "Sub") == 0 ||  strcmp(aux->type, "Mul") == 0 || strcmp(aux->type, "Div") == 0){
 			char operator[3];
             char error[100];
@@ -668,42 +780,22 @@ void checkDeclarationBodyErrors(no * atual, char * type){
 				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);
             }
             else if((strcmp(type,"int")==0 || strcmp(type,"char")==0 || strcmp(type,"short")==0) && strcmp(aux->exprType,"- double")==0){
-                char * token = (char *)malloc(sizeof(char)*strlen(aux->exprType));
+                /*char * token = (char *)malloc(sizeof(char)*strlen(aux->exprType));
                 strcpy(token,aux->exprType);
                 token = strtok(token,"- ");
                 sprintf(error,"Line %d, col %ld: Operator %s cannot be applied to types %s, %s\n", aux->line,aux->col-strlen(operator), operator,type,token);
-				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);
+				addErros(aux->line,aux->col-strlen(operator),error,aux->noCount);*/
+                sprintf(error,"Line %d, col %d: Conflicting types (got double, expected %s)\n", aux->line,colDec, type);
+				addErros(aux->line,colDec,error,aux->noCount);
             }
 		}
-        else if(strcmp(aux->type,"Not")==0 || strcmp(aux->type,"Plus")==0 || strcmp(aux->type,"Minus")==0){
+        
+        else if(strcmp(aux->type,"RealLit")==0){
             char error[100];
-            char operator[3];
-            if(strcmp(aux->type, "Plus") == 0 ){
-                strcpy(operator,"+");
+            if(strcmp(type,"int")==0 || strcmp(type,"char")==0 || strcmp(type,"short")==0){
+                sprintf(error,"Line %d, col %d: Conflicting types (got double, expected %s)\n", aux->line,colDec, type);
+				addErros(aux->line,colDec,error,aux->noCount);
             }
-            else if(strcmp(aux->type, "Not") == 0){
-                strcpy(operator,"!");
-            }
-            else if(strcmp(aux->type, "Minus") == 0){
-                strcpy(operator,"-");
-            }
-            if(strcmp(aux->noFilho->type,"Call")==0 ){  
-                char* rest; 
-                char * token1;
-                rest = (char*) malloc(strlen(aux->noFilho->noFilho->exprType)*sizeof(char)); 
-                strcpy(rest,aux->noFilho->noFilho->exprType);
-                token1 = strtok_r(rest,"- (",&rest);
-                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
-				addErros(aux->line,aux->col,error-1,aux->noCount);
-            }
-            else if(strcmp(aux->noFilho->exprType,"- int")!=0 && /*strcmp(aux->noFilho->type,"Call")!=0 && strcmp(aux->noFilho->exprType,"- void")!=0 &&*/ strcmp(aux->noFilho->exprType,"- char")!=0 && strcmp(aux->noFilho->exprType,"- short")!=0 && strcmp(aux->noFilho->exprType,"- double")!=0){
-                char * token1;
-                char * rest = (char*) malloc(strlen(aux->noFilho->noFilho->exprType)*sizeof(char)); 
-                strcpy(rest,aux->noFilho->noFilho->exprType);
-                token1 = strtok_r(rest,"- (",&rest);
-                sprintf(error,"Line %d, col %d: Operator %s cannot be applied to type %s\n", aux->line,aux->col-1, operator,token1);
-				addErros(aux->line,aux->col-1,error,aux->noCount);
-            }    
         }
         else if(aux->id!=NULL){
             if(aux->exprType!=NULL){
@@ -734,6 +826,8 @@ void anotateBodyError(no * atual){
             if(tipoF!=NULL && tipoF->tabelaAtual!=NULL && strcmp(tipoF->tabelaAtual->tipo,type)==0 && n==1){
                 funcName = (char *) malloc((strlen(atual->noFilho->noIrmao->id)+1)*sizeof(char));
                 strcpy(funcName,atual->noFilho->noIrmao->id);
+                tipoFunc = (char *) malloc((strlen(type)+1)*sizeof(char));
+                strcpy(tipoFunc,type);
                 flagCheckError=1;
             }
             else
@@ -755,4 +849,16 @@ void anotateBodyError(no * atual){
 		anotateBodyError(auxNode);
 		auxNode = auxNode->noIrmao;	
 	}
+}
+
+
+void clearErros(){
+    erros * clear;
+
+   while (errorsHead != NULL){
+       clear = errorsHead;
+       errorsHead = errorsHead->noIrmao;
+       free(clear);
+    }
+
 }

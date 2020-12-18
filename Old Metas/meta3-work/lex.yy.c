@@ -2203,6 +2203,8 @@ int main(int argc, char **argv){
             printTabela();
             if (errorFlag==0)
                 printTreeAnotada(noAST,0);  
+            clearErros();
+            clearTreeAnotada(noAST);
         }
     }
     return 0;

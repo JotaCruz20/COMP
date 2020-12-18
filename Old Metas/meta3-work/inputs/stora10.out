@@ -1,0 +1,408 @@
+Line 7, col 10: Invalid use of void type in declaration
+Line 7, col 14: Invalid use of void type in declaration
+Line 7, col 18: Invalid use of void type in declaration
+Line 7, col 22: Invalid use of void type in declaration
+Line 9, col 5: Unknown symbol A0
+Line 9, col 9: Unknown symbol A1
+Line 9, col 13: Unknown symbol A2
+Line 9, col 17: Unknown symbol A3
+Line 9, col 21: Unknown symbol A4
+Line 11, col 5: Unknown symbol C0
+Line 11, col 9: Unknown symbol C1
+Line 11, col 13: Unknown symbol C2
+Line 11, col 17: Unknown symbol C3
+Line 11, col 21: Unknown symbol C4
+Line 12, col 5: Unknown symbol B0
+Line 12, col 9: Unknown symbol B1
+Line 12, col 13: Unknown symbol B2
+Line 12, col 17: Unknown symbol B3
+Line 12, col 21: Unknown symbol B4
+Line 13, col 5: Unknown symbol Z0
+Line 13, col 9: Unknown symbol Z1
+Line 13, col 13: Unknown symbol Z2
+Line 13, col 17: Unknown symbol Z3
+Line 13, col 21: Unknown symbol Z4
+Line 14, col 5: Unknown symbol Y0
+Line 20, col 6: Invalid use of void type in declaration
+Line 20, col 10: Invalid use of void type in declaration
+Line 20, col 14: Invalid use of void type in declaration
+Line 20, col 18: Invalid use of void type in declaration
+Line 27, col 10: Invalid use of void type in declaration
+Line 27, col 14: Invalid use of void type in declaration
+Line 27, col 18: Invalid use of void type in declaration
+Line 27, col 22: Invalid use of void type in declaration
+Line 30, col 5: Unknown symbol X0
+Line 30, col 9: Unknown symbol X1
+Line 30, col 13: Unknown symbol X2
+Line 30, col 17: Unknown symbol X3
+Line 30, col 21: Unknown symbol X4
+Line 33, col 5: Unknown symbol Z0
+Line 33, col 9: Unknown symbol Z1
+Line 33, col 13: Unknown symbol Z2
+Line 33, col 17: Unknown symbol Z3
+Line 33, col 21: Unknown symbol Z4
+Line 34, col 5: Unknown symbol Y0
+Line 34, col 9: Unknown symbol Y1
+Line 34, col 13: Unknown symbol Y2
+Line 34, col 17: Unknown symbol Y3
+Line 34, col 21: Unknown symbol Y4
+Line 41, col 5: Unknown symbol X0
+Line 41, col 9: Unknown symbol X1
+Line 41, col 13: Unknown symbol X2
+Line 41, col 17: Unknown symbol X3
+Line 41, col 21: Unknown symbol X4
+Line 43, col 5: Unknown symbol B1
+Line 43, col 9: Unknown symbol B2
+Line 43, col 13: Unknown symbol B3
+Line 43, col 17: Unknown symbol B4
+Line 44, col 5: Unknown symbol Z0
+Line 44, col 9: Unknown symbol Z1
+Line 44, col 13: Unknown symbol Z2
+Line 44, col 17: Unknown symbol Z3
+Line 44, col 21: Unknown symbol Z4
+Line 45, col 5: Unknown symbol Y1
+Line 45, col 9: Unknown symbol Y2
+Line 45, col 13: Unknown symbol Y3
+Line 45, col 17: Unknown symbol Y4
+===== Global Symbol Table =====
+putchar	int(int)
+getchar	int(void)
+argc	char
+argv	int
+f	void(void)
+A0	int
+A1	int
+A2	int
+A3	int
+A4	int
+C0	char
+C1	char
+C2	char
+C3	char
+C4	char
+g	void(void)
+main	int(int,char)
+X0	char
+X1	char
+X2	char
+X3	char
+X4	char
+Y	int
+Y1	int
+Y2	int
+Y3	int
+Y4	int
+
+===== Function f Symbol Table =====
+return	void
+X0	char
+X1	char
+X2	char
+X3	char
+X4	char
+Y	int
+Y1	int
+Y2	int
+Y3	int
+Y4	int
+
+===== Function g Symbol Table =====
+return	void
+A0	char
+A1	char
+A2	char
+A3	char
+A4	char
+B0	int
+B1	int
+B2	int
+B3	int
+B4	int
+
+===== Function main Symbol Table =====
+return	int
+argc	int	param
+argv	char	param
+
+Program
+..Declaration
+....Char
+....Id(argc)
+..Declaration
+....Int
+....Id(argv)
+..FuncDefinition
+....Void
+....Id(f)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Declaration
+........Char
+........Id(X0)
+......Declaration
+........Char
+........Id(X1)
+......Declaration
+........Char
+........Id(X2)
+......Declaration
+........Char
+........Id(X3)
+......Declaration
+........Char
+........Id(X4)
+......Declaration
+........Int
+........Id(Y)
+......Declaration
+........Int
+........Id(Y1)
+......Declaration
+........Int
+........Id(Y2)
+......Declaration
+........Int
+........Id(Y3)
+......Declaration
+........Int
+........Id(Y4)
+......Declaration
+........Void
+........Id(Z1)
+......Declaration
+........Void
+........Id(Z2)
+......Declaration
+........Void
+........Id(Z3)
+......Declaration
+........Void
+........Id(Z4)
+......Id(A0) - undef
+......Id(A1) - undef
+......Id(A2) - undef
+......Id(A3) - undef
+......Id(A4) - undef
+......Id(X0) - char
+......Id(X1) - char
+......Id(X2) - char
+......Id(X3) - char
+......Id(X4) - char
+......Id(C0) - undef
+......Id(C1) - undef
+......Id(C2) - undef
+......Id(C3) - undef
+......Id(C4) - undef
+......Id(B0) - undef
+......Id(B1) - undef
+......Id(B2) - undef
+......Id(B3) - undef
+......Id(B4) - undef
+......Id(Z0) - undef
+......Id(Z1) - undef
+......Id(Z2) - undef
+......Id(Z3) - undef
+......Id(Z4) - undef
+......Id(Y0) - undef
+......Id(Y1) - int
+......Id(Y2) - int
+......Id(Y3) - int
+......Id(Y4) - int
+......Id(argc) - char
+......Id(argv) - int
+..Declaration
+....Int
+....Id(A0)
+..Declaration
+....Int
+....Id(A1)
+..Declaration
+....Int
+....Id(A2)
+..Declaration
+....Int
+....Id(A3)
+..Declaration
+....Int
+....Id(A4)
+..Declaration
+....Void
+....Id(B1)
+..Declaration
+....Void
+....Id(B2)
+..Declaration
+....Void
+....Id(B3)
+..Declaration
+....Void
+....Id(B4)
+..Declaration
+....Char
+....Id(C0)
+..Declaration
+....Char
+....Id(C1)
+..Declaration
+....Char
+....Id(C2)
+..Declaration
+....Char
+....Id(C3)
+..Declaration
+....Char
+....Id(C4)
+..FuncDefinition
+....Void
+....Id(g)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Declaration
+........Char
+........Id(A0)
+......Declaration
+........Char
+........Id(A1)
+......Declaration
+........Char
+........Id(A2)
+......Declaration
+........Char
+........Id(A3)
+......Declaration
+........Char
+........Id(A4)
+......Declaration
+........Int
+........Id(B0)
+......Declaration
+........Int
+........Id(B1)
+......Declaration
+........Int
+........Id(B2)
+......Declaration
+........Int
+........Id(B3)
+......Declaration
+........Int
+........Id(B4)
+......Declaration
+........Void
+........Id(C1)
+......Declaration
+........Void
+........Id(C2)
+......Declaration
+........Void
+........Id(C3)
+......Declaration
+........Void
+........Id(C4)
+......Id(A0) - char
+......Id(A1) - char
+......Id(A2) - char
+......Id(A3) - char
+......Id(A4) - char
+......Id(X0) - undef
+......Id(X1) - undef
+......Id(X2) - undef
+......Id(X3) - undef
+......Id(X4) - undef
+......Id(C0) - char
+......Id(C1) - char
+......Id(C2) - char
+......Id(C3) - char
+......Id(C4) - char
+......Id(B0) - int
+......Id(B1) - int
+......Id(B2) - int
+......Id(B3) - int
+......Id(B4) - int
+......Id(Z0) - undef
+......Id(Z1) - undef
+......Id(Z2) - undef
+......Id(Z3) - undef
+......Id(Z4) - undef
+......Id(Y0) - undef
+......Id(Y1) - undef
+......Id(Y2) - undef
+......Id(Y3) - undef
+......Id(Y4) - undef
+......Id(argc) - char
+......Id(argv) - int
+..FuncDefinition
+....Int
+....Id(main)
+....ParamList
+......ParamDeclaration
+........Int
+........Id(argc)
+......ParamDeclaration
+........Char
+........Id(argv)
+....FuncBody
+......Id(A0) - int
+......Id(A1) - int
+......Id(A2) - int
+......Id(A3) - int
+......Id(A4) - int
+......Id(X0) - undef
+......Id(X1) - undef
+......Id(X2) - undef
+......Id(X3) - undef
+......Id(X4) - undef
+......Id(C0) - char
+......Id(C1) - char
+......Id(C2) - char
+......Id(C3) - char
+......Id(C4) - char
+......Id(B1) - undef
+......Id(B2) - undef
+......Id(B3) - undef
+......Id(B4) - undef
+......Id(Z0) - undef
+......Id(Z1) - undef
+......Id(Z2) - undef
+......Id(Z3) - undef
+......Id(Z4) - undef
+......Id(Y1) - undef
+......Id(Y2) - undef
+......Id(Y3) - undef
+......Id(Y4) - undef
+......Id(argc) - int
+......Id(argv) - char
+..Declaration
+....Char
+....Id(X0)
+..Declaration
+....Char
+....Id(X1)
+..Declaration
+....Char
+....Id(X2)
+..Declaration
+....Char
+....Id(X3)
+..Declaration
+....Char
+....Id(X4)
+..Declaration
+....Int
+....Id(Y)
+..Declaration
+....Int
+....Id(Y1)
+..Declaration
+....Int
+....Id(Y2)
+..Declaration
+....Int
+....Id(Y3)
+..Declaration
+....Int
+....Id(Y4)

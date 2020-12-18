@@ -1,0 +1,147 @@
+Line 9, col 12: Conflicting types (got int, expected void)
+Line 10, col 12: Conflicting types (got short, expected void)
+Line 11, col 12: Conflicting types (got char, expected void)
+Line 12, col 12: Conflicting types (got double, expected void)
+Line 13, col 12: Conflicting types (got void(void), expected void)
+Line 21, col 12: Conflicting types (got double, expected char)
+Line 22, col 12: Conflicting types (got void(void), expected char)
+Line 29, col 12: Conflicting types (got double, expected int)
+Line 30, col 12: Conflicting types (got void(void), expected int)
+Line 39, col 12: Conflicting types (got void(void), expected double)
+Line 47, col 12: Conflicting types (got double, expected short)
+Line 48, col 12: Conflicting types (got void(void), expected short)
+===== Global Symbol Table =====
+putchar	int(int)
+getchar	int(void)
+a0	int
+a1	short
+c0	char
+b1	double
+v	void(void)
+g0	void(void)
+g1	char(void)
+g2	int(void)
+g3	double(void)
+g4	short(void)
+
+===== Function g0 Symbol Table =====
+return	void
+
+===== Function g1 Symbol Table =====
+return	char
+
+===== Function g2 Symbol Table =====
+return	int
+
+===== Function g3 Symbol Table =====
+return	double
+
+===== Function g4 Symbol Table =====
+return	short
+
+Program
+..Declaration
+....Int
+....Id(a0)
+..Declaration
+....Short
+....Id(a1)
+..Declaration
+....Char
+....Id(c0)
+..Declaration
+....Double
+....Id(b1)
+..FuncDeclaration
+....Void
+....Id(v)
+....ParamList
+......ParamDeclaration
+........Void
+..FuncDefinition
+....Void
+....Id(g0)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........Id(a0) - int
+......Return
+........Id(a1) - short
+......Return
+........Id(c0) - char
+......Return
+........Id(b1) - double
+......Return
+........Id(v) - void(void)
+......Return
+........Null
+..FuncDefinition
+....Char
+....Id(g1)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........Id(a0) - int
+......Return
+........Id(a1) - short
+......Return
+........Id(c0) - char
+......Return
+........Id(b1) - double
+......Return
+........Id(v) - void(void)
+..FuncDefinition
+....Int
+....Id(g2)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........Id(a0) - int
+......Return
+........Id(a1) - short
+......Return
+........Id(c0) - char
+......Return
+........Id(b1) - double
+......Return
+........Id(v) - void(void)
+..FuncDefinition
+....Double
+....Id(g3)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........Id(a0) - int
+......Return
+........Id(a1) - short
+......Return
+........Id(c0) - char
+......Return
+........Id(b1) - double
+......Return
+........Id(v) - void(void)
+..FuncDefinition
+....Short
+....Id(g4)
+....ParamList
+......ParamDeclaration
+........Void
+....FuncBody
+......Return
+........Id(a0) - int
+......Return
+........Id(a1) - short
+......Return
+........Id(c0) - char
+......Return
+........Id(b1) - double
+......Return
+........Id(v) - void(void)

@@ -711,3 +711,16 @@ void anotateBody(no * atual){
 		auxNode = auxNode->noIrmao;	
 	}
 }
+
+
+void clearTreeAnotada(no* auxNode){
+	if(auxNode!=NULL){
+		if(auxNode->noFilho!=NULL){
+				clearTreeAnotada(auxNode->noFilho);
+		}
+		if(auxNode->noIrmao!=NULL){
+				clearTreeAnotada(auxNode->noIrmao);
+		}
+		free(auxNode);
+	}
+}
