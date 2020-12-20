@@ -14,6 +14,7 @@
 
     extern int errorFlag;
     extern struct no * noAST;
+    extern int flag;
     extern int linha;
     int counter = 0;
     extern int coluna;

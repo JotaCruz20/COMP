@@ -80,7 +80,7 @@ LE  "<="
 <COMMENT>\*\/     {BEGIN 0;coluna+=yyleng;lenghtSTR=(int)yyleng;}
 <COMMENT><<EOF>>   {if(flagError)printf("Line %d, col %d: unterminated comment\n",erroL,erroC); yyterminate();}
 <<EOF>>             {coluna+=yyleng;lenghtSTR=(int)yyleng;yyterminate();}
-{CHAR}  {if(flag==1)printf("CHAR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return CHAR;}
+{CHAR}  {if(flag==1)printf("CHAR\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return CHAR;} // inserimos no yyval uma struct com a linha e coluna para ser passado para os erros semanticos
 {ELSE} {if(flag==1)printf("ELSE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return ELSE;}
 {IF} {if(flag==1)printf("IF\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return IF;}
 {WHILE} {if(flag==1)printf("WHILE\n");coluna+=yyleng;yylval.noCol = addNo(yytext,coluna,linha);return WHILE;}
@@ -157,18 +157,6 @@ int main(int argc, char **argv){
             if (errorFlag==0)
                 printTree(noAST,0);    
         }
-        else if(argv[1][0]=='-' && argv[1][1]=='s'){
-            yyparse();
-            initErrors();
-            checkProgram(noAST);
-            anotateBody(noAST);
-            checkProgramError(noAST);
-            anotateBodyError(noAST);
-            printErros();
-            printTabela();
-            if (errorFlag==0)
-                printTreeAnotada(noAST,0);  
-        }
         else if(argv[1][0]=='-' && argv[1][1]=='e' && argv[1][2]=='3'){
             yyparse();
             initErrors();
@@ -178,18 +166,21 @@ int main(int argc, char **argv){
             anotateBodyError(noAST);
             printErros();
         }
-        else{
+        else if(argv[1][0]=='-' && argv[1][1]=='s'){
             yyparse();
             initErrors();
+            addCounter(noAST);
             checkProgram(noAST);
             anotateBody(noAST);
             checkProgramError(noAST);
             anotateBodyError(noAST);
             printErros();
             printTabela();
-            if (errorFlag==0){
-                geracaoLLVM(noAST);
-            }
+            if (errorFlag==0)
+                printTreeAnotada(noAST,0);  
+            clearErros();
+            clearTreeAnotada(noAST);
+            clearSymTable();
         }
     }
     else{

@@ -6,12 +6,11 @@
 #include <string.h>
 #include "tree.h"
 
-
 typedef struct noTabela
 {
 	char * id;
 	char * tipo;
-	char * params;	
+	char * params;	//verifia se é um argumento da funcao ou nao
 	struct noTabela * next;
 } noTabela;
 
@@ -20,9 +19,9 @@ typedef struct tabela
 	char * name;
 	char * type;
 	int definida;
-	int flag;
-	int print;
-	int params;
+	int flag; // verifica se e suposto imprimir ou nao 
+	int print; // verifica se a funcao q esta pode ser imprimida ou nao(se nao tem erro ou se nao foi duplamente declarada)
+	int params; // parametros da funcao
 	struct noTabela * tabelaAtual;
 	struct tabela * next;
 } tabela;
@@ -38,6 +37,9 @@ int checkFunc(char * nome);
 int nParams(char * nome);
 int checkParamsType(tabela * aux, no * atual);
 void checkParamsTypeError(char * nome, char * nomeFunc, no * atual,no* pai);
+char * getTypeParams(char * nome);
+void clearSymTableParams(noTabela * aux);
+void clearSymTable();
 int isGlobal(char *name);
 noTabela *  searchFunc(char* nomeTabela);
 #endif

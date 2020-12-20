@@ -11,6 +11,20 @@ char name[20];
 char * funcName;
 extern int linha;
 extern int coluna;
+int counterAST = 0;
+
+void addCounter(no * atual){
+	if(atual->noFilho!=NULL){
+		addCounter(atual->noFilho);
+	}
+	atual->noCount=counterAST;
+	counterAST+=1;
+	if(atual->noIrmao!=NULL){
+		addCounter(atual->noIrmao);
+	}
+	
+
+}
 
 void checkProgram(no * atual){ 
 	if (atual == NULL)
@@ -189,6 +203,10 @@ void addType(no * atual, char* pai){
 		}
 		else if(aux->id!=NULL){
 			char * type = searchId(funcName,aux->id);
+			if(strcmp(pai,"Call")==0){
+				char * params = getTypeParams(funcName);
+				strcat(type,params);
+			}
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}
@@ -265,18 +283,57 @@ char * prioridade(no * atual){ // vai buscar o tipo para por no Add/Mul/Sub/Mod
 	no * filho1 = aux->noFilho;
 	no * filho2 = aux->noFilho->noIrmao;
 	char * tipo1, * tipo2;
-	if(filho1->id==NULL){
-		tipo1 = prioridade(filho1);
+	if(filho1->id==NULL){ 
+		if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type,"Not")==0){
+			return (char *) strdup("- int");
+		}
+		else if(strcmp(aux->type, "Or") == 0 || strcmp(aux->type, "And") == 0 ||  strcmp(aux->type, "BitWiseAnd") == 0 || strcmp(aux->type, "BitWiseOr") == 0 || strcmp(aux->type, "BitWiseXor") == 0 || strcmp(aux->type, "Mod") == 0){
+			return (char *) strdup("- int");
+		}
+		else{
+			tipo1 = prioridade(filho1);
+		}
 	}
 	else{
-		tipo1 = searchId(funcName,filho1->id);
+		if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type,"Not")==0){
+			return (char *) strdup("- int");
+		}
+		else if(strcmp(aux->type, "Or") == 0 || strcmp(aux->type, "And") == 0 ||  strcmp(aux->type, "BitWiseAnd") == 0 || strcmp(aux->type, "BitWiseOr") == 0 || strcmp(aux->type, "BitWiseXor") == 0 || strcmp(aux->type, "Mod") == 0){
+			return (char *) strdup("- int");
+		}
+		else{
+			tipo1 = searchId(funcName,filho1->id);
+			if(strstr(tipo1,"(")!=NULL && strcmp(aux->type,"Call")!=0){
+				return strdup("- undef");
+			}
+		}
 	}
 	if(filho2!=NULL){
 		if(filho2->id==NULL){
-			tipo2 = prioridade(filho2);
+			if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type,"Not")==0){
+				return (char *) strdup("- int");
+			}
+			else if(strcmp(aux->type, "Or") == 0 || strcmp(aux->type, "And") == 0 ||  strcmp(aux->type, "BitWiseAnd") == 0 || strcmp(aux->type, "BitWiseOr") == 0 || strcmp(aux->type, "BitWiseXor") == 0 || strcmp(aux->type, "Mod") == 0){
+				return (char *) strdup("- int");
+			}
+			else{
+				tipo2 = prioridade(filho2);
+			}
 		}
 		else{
-			tipo2 = searchId(funcName,filho2->id);
+			if(strcmp(aux->type,"Lt")==0 || strcmp(aux->type,"Le")==0 || strcmp(aux->type,"Gt")==0 || strcmp(aux->type,"Ge")==0 || strcmp(aux->type,"Ne")==0 || strcmp(aux->type,"Eq")==0 || strcmp(aux->type,"Not")==0){
+				return (char *) strdup("- int");
+			}
+			else if(strcmp(aux->type, "Or") == 0 || strcmp(aux->type, "And") == 0 ||  strcmp(aux->type, "BitWiseAnd") == 0 || strcmp(aux->type, "BitWiseOr") == 0 || strcmp(aux->type, "BitWiseXor") == 0 || strcmp(aux->type, "Mod") == 0){
+				return (char *) strdup("- int");
+			}
+			else{
+			
+				tipo2 = searchId(funcName,filho2->id);
+				if(strstr(tipo2,"(")!=NULL && strcmp(aux->type,"Call")!=0){
+					return strdup("- undef");
+				}
+			}
 		}
 	}
 	else{
@@ -394,10 +451,83 @@ char * searchComma(no * atual){
 	return strdup("- undef");
 }
 
+char * searchCommaFirstSon(no * atual){
+	no * filho = atual->noFilho;
+	if(filho->id!=NULL){
+		char * id = searchId(funcName,filho->id);
+		if(strcmp(id,"undef")==0){
+			if(strcmp(filho->type,"IntLit")==0 || strcmp(filho->type,"ChrLit")==0){
+				return strdup("- int");
+			}
+			else if(strcmp(filho->type,"RealLit")==0){
+				return strdup("- double");
+			}
+		}
+		char * tokenF = (char *) malloc((strlen(id)+3)*sizeof(char));
+		strcpy(tokenF,"- ");
+		strcat(tokenF,id);
+		return strdup(tokenF);
+	}
+	else{
+		if(strcmp(filho->type,"ChrLit")==0 || strcmp(filho->type,"IntLit")==0){
+			return strdup("- int");
+		}
+		else if(strcmp(filho->type,"RealLit")==0){
+			return strdup("- double");
+		}
+		else if(strcmp(filho->type,"Lt")==0 || strcmp(filho->type,"Le")==0 || strcmp(filho->type,"Gt")==0 || strcmp(filho->type,"Ge")==0 || strcmp(filho->type,"Ne")==0 || strcmp(filho->type,"Eq")==0 || strcmp(filho->type,"Not")==0){
+			return strdup("- int");
+		}
+		else if(strcmp(filho->type, "Or") == 0 || strcmp(filho->type, "And") == 0 ||  strcmp(filho->type, "BitWiseAnd") == 0 || strcmp(filho->type, "BitWiseOr") == 0 || strcmp(filho->type, "BitWiseXor") == 0 || strcmp(filho->type, "Mod") == 0){
+			return strdup("- int");
+		}
+		else if (strcmp(filho->type, "Add") == 0 || strcmp(filho->type, "Sub") == 0 ||  strcmp(filho->type, "Mul") == 0 || strcmp(filho->type, "Div") == 0){
+			return prioridade(filho);
+		}
+		else if(strcmp(filho->type,"Call") == 0){
+			if(strcmp(filho->noFilho->id,"putchar")==0 || strcmp(filho->noFilho->id,"getchar")==0){
+				return strdup("- int");
+			}	
+			else{
+				char * type = searchId(funcName,filho->noFilho->id);
+				char * token;
+    			token = strtok(type,"(");
+				char * tokenF = (char *) malloc((strlen(token)+3)*sizeof(char));
+				strcpy(tokenF,"- ");
+				strcat(tokenF,token);
+				return strdup(tokenF);
+
+			}
+		}
+		else if (strcmp(filho->type,"Store") == 0 || strcmp(filho->type,"Minus")==0 || strcmp(filho->type,"Plus")==0){
+				char * type = searchId(funcName,filho->noFilho->id);
+				if(strcmp(type,"undef")==0){
+					if(strcmp(filho->noFilho->type,"IntLit")==0 || strcmp(filho->noFilho->type,"ChrLit")==0){
+						strcpy(type, "- int");
+					}
+					else if(strcmp(filho->noFilho->type,"RealLit")==0){
+						strcpy(type, "- double");
+					}
+				}
+				return strdup(type);
+		}
+		else if(strcmp(filho->type,"Comma")==0){
+			return searchCommaFirstSon(filho);
+		}
+		else{
+			return strdup("- undef");
+		}
+	}
+	return strdup("- undef");
+}
+
 void searchStore(no *atual, char* typeBrother){
 	no * aux = atual;
 	if(aux->noFilho->id!=NULL){
 		char * type = searchId(funcName,aux->noFilho->id);
+		if(strstr(type,"(")!=NULL){
+			strcpy(type, "undef");
+		}
 		if(strcmp(type,"undef")==0){
 				if(strcmp(aux->noFilho->type,"IntLit")==0 || strcmp(aux->type,"ChrLit")==0){
 					strcpy(type, "int");
@@ -463,6 +593,9 @@ void searchStore(no *atual, char* typeBrother){
 		sprintf(aux->exprType,"- %s",type);
 
 	}
+	else{
+		aux->exprType = prioridade(atual);
+	}
 
 }
 
@@ -485,9 +618,20 @@ void checkBody(no * atual,char * pai){
 			aux->exprType= prioridade(aux);
 		}
 		else if(strcmp(aux->type,"Comma")==0){	
-			char * id;
-			id = searchComma(aux);
-			aux->exprType= id;
+			char * id2, *id1;
+			id2 = searchComma(aux);
+			id1 = searchCommaFirstSon(aux);
+			if(strcmp(id1,"- undef")==0 || strcmp(id2, "- undef")==0){
+				aux->exprType = (char*)malloc(sizeof(char)*strlen("- undef"));
+				strcpy(aux->exprType,"- undef");
+			}
+			else if(strcmp(id1,id2)!=0 && (strstr(id1,"(")!=NULL || strstr(id2,"(")!=NULL)){
+				aux->exprType = (char*)malloc(sizeof(char)*strlen("- undef"));
+				strcpy(aux->exprType,"- undef");	
+			}
+			else{
+				aux->exprType= id2;
+			}
 		}
 		else if(strcmp(aux->type,"Call") == 0){
 			if(strcmp(aux->noFilho->id,"putchar")==0 || strcmp(aux->noFilho->id,"getchar")==0){
@@ -510,7 +654,9 @@ void checkBody(no * atual,char * pai){
 		else if(strcmp(aux->type,"Minus")==0 || strcmp(aux->type,"Plus")==0){
 			char * type;
 			if(aux->noFilho->id==NULL){
-				type = searchId(funcName,aux->noFilho->noFilho->id);
+				//type = aux->noFilho->type;
+				type = (char*)malloc(strlen("int")*sizeof(char));
+				strcpy(type,"int");
 			}
 			else{
 				type = searchId(funcName,aux->noFilho->id);
@@ -529,6 +675,10 @@ void checkBody(no * atual,char * pai){
 		}
 		else if(aux->id!=NULL && strcmp(pai,"Declaration")!=0){
 			char * type = searchId(funcName,aux->id);
+			if(strcmp(pai,"Call")==0){
+				char * params = getTypeParams(funcName);
+				strcat(type,params);
+			}
 			aux->exprType = (char *)malloc((strlen(type)+3)*sizeof(char));
 			sprintf(aux->exprType,"- %s",type);
 		}
@@ -559,5 +709,18 @@ void anotateBody(no * atual){
 	while(auxNode != NULL){
 		anotateBody(auxNode);
 		auxNode = auxNode->noIrmao;	
+	}
+}
+
+
+void clearTreeAnotada(no* auxNode){
+	if(auxNode!=NULL){
+		if(auxNode->noFilho!=NULL){
+				clearTreeAnotada(auxNode->noFilho);
+		}
+		if(auxNode->noIrmao!=NULL){
+				clearTreeAnotada(auxNode->noIrmao);
+		}
+		free(auxNode);
 	}
 }

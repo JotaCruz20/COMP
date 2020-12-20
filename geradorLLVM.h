@@ -23,7 +23,4 @@ void gerCall(no *node);
 void typeConversion(no *received, char *expected);
 int is_expression(no *node);
 void gerArithemetic(no *node,char * op,char * opD);
-void gerMod(no *node);
-int prioridadeTipo(char *first, char *second);
-void gerLogical(no *node, char * op, char* opD);
 #endif //CODE_GEN_H

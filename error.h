@@ -22,5 +22,6 @@ void checkDeclarationError(no * atual);
 void checkBodyError(no * atual,char * pai);
 void anotateBodyError(no * atual);
 void addParamsFunctionError(no * atual, char * nameTable);
-void checkDeclarationBodyErrors(no * atual);
+void checkDeclarationBodyErrors(no * atual,char* type);
+void clearErros();
 #endif

@@ -47,9 +47,6 @@ void geracaoLLVM(no *node){
 		strcpy(tipoVar,node->exprType);
 		gerStore(node);
 	}
-	/*} else if(0 == strcmp(node->type, "Plus")) {
-		geracaoLLVM(node->noFilho);
-	} */
 	else if(0 == strcmp(node->type, "Minus")) {
 		gerMinus(node);
 	} 
@@ -74,31 +71,6 @@ void geracaoLLVM(no *node){
 	else if(0 == strcmp(node->type, "Mod")) {
 		gerArithemetic(node,"srem","srem");
 	} 
-	/*else if(0 == strcmp(node->type, "Or")) {
-		gerOr(node);
-	} else if(0 == strcmp(node->type, "And")) {
-		gerAnd(node);
-	} else if(0 == strcmp(node->type, "BitWiseAnd")) {
-		gerBitWiseAnd(node);
-	} else if(0 == strcmp(node->type, "BitWiseOr")) {
-		gerBitWiseOr(node);
-	} else if(0 == strcmp(node->type, "BitWiseXor")) {
-		gerBitWiseXor(node);
-	} else if(0 == strcmp(node->type, "Eq")) {
-		gerEq(node);
-	} else if(0 == strcmp(node->type, "Ne")) {
-		gerNe(node);
-	} else if(0 == strcmp(node->type, "Le")) {
-		gerLe(node);
-	} else if(0 == strcmp(node->type, "Ge")) {
-		gerGe(node);
-	} else if(0 == strcmp(node->type, "Lt")) {
-		gerLt(node);
-	} else if(0 == strcmp(node->type, "Gt")) {
-		gerGt(node);
-	} else if(0 == strcmp(node->type, "Not")) {
-		gerNot(node);
-	}*/
 }
 
 void program_gen(no *node){
@@ -200,10 +172,10 @@ void gerReturn(no *node){
 	}
 }
 
-void gerFuncDef(no *node){ //falta saber para q serve as flags and,or
+void gerFuncDef(no *node){ //cria nova funcao
 	temporary_var = 1; // numero da variavel
-	//and_cmp = 1;
-	//or_cmp = 1;
+	and_cmp = 1; //recomeca contagem dos ands
+	or_cmp = 1; //recomeca contagem dos ors
 	char *type = tipoLLVM(node->noFilho->type);
 	char *name = node->noFilho->noIrmao->id; // nome da funcao
 	printf("define %s @%s", type, name);
@@ -655,157 +627,3 @@ void gerArithemetic(no *node,char * op,char * opD){
 	temporary_var++;
 }
 
-int prioridadeTipo(char *first, char *second){//verifica as prioridades entre os tipos
-	if(0 == strcmp(second, "double") && strcmp(first, "double")){ // segundo double e primeiro diferente de double
-		return 0;
-	} 
-	else if(0 == strcmp(first, "double") && strcmp(second, "double")){ // primeiro double e segundo diferent de double
-		return 1;
-	} 
-	else if(0 == strcmp(first, "i32")){
-		return 1;
-	} 
-	else if(0 == strcmp(second, "i32")){
-		return 0;
-	}
-	return 0;
-}
-
-void gerLogical(no *node, char * op, char* opD){
-	int local_vars[2];
-	char *first_type = tipoLLVM(node->noFilho->type);
-	char *second_type = tipoLLVM(node->noFilho->noIrmao->type);
-	char *type = strdup(first_type);
-	if(strcmp(first_type, second_type)){
-		int greater = prioridadeTipo(first_type, second_type);
-		if(greater == 1){ 
-			if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
-				printf("%%%d = load %s, %s* ", temporary_var, second_type, second_type);
-				geracaoLLVM(node->noFilho->noIrmao);
-				printf("\n");
-				local_vars[1] = temporary_var;
-				temporary_var++;
-			} 
-			else if(is_expression(node->noFilho->noIrmao)){
-				geracaoLLVM(node->noFilho->noIrmao);
-				local_vars[1] = temporary_var-1;
-			}
-			type = strdup(first_type);
-			convert_types(node->noFilho->noIrmao, first_type);
-			local_vars[1] = temporary_var-1;
-			if(0 == strcmp(node->noFilho->type, "Id")){
-				printf("%%%d = load %s, %s* ", temporary_var, first_type, first_type);
-				geracaoLLVM(node->noFilho);
-				printf("\n");
-				local_vars[0] = temporary_var;
-				temporary_var++;
-			} else if(is_expression(node->noFilho)){
-				geracaoLLVM(node->noFilho);
-				local_vars[0] = temporary_var-1;
-			}
-		} else {
-			if(0 == strcmp(node->noFilho->type, "Id")){
-				printf("%%%d = load %s, %s* ", temporary_var, first_type, first_type);
-				geracaoLLVM(node->noFilho);
-				printf("\n");
-				local_vars[0] = temporary_var;
-				temporary_var++;
-			} else if(is_expression(node->noFilho)){
-				geracaoLLVM(node->noFilho);
-				local_vars[0] = temporary_var-1;
-			}
-			type = strdup(second_type);
-			convert_types(node->noFilho, second_type);
-			local_vars[0] = temporary_var-1;
-			if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
-				printf("%%%d = load %s, %s* ", temporary_var, second_type, second_type);
-				geracaoLLVM(node->noFilho->noIrmao);
-				printf("\n");
-				local_vars[1] = temporary_var;
-				temporary_var++;
-			} else if(is_expression(node->noFilho->noIrmao)){
-				geracaoLLVM(node->noFilho->noIrmao);
-				local_vars[1] = temporary_var-1;
-			}
-		}
-		if(0 == strcmp(type, "double")){
-			if(greater == 1){
-				if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho)){
-					printf("%%%d = fcmp ogt double %%%d, %%%d\n", temporary_var, local_vars[0], local_vars[1]);
-				} else { /* Is another terminal */
-					printf("%%%d = fcmp ogt double %s, %%%d\n", temporary_var, node->noFilho->id, local_vars[1]);
-				}
-			} else {
-				if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao)){
-					printf("%%%d = fcmp ogt double %%%d, %%%d\n", temporary_var, local_vars[0], local_vars[1]);
-				} else { /* Is another terminal */
-					printf("%%%d = fcmp ogt double %%%d, %s\n", temporary_var, local_vars[0], node->noFilho->noIrmao->id);
-				}
-			}
-		} else {
-			if(greater == 1){
-				if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho)){
-					printf("%%%d = icmp sgt %s %%%d, %%%d\n", temporary_var, type, local_vars[0], local_vars[1]);
-				} else { /* Is another terminal */
-					printf("%%%d = icmp sgt %s %s, %%%d\n", temporary_var, type, node->noFilho->id, local_vars[1]);
-				}
-			} else {
-				if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao)){
-					printf("%%%d = icmp sgt %s %%%d, %%%d\n", temporary_var, type, local_vars[0], local_vars[1]);
-				} else { /* Is another terminal */
-					printf("%%%d = icmp sgt %s %%%d, %s\n", temporary_var, type, local_vars[0], node->noFilho->noIrmao->id);
-				}
-			}
-		}
-		temporary_var++;
-	} else {
-		if(0 == strcmp(node->noFilho->type, "Id")){
-			printf("%%%d = load %s, %s* ", temporary_var, first_type, first_type);
-			geracaoLLVM(node->noFilho);
-			printf("\n");
-			local_vars[0] = temporary_var;
-			temporary_var++;
-		} else if(is_expression(node->noFilho)){
-			geracaoLLVM(node->noFilho);
-			local_vars[0] = temporary_var-1;
-		}
-		if(0 == strcmp(node->noFilho->noIrmao->type, "Id")){
-			printf("%%%d = load %s, %s* ", temporary_var, second_type, second_type);
-			geracaoLLVM(node->noFilho->noIrmao);
-			printf("\n");
-			local_vars[1] = temporary_var;
-			temporary_var++;
-		} else if(is_expression(node->noFilho->noIrmao)){
-			geracaoLLVM(node->noFilho->noIrmao);
-			local_vars[1] = temporary_var-1;
-		}
-		if(0 == strcmp(type, "double")) {
-			if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho)){
-				if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao)){  /* First and Second are ID */
-					printf("%%%d = fcmp ogt double %%%d, %%%d\n", temporary_var, local_vars[0], local_vars[1]);
-				} else { /* First is ID */
-					printf("%%%d = fcmp ogt double %%%d, %s\n", temporary_var, local_vars[0], node->noFilho->noIrmao->id);
-				}
-			} else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao)){ /* Second is ID */
-				printf("%%%d = fcmp ogt double %s, %%%d\n", temporary_var, node->noFilho->id, local_vars[1]);
-			} else {
-				printf("%%%d = fcmp ogt double %s, %s\n", temporary_var, node->noFilho->id, node->noFilho->noIrmao->id);
-			}
-		} else {
-			if(0 == strcmp(node->noFilho->type, "Id") || is_expression(node->noFilho)){
-				if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao)){  /* First and Second are ID */
-					printf("%%%d = icmp sgt %s %%%d, %%%d\n", temporary_var, type, local_vars[0], local_vars[1]);
-				} else { /* First is ID */
-					printf("%%%d = icmp sgt double %%%d, %s\n", temporary_var, local_vars[0], node->noFilho->noIrmao->id);
-				}
-			} else if(0 == strcmp(node->noFilho->noIrmao->type, "Id") || is_expression(node->noFilho->noIrmao)){ /* Second is ID */
-				printf("%%%d = icmp sgt double %s, %%%d\n", temporary_var, node->noFilho->id, local_vars[1]);
-			} else {
-				printf("%%%d = icmp sgt %s %s, %s\n", temporary_var, type, node->noFilho->id, node->noFilho->noIrmao->id);
-			}
-		}
-		temporary_var++;
-	}	
-	printf("%%%d = zext i1 %%%d to i32\n", temporary_var, temporary_var-1);
-	temporary_var++;
-}

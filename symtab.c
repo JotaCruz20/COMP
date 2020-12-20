@@ -47,10 +47,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 			if (strcmp(auxNoTabela->id, id)==0){ // se ja estiver o id na tabela nao precisamos do adicionar novamente
 				if(flag==1){
 					if(strcmp(params,"")==0){ //é uma var
-						free(tab);
-						char error[100];
-						sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
-						addErros(line,col-strlen(id),error,noCount);
+						if(strcmp(auxNoTabela->tipo,"void")!=0){
+							free(tab);
+							char error[100];
+							sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
+							addErros(line,col-strlen(id),error,noCount);
+						}
 					}
 					else{// e uma funcao
 						char error[100];
@@ -61,10 +63,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 				else if(flag==2 || flag==3){
 					free(tab);
 					if(strcmp(auxNoTabela->tipo,tipo)!=0 && strcmp(params,"")==0){//é uma var
-						char error[100];
-						sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
-						addErros(line,col,error,noCount);
-						return 0;
+						if(strcmp(auxNoTabela->tipo,"void")!=0){
+							char error[100];
+							sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
+							addErros(line,col,error,noCount);
+							return 0;
+						}
 					}
 					else if(strcmp(auxNoTabela->tipo,tipo)!=0 || strcmp(params,auxNoTabela->params)!=0){//é uma função
 						if(auxFunc!=NULL && auxFunc->definida==1 && flag==2){
@@ -89,10 +93,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 			
 			if(flag==1){
 				if(strcmp(params,"")==0){ //é uma var
-					free(tab);
-					char error[100];
-					sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
-					addErros(line,col-strlen(id),error,noCount);
+					if(strcmp(auxNoTabela->tipo,"void")!=0){
+						free(tab);
+						char error[100];
+						sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(id),id);
+						addErros(line,col-strlen(id),error,noCount);
+					}
 				}
 				else{//e uma funcao
 					char error[100];
@@ -103,10 +109,12 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 			else if(flag==2 || flag==3){
 					free(tab);
 					if(strcmp(auxNoTabela->tipo,tipo)!=0 && strcmp(params,"")==0){//é uma var
-						char error[100];
-						sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
-						addErros(line,col,error,noCount);
-						return 0;
+						if(strcmp(auxNoTabela->tipo,"void")!=0){
+							char error[100];
+							sprintf(error, "Line %d, col %d: Conflicting types (got %s, expected %s)\n",line,col,tipo,auxNoTabela->tipo);
+							addErros(line,col,error,noCount);
+							return 0;
+						}
 					}
 					else if(strcmp(auxNoTabela->tipo,tipo)!=0 || strcmp(params,auxNoTabela->params)!=0){//é uma função
 						if(auxFunc!=NULL && auxFunc->definida==1 && flag==2){
@@ -126,7 +134,9 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 				}
 				return 1;
 		}
-		auxNoTabela->next = tab;
+		if(strcmp(tipo,"void")!=0 ||  strstr(params,"(")!=NULL ){
+			auxNoTabela->next = tab;
+		}
 		return 1;
 	}
 		return 1;
@@ -201,7 +211,7 @@ int checkParamsType(tabela * aux, no * atual){
 void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 	tabela * aux = tabelaSimbolos;
 	if(aux!=NULL){
-		while (aux!=NULL && strcmp(aux->name,nomeFunc)!=0)
+		while (aux!=NULL && strcmp(aux->name,nome)!=0)
 		{
 			aux=aux->next;
 		}
@@ -251,7 +261,7 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 				}
 			}
 			if(strcmp(type,paramsTabela->tipo)!=0){
-				if((strcmp(type,"int/short/double")==0 || strcmp(type,"int")==0) && strcmp(paramsTabela->tipo,"short")==0){
+				if((strcmp(type,"int/short/double")==0 || strcmp(type,"int")==0) && (strcmp(paramsTabela->tipo,"short")==0 || strcmp(paramsTabela->tipo,"double")==0)){
 					;
 				}
 				else if((strcmp(type,"int/short/double")==0 || strcmp(type,"short")==0)  && strcmp(paramsTabela->tipo,"int")==0){
@@ -260,13 +270,19 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 				else if(strcmp(type,"int/short/double")==0 && strcmp(paramsTabela->tipo,"double")==0){
 					;
 				}
+				else if(strcmp(type,"char")==0 && (strcmp(paramsTabela->tipo,"short") || strcmp(paramsTabela->tipo,"int"))){
+					;
+				}
+				else if(strcmp(type,"short")==0 && (strcmp(paramsTabela->tipo,"char") || strcmp(paramsTabela->tipo,"int"))){
+					;
+				}
 				else{
 					char * typeError = (char *)malloc(strlen(atual->exprType)*sizeof(char));
 					strcpy(typeError,atual->exprType);
 					typeError = strtok(typeError,"- ");
 					char error[100];
 					sprintf(error,"Line %d, col %d: Conflicting types (got %s, expected %s)\n", atual->line,pai->noFilho->col+1,typeError,paramsTabela->tipo);
-					addErros(atual->line,pai->noFilho->col+1,error,pai->noFilho->noCount); //marcado
+					addErros(pai->noFilho->line,pai->noFilho->col+1,error,pai->noFilho->noCount); //marcado
 				}
 			}
 			atual=atual->noIrmao;
@@ -301,7 +317,7 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 					type = strtok(type,"- ");
 					if(strcmp(type,"IntLit")==0){
 						free(type);
-						type = (char *)malloc(strlen("int")*sizeof(char));
+						type = (char *)malloc(strlen("int/short/double")*sizeof(char));
 						strcpy(type,"int/short/double");
 					}
 					else if(strcmp(type,"ChrLit")==0){
@@ -321,7 +337,7 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 				if(strcmp(type,"undef")==0){
 					if(strcmp(atual->type,"IntLit")==0){
 						free(type);
-						type = (char *)malloc(strlen("int")*sizeof(char));
+						type = (char *)malloc(strlen("int/short/double")*sizeof(char));
 						strcpy(type,"int/short/double");
 					}
 					else if(strcmp(atual->type,"ChrLit")==0){
@@ -336,27 +352,40 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 					}
 				}
 				if(strcmp(type,token)!=0){
-					if(strcmp(type,"int/short/double")==0 && strcmp(token,"short")==0){
+					if((strcmp(type,"int/short/double")==0 || strcmp(type,"int")==0) && (strcmp(token,"short")==0 || strcmp(token,"double")==0 )){
 						;
 					}
-					else if(strcmp(type,"int/short/double")==0 && strcmp(token,"int")==0){
+					else if((strcmp(type,"int/short/double")==0 || strcmp(type,"short")==0)  && strcmp(token,"int")==0){
 						;
 					}
 					else if(strcmp(type,"int/short/double")==0 && strcmp(token,"double")==0){
 						;
 					}
+					else if(strcmp(type,"char")==0 && (strcmp(token,"short") || strcmp(token,"int"))){
+					;
+					}
+					else if(strcmp(type,"short")==0 && (strcmp(token,"char") || strcmp(token,"int"))){
+						;
+					}
 
+					else if(strcmp(atual->type,"Call")==0){
+						char * typeError = (char *)malloc(strlen(atual->exprType)*sizeof(char));
+						strcpy(typeError,atual->exprType);
+						typeError = strtok(typeError,"- ");
+						char error[100];
+						sprintf(error,"Line %d, col %ld: Conflicting types (got %s, expected %s)\n", atual->line,atual->noFilho->col-strlen(nome),type,token);
+						addErros(atual->line,atual->noFilho->col-strlen(nome),error,atual->noCount);
+					}
 					else{
 						char * typeError = (char *)malloc(strlen(atual->exprType)*sizeof(char));
 						strcpy(typeError,atual->exprType);
 						typeError = strtok(typeError,"- ");
 						char error[100];
-						sprintf(error,"Line %d, col %d: Conflicting types (got %s, expected %s)\n", pai->noFilho->line,pai->noFilho->col-1,paramsTabela->tipo,typeError);
-						addErros(pai->noFilho->line,pai->noFilho->col-1,error,pai->noFilho->noCount);
+						sprintf(error,"Line %d, col %ld: Conflicting types (got %s, expected %s)\n", atual->line,atual->col-strlen(nome),type,token);
+						addErros(atual->line,atual->col-strlen(nome),error,atual->noCount);
 					}
 				}
 				atual=atual->noIrmao;
-				paramsTabela=paramsTabela->next;
 			}
 		}
 	}
@@ -372,6 +401,37 @@ tabela * searchTabela(char * nome){
 			aux = aux->next;
         return aux;
 	}
+}
+
+char * getTypeParams(char * nome){
+	tabela * aux = tabelaSimbolos;
+	char tipoParams[500]="(";
+	if(aux!=NULL){
+		while (aux!=NULL && strcmp(aux->name,nome)!=0)
+		{
+			aux=aux->next;
+		}
+		if(aux!=NULL){
+			noTabela * auxTab = aux->tabelaAtual;
+			if(auxTab->next!=NULL){
+				auxTab=auxTab->next;
+				while(auxTab!=NULL){
+					if(strcmp(auxTab->params,"")!=0){
+						strcat(tipoParams,auxTab->tipo);
+					}
+					auxTab=auxTab->next;
+					if (auxTab != NULL)
+						strcat(tipoParams,",");
+				}
+			}
+			else{
+				strcat(tipoParams,"void");
+			}
+		}
+		strcat(tipoParams,")");
+		//return strdup(tipoParams);
+	}
+	return strdup("");
 }
 
 char * typeParams(char * nome,int n,char* type){
@@ -503,6 +563,7 @@ char* searchId(char* nTabela,char * id){
 						strcpy(type,auxTab->tipo);
 					}
 				}
+				
 				auxTab=auxTab->next;
 			}
 			while( strcmp(aux->name,nTabela)!=0 && aux->next!=NULL){
@@ -527,7 +588,6 @@ char* searchId(char* nTabela,char * id){
 	}
 	return strdup("undef");
 }
-
 int isGlobal(char *name){
 	noTabela * aux = tabelaSimbolos->tabelaAtual;
 	while(aux){ 
@@ -537,4 +597,23 @@ int isGlobal(char *name){
 		aux = aux->next;
 	}
 	return 0;
+}
+
+void clearSymTableParams(noTabela * aux){
+	noTabela * clear;
+	while (aux != NULL){
+       clear = aux;
+       aux = aux->next;
+       free(clear);
+    }
+}
+
+void clearSymTable(){
+	tabela * clear;
+	while (tabelaSimbolos != NULL){
+		clearSymTableParams(tabelaSimbolos->tabelaAtual);
+       	clear = tabelaSimbolos;
+      	tabelaSimbolos = tabelaSimbolos->next;
+      	free(clear);
+    }
 }

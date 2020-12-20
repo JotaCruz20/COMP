@@ -4,7 +4,7 @@
 #include <ctype.h> 
 #include "tree.h"
 
-noLex * addNo(char * id,int col,int line){
+noLex * addNo(char * id,int col,int line){ //adiciona no na AST
     noLex * no = (noLex *)malloc(sizeof(noLex));
     if(id!=NULL){
         no->id=(char*)malloc((strlen(id)+1)*sizeof(char));

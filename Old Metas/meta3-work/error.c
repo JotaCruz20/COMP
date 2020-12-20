@@ -27,12 +27,6 @@ void initErrors(){
 void addErros(int line,int col,char * erro,int noOrder){
 	erros * aux = errorsHead;
 	erros * create;
-	/*while (aux->noIrmao!=NULL && aux->noIrmao->line<line){
-		aux=aux->noIrmao;
-	}
-    while (aux->noIrmao!=NULL && aux->noIrmao->col<col && aux->noIrmao->line==line){
-		aux=aux->noIrmao;
-	}*/
     while (aux->noIrmao!=NULL && aux->noIrmao->noOrder<noOrder){
 		aux=aux->noIrmao;
 	}
