@@ -1,12 +1,12 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-typedef struct erros{
+typedef struct erros{ //struct de erros 
         int line;
         int col;
         char * erro;
-        int noOrder;
-        struct erros * noIrmao; // facilita, pois so temos de ter 1 pointer para o filho
+        int noOrder; // order do no na tree
+        struct erros * noIrmao; 
 } erros; 
 
 

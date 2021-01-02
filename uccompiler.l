@@ -162,8 +162,8 @@ int main(int argc, char **argv){
             initErrors();
             checkProgram(noAST);
             anotateBody(noAST);
-            checkProgramError(noAST);
-            anotateBodyError(noAST);
+            checkProgramError(noAST); //verifica as declaracoes e funcoes
+            anotateBodyError(noAST); //anota body das funcoes
             printErros();
         }
         else if(argv[1][0]=='-' && argv[1][1]=='s'){
@@ -172,8 +172,8 @@ int main(int argc, char **argv){
             addCounter(noAST);
             checkProgram(noAST);
             anotateBody(noAST);
-            checkProgramError(noAST);
-            anotateBodyError(noAST);
+            checkProgramError(noAST); //verifica as declaracoes e funcoes
+            anotateBodyError(noAST); //anota body das funcoes
             printErros();
             printTabela();
             if (errorFlag==0)
@@ -188,8 +188,8 @@ int main(int argc, char **argv){
             initErrors();
             checkProgram(noAST);
             anotateBody(noAST);
-            checkProgramError(noAST);
-            anotateBodyError(noAST);
+            checkProgramError(noAST); //verifica as declaracoes e funcoes
+            anotateBodyError(noAST); //anota body das funcoes
             if(errorFlag==0){
                 geracaoLLVM(noAST);
             }

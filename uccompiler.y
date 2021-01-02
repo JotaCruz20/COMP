@@ -22,7 +22,7 @@
     char * auxType;
     no * noAuxiliar;
 
-    no * inserirNo(char * id, char * type, no * noFilho,int line,int col){
+    no * inserirNo(char * id, char * type, no * noFilho,int line,int col){ //insere o no na AST 
         no * noAtual = (no *)malloc(sizeof(no));
         if(type!=NULL){
                 noAtual->type =(char *)malloc(sizeof(char)*(strlen(type)+1));
@@ -38,8 +38,6 @@
         else{
                 noAtual->id = NULL;
         }
-        //noAtual->noCount = counter;
-        //counter+=1;
         noAtual->line = line;
         noAtual->col= col;
         noAtual->noFilho = noFilho;
@@ -47,8 +45,7 @@
         return noAtual;
     }
 
-    void addIrmao(no * no1, no * no2)
-    {
+    void addIrmao(no * no1, no * no2){ //adiciona o irmao no final da lista
         no * noAuxiliar  = no1;
         while(noAuxiliar->noIrmao!=NULL){
                 noAuxiliar=noAuxiliar->noIrmao;
@@ -56,8 +53,7 @@
         noAuxiliar->noIrmao = no2;
     }
 
-    void printTree(no * auxNode, int pontos) /* mudar isto */
-    {
+    void printTree(no * auxNode, int pontos){ //print da AST
         int i=0;
         if(auxNode!=NULL){
                 for(i=0;i<pontos*2;i++){
@@ -79,6 +75,10 @@
         }
         //free(auxNode);
     }
+
+    /* A passagem pelo codigo é feita bottom-up, ou seja, vai ser começado no final até ao inicio, e vao ser
+    passados para o topo da pilha o no com o filho é adicionado na AST com os seus irmaos */
+    /* Na union é posto o no * e o noLex que tem a linha e coluna do token, assim como o seu id*/
 
 %}
 
@@ -262,7 +262,6 @@ ParameterDeclaration: TypeSpec  {$$ = inserirNo(NULL,"ParamDeclaration",$1,linha
                 ;
                            
 Declaration:TypeSpec DeclarationCD SEMI  {      no * noDeclarate;
-                                                /*addIrmao($1,$2);*/
                                                 noAuxiliar=$2;
                                                 while(noAuxiliar!=NULL){
                                                         noDeclarate=noAuxiliar->noFilho;

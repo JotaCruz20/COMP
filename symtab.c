@@ -5,7 +5,7 @@
 
 tabela * tabelaSimbolos;
 
-void initTabela(){
+void initTabela(){ //inicializa tabela de simbolos
     tabelaSimbolos = (tabela *)malloc(sizeof(tabela));
 
 	tabelaSimbolos->type = (char *)malloc((strlen("Global") + 1)*sizeof(char));
@@ -18,7 +18,7 @@ void initTabela(){
 	insert("getchar","int(void)","","Global",0,0,0,0);
 }
 
-noTabela *  searchFunc(char* nomeTabela){
+noTabela *  searchFunc(char* nomeTabela){ //procura funcao e devolve a sua tabela
 	noTabela * aux = tabelaSimbolos->tabelaAtual;
 	while(aux!=NULL && strcmp(nomeTabela,aux->id)!=0){
 		aux=aux->next;
@@ -26,7 +26,7 @@ noTabela *  searchFunc(char* nomeTabela){
 	return aux;
 }
 
-int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, int col, int flag,int noCount){
+int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, int col, int flag,int noCount){ //insere na tabela
     noTabela * tab = (noTabela*)malloc(sizeof(noTabela));
     tab->id=(char *)malloc((strlen(id)+1)*sizeof(char));
     tab->tipo=(char *)malloc((strlen(tipo)+1)*sizeof(char));
@@ -36,9 +36,8 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
     strcpy(tab->params,params);
     tabela * aux = searchTabela(nomeTabela);
 	tabela * auxFunc = searchTabela(id);
-	//noTabela * procuraFuncGlobal = searchFunc(nomeTabela);
 	if(aux!=NULL){
-    if (aux->tabelaAtual == NULL || strcmp("return",id)==0){
+    if (aux->tabelaAtual == NULL || strcmp("return",id)==0){ // se a tabelaAtual tiver vazia ou for return entao da-se overwrite 
 		aux->tabelaAtual = tab;
 	}
 	else{
@@ -144,7 +143,7 @@ int insert(char * id, char * tipo, char * params, char * nomeTabela, int line, i
 	return 0;
 }
 
-int checkFunc(char * nome){
+int checkFunc(char * nome){ //verifica se é funcao ou nao
 	tabela * aux = tabelaSimbolos;
 	if(aux!=NULL){
 		if(strcmp(nome,"putchar")==0 || strcmp(nome,"getchar")==0){
@@ -160,7 +159,7 @@ int checkFunc(char * nome){
 	return 0;
 }
 
-int nParams(char * nome){
+int nParams(char * nome){ //devolce o numero de parametros da funcao
 	tabela * aux = tabelaSimbolos;
 	int counter=0;
 	if(strcmp(nome,"getchar")==0){
@@ -179,23 +178,23 @@ int nParams(char * nome){
 	return counter;
 }
 
-int checkParamsType(tabela * aux, no * atual){
+int checkParamsType(tabela * aux, no * atual){ //devolve 1 se o tipo de parametros for correto e 0 se nao for
 	if(aux!=NULL && aux->tabelaAtual!=NULL){
 		noTabela * paramsTabela = aux->tabelaAtual->next;
 		while(paramsTabela!=NULL && strcmp(paramsTabela->params,"")!=0){
-			if(atual==NULL){
+			if(atual==NULL){ // menos parametros dq esperado
 				return 0;
 			}
 			char * type = (char *) malloc(strlen(atual->noFilho->type)*sizeof(char));
 			strcpy(type,atual->noFilho->type);
 			toLowerCase(type);
-			if(strcmp(type,paramsTabela->tipo)!=0){
+			if(strcmp(type,paramsTabela->tipo)!=0){ //tipos diferentes 
 				return 0;
 			}
 			atual=atual->noIrmao;
 			paramsTabela=paramsTabela->next;
 		}
-		if(atual!=NULL){
+		if(atual!=NULL){ //tem mais parametros q o esperado
 			if(strcmp(atual->noFilho->type,"Void")==0){
 				return 1;
 			}
@@ -208,26 +207,26 @@ int checkParamsType(tabela * aux, no * atual){
 	return 0;
 }
 
-void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
+void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){ //verifica o tipo dos parametros passados
 	tabela * aux = tabelaSimbolos;
-	if(aux!=NULL){
+	if(aux!=NULL){ //procura a tabela certa
 		while (aux!=NULL && strcmp(aux->name,nome)!=0)
 		{
 			aux=aux->next;
 		}
 	}
-	if(aux!=NULL && aux->tabelaAtual!=NULL){
+	if(aux!=NULL && aux->tabelaAtual!=NULL){//verifica se a tabela nao esta vazia
 		noTabela * paramsTabela = aux->tabelaAtual->next;
 		while(paramsTabela!=NULL && strcmp(paramsTabela->params,"")!=0 && atual!=NULL){
 			char * type;
-			if(atual->exprType!=NULL){
+			if(atual->exprType!=NULL){ //se ja tiver o tipo anotado vai buscar o tipo anotado
 				type= (char *)malloc(strlen(atual->exprType)*sizeof(char));
 				strcpy(type,atual->exprType);
 				type = strtok(type,"- (");
 				if(strcmp(type,"IntLit")==0){
 					free(type);
 					type = (char *)malloc(strlen("int")*sizeof(char));
-					strcpy(type,"int/short");
+					strcpy(type,"int/short"); //tipo especial para nao dar erro
 				}
 				else if(strcmp(type,"ChrLit")==0){
 					free(type);
@@ -240,9 +239,10 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 					strcpy(type,"double");
 				}
 			}
-			else{
+			else{ // se nao procura pelo id o tipo
 				type = searchId(nome,atual->id);
 			}
+			// verifica se é literal
 			if(strcmp(type,"undef")==0){
 				if(strcmp(atual->type,"IntLit")==0){
 					free(type);
@@ -276,6 +276,7 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 				else if(strcmp(type,"short")==0 && (strcmp(paramsTabela->tipo,"char") || strcmp(paramsTabela->tipo,"int"))){
 					;
 				}
+				//tipos diferentes dos esperados
 				else{
 					char * typeError = (char *)malloc(strlen(atual->exprType)*sizeof(char));
 					strcpy(typeError,atual->exprType);
@@ -285,10 +286,11 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 					addErros(pai->noFilho->line,pai->noFilho->col+1,error,pai->noFilho->noCount); //marcado
 				}
 			}
+			//verifica o resto dos tipos 
 			atual=atual->noIrmao;
 			paramsTabela=paramsTabela->next;
 		}
-		if(atual!=NULL){
+		if(atual!=NULL){ 
 			if(strcmp(atual->type,"Void")==0){
 				char * typeError = (char *)malloc(strlen(atual->exprType)*sizeof(char));
 				strcpy(typeError,atual->exprType);
@@ -299,13 +301,14 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 			}
 		}
 	}
-	else{
+	else{ // a funcao so se encontra definida e nao declarada
 		aux = tabelaSimbolos;
 		noTabela * paramsTabela = aux->tabelaAtual;
 		while(strcmp(paramsTabela->id,nome)!=0){
 			paramsTabela = paramsTabela->next;
 		}
-		if(paramsTabela!=NULL){
+		//faz o mesmo que o codigo anterior, mas compara com o tipo guardado no char *
+		if(paramsTabela!=NULL){ 
 			char * token, * rest;
 			rest = (char * )malloc(strlen(paramsTabela->params)*sizeof(char));
 			strcpy(rest,paramsTabela->params);
@@ -391,7 +394,7 @@ void checkParamsTypeError(char * nome,char * nomeFunc, no * atual,no* pai){
 	}
 }
 
-tabela * searchTabela(char * nome){
+tabela * searchTabela(char * nome){ //procura tabela da funcao
     tabela * aux;
     if (strcmp(nome, "Global")==0)
 		return tabelaSimbolos;
@@ -403,7 +406,7 @@ tabela * searchTabela(char * nome){
 	}
 }
 
-char * getTypeParams(char * nome){
+char * getTypeParams(char * nome){ //nao faz nada 
 	tabela * aux = tabelaSimbolos;
 	char tipoParams[500]="(";
 	if(aux!=NULL){
@@ -434,7 +437,7 @@ char * getTypeParams(char * nome){
 	return strdup("");
 }
 
-char * typeParams(char * nome,int n,char* type){
+char * typeParams(char * nome,int n,char* type){ // retorna o tipo do parametro n 
 	tabela * aux = tabelaSimbolos;
 	if(aux!=NULL){
 		while (aux!=NULL && strcmp(aux->name,nome)!=0)
@@ -464,6 +467,7 @@ char * typeParams(char * nome,int n,char* type){
 	return strdup("");
 }
 
+//inicia a tabela da funcao 
 void initFunctionTabela(char * name, int flag, int print, int params, int def,int line,int col,int error,int noCount){
 	tabela * novaTabela = (tabela *)malloc(sizeof(tabela));
 
@@ -482,12 +486,12 @@ void initFunctionTabela(char * name, int flag, int print, int params, int def,in
             auxTabela->flag = 1;
 			auxTabela->print=print;
 			if(def==1){
-				if(auxTabela->definida==1){
+				if(auxTabela->definida==1){ // se a funcao ja tiver na tabela e tiver definida entao da erro, se for declaracao entao nao da erro
 					char error[100];
 					sprintf(error, "Line %d, col %ld: Symbol %s already defined\n",line,col-strlen(name),name);
 					addErros(line,col-strlen(name),error,noCount);
 				}
-				else if(error==1){
+				else if(error==1){ //se houver erro, entao substitui o definida
 					auxTabela->definida=def;
 				}
 			}
@@ -495,7 +499,7 @@ void initFunctionTabela(char * name, int flag, int print, int params, int def,in
             return;
         }
         auxTabela = auxTabela->next;
-    }
+    } //verifica o ultimo elemento 
     if (strcmp(auxTabela->name, name)==0){
         auxTabela->flag = 1;
 		auxTabela->print=print;
@@ -515,7 +519,7 @@ void initFunctionTabela(char * name, int flag, int print, int params, int def,in
     auxTabela->next = novaTabela;
 }
 
-void printTabela(){
+void printTabela(){ //printa tabela de simbolos 
 	tabela * auxTabela = tabelaSimbolos;
 	noTabela * auxNoTabela;
 
@@ -545,7 +549,7 @@ void printTabela(){
 	}
 }
 
-char* searchId(char* nTabela,char * id){
+char* searchId(char* nTabela,char * id){ //procura o id da variavel 
 	char * type = (char *) calloc(2,sizeof(char));
 	tabela * aux = tabelaSimbolos;
 	if(aux!=NULL){
@@ -588,7 +592,8 @@ char* searchId(char* nTabela,char * id){
 	}
 	return strdup("undef");
 }
-int isGlobal(char *name){
+
+int isGlobal(char *name){//verifica se o id é global ou nao
 	noTabela * aux = tabelaSimbolos->tabelaAtual;
 	while(aux){ 
 		if(0 == strcmp(aux->id, name)){
@@ -598,6 +603,8 @@ int isGlobal(char *name){
 	}
 	return 0;
 }
+
+//limpar listas ligadas
 
 void clearSymTableParams(noTabela * aux){
 	noTabela * clear;
